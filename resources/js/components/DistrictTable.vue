@@ -8,7 +8,7 @@ interface State {
     is_active: boolean;
 }
 
-interface City {
+interface District {
     id: number;
     name: string;
     state_id: number;
@@ -19,14 +19,14 @@ interface City {
 }
 
 interface Props {
-    cities: City[];
+    districts: District[];
 }
 
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    edit: [city: City];
-    delete: [city: City];
+    edit: [district: District];
+    delete: [district: District];
 }>();
 
 const formatDate = (dateString: string) => {
@@ -50,7 +50,7 @@ onMounted(() => {
 <template>
     <div class="card mb-3">
         <div class="card-header color-dark fw-500">
-            Cities Management
+            Districts Management
         </div>
         <div class="card-body p-0">
             <div class="table4 p-25 bg-white mb-30">
@@ -59,7 +59,7 @@ onMounted(() => {
                         <thead>
                             <tr class="userDatatable-header">
                                 <th>
-                                    <span class="userDatatable-title">City Name</span>
+                                    <span class="userDatatable-title">District Name</span>
                                 </th>
                                 <th>
                                     <span class="userDatatable-title">State</span>
@@ -76,14 +76,14 @@ onMounted(() => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="city in cities" :key="city.id">
-                                <!-- City Name -->
+                            <tr v-for="district in districts" :key="district.id">
+                                <!-- District Name -->
                                 <td>
                                     <div class="userDatatable-content">
                                         <div class="d-flex align-items-center">
                                             <div class="userDatatable-inline-title">
                                                 <a href="#" class="text-dark fw-500">
-                                                    {{ city.name }}
+                                                    {{ district.name }}
                                                 </a>
                                             </div>
                                         </div>
@@ -94,7 +94,7 @@ onMounted(() => {
                                 <td>
                                     <div class="userDatatable-content">
                                         <span class="bg-opacity-primary color-primary rounded-pill userDatatable-content-status active">
-                                            {{ city.state.name }} ({{ city.state.code }})
+                                            {{ district.state.name }} ({{ district.state.code }})
                                         </span>
                                     </div>
                                 </td>
@@ -104,9 +104,9 @@ onMounted(() => {
                                     <div class="userDatatable-content">
                                         <span 
                                             class="rounded-pill userDatatable-content-status"
-                                            :class="city.is_active ? 'bg-opacity-success color-success active' : 'bg-opacity-danger color-danger'"
+                                            :class="district.is_active ? 'bg-opacity-success color-success active' : 'bg-opacity-danger color-danger'"
                                         >
-                                            {{ city.is_active ? 'Active' : 'Inactive' }}
+                                            {{ district.is_active ? 'Active' : 'Inactive' }}
                                         </span>
                                     </div>
                                 </td>
@@ -114,7 +114,7 @@ onMounted(() => {
                                 <!-- Created Date -->
                                 <td>
                                     <div class="userDatatable-content">
-                                        {{ formatDate(city.created_at) }}
+                                        {{ formatDate(district.created_at) }}
                                     </div>
                                 </td>
 
@@ -123,17 +123,17 @@ onMounted(() => {
                                     <div class="userDatatable-content">
                                         <div class="d-flex align-items-center gap-2">
                                             <button
-                                                @click="emit('edit', city)"
+                                                @click="emit('edit', district)"
                                                 class="btn btn-sm btn-outline-primary"
-                                                title="Edit City"
+                                                title="Edit District"
                                                 style="padding: 4px 8px; min-width: 32px; height: 32px;"
                                             >
                                                 ✏️
                                             </button>
                                             <button
-                                                @click="emit('delete', city)"
+                                                @click="emit('delete', district)"
                                                 class="btn btn-sm btn-outline-danger"
-                                                title="Delete City"
+                                                title="Delete District"
                                                 style="padding: 4px 8px; min-width: 32px; height: 32px;"
                                             >
                                                 🗑️
@@ -149,14 +149,13 @@ onMounted(() => {
         </div>
 
         <!-- Empty State -->
-        <div v-if="cities.length === 0" class="text-center py-5">
+        <div v-if="districts.length === 0" class="text-center py-5">
             <div class="mb-3">
-                <span style="font-size: 48px;">🏙️</span>
+                <span style="font-size: 48px;">🏘️</span>
             </div>
-            <h6 class="text-muted">No cities found</h6>
-            <p class="text-muted mb-0">Get started by creating a new city.</p>
+            <h6 class="text-muted">No districts found</h6>
+            <p class="text-muted mb-0">Get started by creating a new district.</p>
         </div>
     </div>
 </template>
-
 

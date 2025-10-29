@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class City extends Model
+class District extends Model
 {
     protected $fillable = [
         'name',
@@ -26,8 +26,14 @@ class City extends Model
         return $this->belongsTo(State::class);
     }
 
-    public function localities(): HasMany
+    public function talukas(): HasMany
     {
-        return $this->hasMany(Locality::class);
+        return $this->hasMany(Taluka::class);
+    }
+
+    public function villages(): HasMany
+    {
+        return $this->hasMany(Village::class);
     }
 }
+

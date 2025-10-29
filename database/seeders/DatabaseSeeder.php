@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             StateSeeder::class,
             CitySeeder::class,
+            DistrictSeeder::class,
         ]);
 
         // Ensure the role exists (seeder creates it) then assign to user

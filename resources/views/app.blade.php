@@ -932,6 +932,50 @@
                                     </li>
                                     <li class="d-flex">
                                         <div class="me-3">
+                                            <span data-feather="layers" style="color: #8b5cf6; width: 24px; height: 24px;"></span>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6>
+                                                <a href="/districts" class="stretched-link">Districts Management</a>
+                                            </h6>
+                                            <p>Manage districts within states</p>
+                                        </div>
+                                    </li>
+                                    <li class="d-flex">
+                                        <div class="me-3">
+                                            <span data-feather="map-pin" style="color: #ec4899; width: 24px; height: 24px;"></span>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6>
+                                                <a href="/localities" class="stretched-link">Localities Management</a>
+                                            </h6>
+                                            <p>Manage localities with zip codes</p>
+                                        </div>
+                                    </li>
+                                    <li class="d-flex">
+                                        <div class="me-3">
+                                            <span data-feather="grid" style="color: #06b6d4; width: 24px; height: 24px;"></span>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6>
+                                                <a href="/talukas" class="stretched-link">Talukas Management</a>
+                                            </h6>
+                                            <p>Manage talukas within districts</p>
+                                        </div>
+                                    </li>
+                                    <li class="d-flex">
+                                        <div class="me-3">
+                                            <span data-feather="home" style="color: #14b8a6; width: 24px; height: 24px;"></span>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h6>
+                                                <a href="/villages" class="stretched-link">Villages Management</a>
+                                            </h6>
+                                            <p>Manage villages within talukas</p>
+                                        </div>
+                                    </li>
+                                    <li class="d-flex">
+                                        <div class="me-3">
                                             <span data-feather="users" style="color: #f59e0b; width: 24px; height: 24px;"></span>
                                         </div>
                                         <div class="flex-grow-1">
@@ -1037,6 +1081,12 @@
                             <a href="/cities" class="{{ request()->is('cities*') ? 'active' : '' }}">
                                 <span data-feather="map" class="nav-icon" style="color: #10b981;"></span>
                                 <span class="menu-text" style="{{ request()->is('cities*') ? 'font-weight: bold;' : '' }}">Cities</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/districts" class="{{ request()->is('districts*') ? 'active' : '' }}">
+                                <span data-feather="layers" class="nav-icon" style="color: #8b5cf6;"></span>
+                                <span class="menu-text" style="{{ request()->is('districts*') ? 'font-weight: bold;' : '' }}">Districts</span>
                             </a>
                         </li>
                         <li>

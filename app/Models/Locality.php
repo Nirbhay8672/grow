@@ -4,13 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class City extends Model
+class Locality extends Model
 {
     protected $fillable = [
         'name',
         'state_id',
+        'city_id',
+        'zip_code',
         'is_active',
     ];
 
@@ -26,8 +27,9 @@ class City extends Model
         return $this->belongsTo(State::class);
     }
 
-    public function localities(): HasMany
+    public function city(): BelongsTo
     {
-        return $this->hasMany(Locality::class);
+        return $this->belongsTo(City::class);
     }
 }
+

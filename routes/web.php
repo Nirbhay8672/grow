@@ -5,6 +5,10 @@ use Inertia\Inertia;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StateController;
 use App\Http\Controllers\CityController;
+use App\Http\Controllers\DistrictController;
+use App\Http\Controllers\LocalityController;
+use App\Http\Controllers\TalukaController;
+use App\Http\Controllers\VillageController;
 use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
@@ -62,6 +66,46 @@ Route::get('cities', function () {
     ]);
 })->middleware(['auth', 'verified', 'permission:role.read'])->name('cities.index');
 
+Route::get('districts', function () {
+    $districts = \App\Models\District::with('state')->orderBy('name')->get();
+    $states = \App\Models\State::where('is_active', true)->orderBy('name')->get();
+    
+    return Inertia::render('Districts', [
+        'districts' => $districts,
+        'states' => $states,
+    ]);
+})->middleware(['auth', 'verified', 'permission:role.read'])->name('districts.index');
+
+Route::get('localities', function () {
+    $localities = \App\Models\Locality::with(['state', 'city'])->orderBy('name')->get();
+    $states = \App\Models\State::where('is_active', true)->orderBy('name')->get();
+    
+    return Inertia::render('Localities', [
+        'localities' => $localities,
+        'states' => $states,
+    ]);
+})->middleware(['auth', 'verified', 'permission:role.read'])->name('localities.index');
+
+Route::get('talukas', function () {
+    $talukas = \App\Models\Taluka::with('district')->orderBy('name')->get();
+    $districts = \App\Models\District::where('is_active', true)->orderBy('name')->get();
+    
+    return Inertia::render('Talukas', [
+        'talukas' => $talukas,
+        'districts' => $districts,
+    ]);
+})->middleware(['auth', 'verified', 'permission:role.read'])->name('talukas.index');
+
+Route::get('villages', function () {
+    $villages = \App\Models\Village::with(['district', 'taluka'])->orderBy('name')->get();
+    $districts = \App\Models\District::where('is_active', true)->orderBy('name')->get();
+    
+    return Inertia::render('Villages', [
+        'villages' => $villages,
+        'districts' => $districts,
+    ]);
+})->middleware(['auth', 'verified', 'permission:role.read'])->name('villages.index');
+
 Route::get('users', function () {
     $users = \App\Models\User::with(['state', 'city', 'roles'])->orderBy('created_at', 'desc')->get();
     $states = \App\Models\State::where('is_active', true)->orderBy('name')->get();
@@ -88,6 +132,30 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/cities/{city}', [CityController::class, 'update'])->name('cities.update')->middleware('permission:role.update');
     Route::delete('/cities/{city}', [CityController::class, 'destroy'])->name('cities.destroy')->middleware('permission:role.delete');
     Route::get('/states/{state}/cities', [CityController::class, 'getByState'])->name('cities.by-state')->middleware('permission:role.read');
+    
+    Route::post('/districts', [DistrictController::class, 'store'])->name('districts.store')->middleware('permission:role.create');
+    Route::get('/districts/{district}', [DistrictController::class, 'show'])->name('districts.show')->middleware('permission:role.read');
+    Route::put('/districts/{district}', [DistrictController::class, 'update'])->name('districts.update')->middleware('permission:role.update');
+    Route::delete('/districts/{district}', [DistrictController::class, 'destroy'])->name('districts.destroy')->middleware('permission:role.delete');
+    Route::get('/states/{state}/districts', [DistrictController::class, 'getByState'])->name('districts.by-state')->middleware('permission:role.read');
+    
+    Route::post('/localities', [LocalityController::class, 'store'])->name('localities.store')->middleware('permission:role.create');
+    Route::get('/localities/{locality}', [LocalityController::class, 'show'])->name('localities.show')->middleware('permission:role.read');
+    Route::put('/localities/{locality}', [LocalityController::class, 'update'])->name('localities.update')->middleware('permission:role.update');
+    Route::delete('/localities/{locality}', [LocalityController::class, 'destroy'])->name('localities.destroy')->middleware('permission:role.delete');
+    Route::get('/cities/{city}/localities', [LocalityController::class, 'getByCity'])->name('localities.by-city')->middleware('permission:role.read');
+    
+    Route::post('/talukas', [TalukaController::class, 'store'])->name('talukas.store')->middleware('permission:role.create');
+    Route::get('/talukas/{taluka}', [TalukaController::class, 'show'])->name('talukas.show')->middleware('permission:role.read');
+    Route::put('/talukas/{taluka}', [TalukaController::class, 'update'])->name('talukas.update')->middleware('permission:role.update');
+    Route::delete('/talukas/{taluka}', [TalukaController::class, 'destroy'])->name('talukas.destroy')->middleware('permission:role.delete');
+    Route::get('/districts/{district}/talukas', [TalukaController::class, 'getByDistrict'])->name('talukas.by-district')->middleware('permission:role.read');
+    
+    Route::post('/villages', [VillageController::class, 'store'])->name('villages.store')->middleware('permission:role.create');
+    Route::get('/villages/{village}', [VillageController::class, 'show'])->name('villages.show')->middleware('permission:role.read');
+    Route::put('/villages/{village}', [VillageController::class, 'update'])->name('villages.update')->middleware('permission:role.update');
+    Route::delete('/villages/{village}', [VillageController::class, 'destroy'])->name('villages.destroy')->middleware('permission:role.delete');
+    Route::get('/talukas/{taluka}/villages', [VillageController::class, 'getByTaluka'])->name('villages.by-taluka')->middleware('permission:role.read');
     
     Route::post('/users', [UserController::class, 'store'])->name('users.store')->middleware('permission:user.create');
     Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show')->middleware('permission:user.read');

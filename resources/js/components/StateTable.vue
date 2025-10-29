@@ -40,7 +40,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="card">
+    <div class="card mb-3">
         <div class="card-header color-dark fw-500">
             States Management
         </div>
