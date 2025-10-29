@@ -1,0 +1,27 @@
+{
+  "faIcons": [
+    "home",
+    "user",
+    "bell",
+    "cog",
+    "search",
+    "heart"
+  ],
+  "laIcons": [
+    "home",
+    "user",
+    "bell",
+    "cog",
+    "search",
+    "heart"
+  ],
+  "featherIcons": [
+    "home",
+    "user",
+    "bell",
+    "settings",
+    "search",
+    "heart"
+  ]
+}
+
