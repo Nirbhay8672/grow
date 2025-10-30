@@ -53,7 +53,7 @@
         <nav class="navbar navbar-light">
             <div class="navbar-left">
                 <a href="" class="sidebar-toggle">
-                    <img class="svg" src="img/svg/bars.svg" alt="img"></a>
+                    <img class="svg" src="/img/svg/bars.svg" alt="img"></a>
                 <a class="navbar-brand" href="/dashboard"><img src="https://growedgerealty.com/assets/images/logo/logo_1.png" alt="logo" class="img-fluid"></a>
                 <form action="../index.html" class="search-form">
                     <span data-feather="search"></span>
@@ -726,7 +726,7 @@
                                 <ul>
                                     <li class="author-online has-new-message">
                                         <div class="user-avater">
-                                            <img src="img/team-1.png" alt="">
+                                            <img src="/img/team-1.png" alt="">
                                         </div>
                                         <div class="user-message">
                                             <p>
@@ -742,7 +742,7 @@
                                     </li>
                                     <li class="author-offline has-new-message">
                                         <div class="user-avater">
-                                            <img src="img/team-1.png" alt="">
+                                            <img src="/img/team-1.png" alt="">
                                         </div>
                                         <div class="user-message">
                                             <p>
@@ -758,7 +758,7 @@
                                     </li>
                                     <li class="author-online has-new-message">
                                         <div class="user-avater">
-                                            <img src="img/team-1.png" alt="">
+                                            <img src="/img/team-1.png" alt="">
                                         </div>
                                         <div class="user-message">
                                             <p>
@@ -774,7 +774,7 @@
                                     </li>
                                     <li class="author-offline">
                                         <div class="user-avater">
-                                            <img src="img/team-1.png" alt="">
+                                            <img src="/img/team-1.png" alt="">
                                         </div>
                                         <div class="user-message">
                                             <p>
@@ -992,23 +992,23 @@
                     <!-- ends: .nav-support -->
                     <li class="nav-flag-select">
                         <div class="dropdown-custom">
-                            <a href="javascript:;" class="nav-item-toggle"><img src="img/flag.png" alt="" class="rounded-circle"></a>
+                            <a href="javascript:;" class="nav-item-toggle"><img src="/img/flag.png" alt="" class="rounded-circle"></a>
                             <div class="dropdown-wrapper dropdown-wrapper--small">
-                                <a href=""><img src="img/eng.png" alt=""> English</a>
-                                <a href=""><img src="img/ger.png" alt=""> German</a>
-                                <a href=""><img src="img/spa.png" alt=""> Spanish</a>
-                                <a href=""><img src="img/tur.png" alt=""> Turkish</a>
+                                <a href=""><img src="/img/eng.png" alt=""> English</a>
+                                <a href=""><img src="/img/ger.png" alt=""> German</a>
+                                <a href=""><img src="/img/spa.png" alt=""> Spanish</a>
+                                <a href=""><img src="/img/tur.png" alt=""> Turkish</a>
                             </div>
                         </div>
                     </li>
                     <!-- ends: .nav-flag-select -->
                     <li class="nav-author">
                         <div class="dropdown-custom">
-                            <a href="javascript:;" class="nav-item-toggle"><img src="img/author-nav.jpg" alt="" class="rounded-circle"></a>
+                            <a href="javascript:;" class="nav-item-toggle"><img src="/img/author-nav.jpg" alt="" class="rounded-circle"></a>
                             <div class="dropdown-wrapper">
                                 <div class="nav-author__info">
                                     <div class="author-img">
-                                        <img src="img/author-nav.jpg" alt="" class="rounded-circle">
+                                        <img src="/img/author-nav.jpg" alt="" class="rounded-circle">
                                     </div>
                                     <div>
                                         <h6>{{ auth()->user()->name }}</h6>
@@ -1131,13 +1131,13 @@
                     <ul class="customizer-list d-flex layout">
                         <li class="customizer-list__item">
                             <a href="https://demo.dashboardmarket.com/ltr" class="active">
-                                <img src="img/ltr.png" alt="">
+                                <img src="/img/ltr.png" alt="">
                                 <i class="fa fa-check-circle"></i>
                             </a>
                         </li>
                         <li class="customizer-list__item">
                             <a href="https://demo.dashboardmarket.com/rtl">
-                                <img src="img/rtl.png" alt="">
+                                <img src="/img/rtl.png" alt="">
                                 <i class="fa fa-check-circle"></i>
                             </a>
                         </li>
@@ -1150,13 +1150,13 @@
                     <ul class="customizer-list d-flex l_sidebar">
                         <li class="customizer-list__item">
                             <a href="#" data-layout="light" class="active">
-                                <img src="img/light.png" alt="">
+                                <img src="/img/light.png" alt="">
                                 <i class="fa fa-check-circle"></i>
                             </a>
                         </li>
                         <li class="customizer-list__item">
                             <a href="#" data-layout="dark">
-                                <img src="img/dark.png" alt="">
+                                <img src="/img/dark.png" alt="">
                                 <i class="fa fa-check-circle"></i>
                             </a>
                         </li>
@@ -1169,13 +1169,13 @@
                     <ul class="customizer-list d-flex l_navbar">
                         <li class="customizer-list__item">
                             <a href="#" data-layout="side" class="active">
-                                <img src="img/side.png" alt="">
+                                <img src="/img/side.png" alt="">
                                 <i class="fa fa-check-circle"></i>
                             </a>
                         </li>
                         <li class="customizer-list__item top">
                             <a href="#" data-layout="top">
-                                <img src="img/top.png" alt="">
+                                <img src="/img/top.png" alt="">
                                 <i class="fa fa-check-circle"></i>
                             </a>
                         </li>
