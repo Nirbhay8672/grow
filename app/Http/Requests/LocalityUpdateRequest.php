@@ -39,6 +39,19 @@ class LocalityUpdateRequest extends FormRequest
                         ->where('zip_code', $this->zip_code ?? $locality->zip_code);
                 })->ignore($locality->id),
             ],
+            // Ensure combination of all fields is unique as requested
+            'name' => [
+                'sometimes',
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('localities')->where(function ($query) use ($locality) {
+                    return $query->where('state_id', $this->state_id ?? $locality->state_id)
+                        ->where('city_id', $this->city_id ?? $locality->city_id)
+                        ->where('zip_code', $this->zip_code ?? $locality->zip_code)
+                        ->where('name', $this->name ?? $locality->name);
+                })->ignore($locality->id),
+            ],
             'is_active' => ['sometimes', 'boolean'],
         ];
     }

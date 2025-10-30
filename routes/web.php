@@ -34,6 +34,7 @@ Route::get('management/locations', function () {
         'states' => \App\Models\State::count(),
         'cities' => \App\Models\City::count(),
         'districts' => \App\Models\District::count(),
+        'localities' => \App\Models\Locality::count(),
     ];
 
     return Inertia::render('LocationManagement', [

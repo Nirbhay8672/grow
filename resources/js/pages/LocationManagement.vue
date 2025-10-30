@@ -8,6 +8,7 @@ interface Props {
         states: number;
         cities: number;
         districts: number;
+        localities: number;
     };
 }
 
@@ -91,6 +92,28 @@ onMounted(() => {
                             </div>
                             <div class="mt-3">
                                 <span class="text-primary small">Manage districts →</span>
+                            </div>
+                        </div>
+                    </div>
+                </Link>
+            </div>
+
+            <!-- Localities Card -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <Link href="/localities" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm hover-shadow transition">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="text-muted mb-2">Localities</h6>
+                                    <h3 class="mb-0 color-dark fw-bold">{{ stats.localities }}</h3>
+                                </div>
+                                <div class="bg-danger bg-opacity-10 rounded-circle p-3">
+                                    <span data-feather="map-pin" class="text-danger" style="width: 32px; height: 32px;"></span>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-danger small">Manage localities →</span>
                             </div>
                         </div>
                     </div>

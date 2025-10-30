@@ -104,7 +104,7 @@ onMounted(() => {
                                             </div>
                                         </div>
                                     </div>
-                                </td macroscopic>
+                                </td>
 
                                 <!-- City -->
                                 <td>
@@ -174,7 +174,7 @@ onMounted(() => {
                                     </div>
                                 </td>
                             </tr>
-                        худо>
+                        </tbody>
                     </table>
                 </div>
             </div>

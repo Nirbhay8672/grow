@@ -35,6 +35,18 @@ class LocalityStoreRequest extends FormRequest
                         ->where('zip_code', $this->zip_code);
                 }),
             ],
+            // Ensure combination of all fields is unique as requested
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('localities')->where(function ($query) {
+                    return $query->where('state_id', $this->state_id)
+                        ->where('city_id', $this->city_id)
+                        ->where('zip_code', $this->zip_code)
+                        ->where('name', $this->name);
+                }),
+            ],
             'is_active' => ['boolean'],
         ];
     }
