@@ -28,8 +28,34 @@ Route::get('dashboard', function () {
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Management landing pages
+Route::get('management/locations', function () {
+    $stats = [
+        'states' => \App\Models\State::count(),
+        'cities' => \App\Models\City::count(),
+        'districts' => \App\Models\District::count(),
+    ];
+
+    return Inertia::render('LocationManagement', [
+        'stats' => $stats,
+    ]);
+})->middleware(['auth', 'verified'])->name('management.locations');
+
+Route::get('management/users', function () {
+    $stats = [
+        'users' => \App\Models\User::count(),
+        'roles' => \Spatie\Permission\Models\Role::count(),
+    ];
+
+    return Inertia::render('UserManagement', [
+        'stats' => $stats,
+    ]);
+})->middleware(['auth', 'verified'])->name('management.users');
+
 Route::get('profile', function () {
-    $user = auth()->user()->load(['state', 'city']);
+    $user = \Illuminate\Support\Facades\Auth::user();
+    /** @var \App\Models\User|null $user */
+    $user?->load(['state', 'city']);
     $states = \App\Models\State::where('is_active', true)->orderBy('name')->get();
     
     return Inertia::render('Profile', [

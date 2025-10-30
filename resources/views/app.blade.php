@@ -1066,33 +1066,15 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/roles" class="{{ request()->is('roles*') ? 'active' : '' }}">
-                                <span data-feather="shield" class="nav-icon" style="color: #ef4444;"></span>
-                                <span class="menu-text" style="{{ request()->is('roles*') ? 'font-weight: bold;' : '' }}">Roles</span>
+                            <a href="/management/locations" class="{{ request()->is('management/locations') ? 'active' : '' }}">
+                                <span data-feather="map" class="nav-icon" style="color: #0ea5e9;"></span>
+                                <span class="menu-text" style="{{ request()->is('management/locations') ? 'font-weight: bold;' : '' }}">Location Management</span>
                             </a>
                         </li>
                         <li>
-                            <a href="/states" class="{{ request()->is('states*') ? 'active' : '' }}">
-                                <span data-feather="map-pin" class="nav-icon" style="color: #06b6d4;"></span>
-                                <span class="menu-text" style="{{ request()->is('states*') ? 'font-weight: bold;' : '' }}">States</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/cities" class="{{ request()->is('cities*') ? 'active' : '' }}">
-                                <span data-feather="map" class="nav-icon" style="color: #10b981;"></span>
-                                <span class="menu-text" style="{{ request()->is('cities*') ? 'font-weight: bold;' : '' }}">Cities</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/districts" class="{{ request()->is('districts*') ? 'active' : '' }}">
-                                <span data-feather="layers" class="nav-icon" style="color: #8b5cf6;"></span>
-                                <span class="menu-text" style="{{ request()->is('districts*') ? 'font-weight: bold;' : '' }}">Districts</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/users" class="{{ request()->is('users*') ? 'active' : '' }}">
+                            <a href="/management/users" class="{{ request()->is('management/users') ? 'active' : '' }}">
                                 <span data-feather="users" class="nav-icon" style="color: #f59e0b;"></span>
-                                <span class="menu-text" style="{{ request()->is('users*') ? 'font-weight: bold;' : '' }}">Users</span>
+                                <span class="menu-text" style="{{ request()->is('management/users') ? 'font-weight: bold;' : '' }}">User Management</span>
                             </a>
                         </li>
                     </ul>

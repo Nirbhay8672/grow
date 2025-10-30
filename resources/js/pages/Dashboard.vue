@@ -37,97 +37,13 @@ onMounted(() => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="row mt-4">
             <div class="col-12">
-                <h4 class="color-dark fw-500 mb-4">Dashboard Overview</h4>
-            </div>
-        </div>
-
-        <div class="row">
-            <!-- Roles Card -->
-            <div class="col-md-6 col-lg-3 mb-4">
-                <Link href="/roles" class="text-decoration-none">
-                    <div class="card h-100 shadow-sm hover-shadow transition">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <h6 class="text-muted mb-2">Total Roles</h6>
-                                    <h3 class="mb-0 color-dark fw-bold">{{ stats.roles }}</h3>
-                                </div>
-                                <div class="bg-primary bg-opacity-10 rounded-circle p-3">
-                                    <span data-feather="shield" class="text-primary" style="width: 32px; height: 32px;"></span>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <span class="text-primary small">View all roles →</span>
-                            </div>
-                        </div>
-                    </div>
-                </Link>
-            </div>
-
-            <!-- Users Card -->
-            <div class="col-md-6 col-lg-3 mb-4">
-                <Link href="/users" class="text-decoration-none">
-                    <div class="card h-100 shadow-sm hover-shadow transition">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <h6 class="text-muted mb-2">Total Users</h6>
-                                    <h3 class="mb-0 color-dark fw-bold">{{ stats.users }}</h3>
-                                </div>
-                                <div class="bg-success bg-opacity-10 rounded-circle p-3">
-                                    <span data-feather="users" class="text-success" style="width: 32px; height: 32px;"></span>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <span class="text-success small">View all users →</span>
-                            </div>
-                        </div>
-                    </div>
-                </Link>
-            </div>
-
-            <!-- States Card -->
-            <div class="col-md-6 col-lg-3 mb-4">
-                <Link href="/states" class="text-decoration-none">
-                    <div class="card h-100 shadow-sm hover-shadow transition">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <h6 class="text-muted mb-2">Total States</h6>
-                                    <h3 class="mb-0 color-dark fw-bold">{{ stats.states }}</h3>
-                                </div>
-                                <div class="bg-info bg-opacity-10 rounded-circle p-3">
-                                    <span data-feather="map-pin" class="text-info" style="width: 32px; height: 32px;"></span>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <span class="text-info small">View all states →</span>
-                            </div>
-                        </div>
-                    </div>
-                </Link>
-            </div>
-
-            <!-- Cities Card -->
-            <div class="col-md-6 col-lg-3 mb-4">
-                <Link href="/cities" class="text-decoration-none">
-                    <div class="card h-100 shadow-sm hover-shadow transition">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <h6 class="text-muted mb-2">Total Cities</h6>
-                                    <h3 class="mb-0 color-dark fw-bold">{{ stats.cities }}</h3>
-                                </div>
-                                <div class="bg-warning bg-opacity-10 rounded-circle p-3">
-                                    <span data-feather="map" class="text-warning" style="width: 32px; height: 32px;"></span>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <span class="text-warning small">View all cities →</span>
-                            </div>
-                        </div>
-                    </div>
-                </Link>
+                <div class="d-flex justify-content-center align-items-center mb-4" style="min-height: 40vh;">
+                    <img
+                        src="https://growedgerealty.com/assets/images/logo/logo_1.png"
+                        alt="Logo"
+                        style="max-height: 160px; height: auto; width: auto;"
+                    />
+                </div>
             </div>
         </div>
     </AppLayout>
