@@ -1104,11 +1104,13 @@
     </main>
     <div id="overlayer">
         <span class="loader-overlay">
-            <div class="atbd-spin-dots spin-lg">
-                <span class="spin-dot badge-dot dot-primary"></span>
-                <span class="spin-dot badge-dot dot-primary"></span>
-                <span class="spin-dot badge-dot dot-primary"></span>
-                <span class="spin-dot badge-dot dot-primary"></span>
+            <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 30vh;">
+                <div class="atbd-spin-dots spin-lg">
+                    <span class="spin-dot badge-dot dot-primary"></span>
+                    <span class="spin-dot badge-dot dot-primary"></span>
+                    <span class="spin-dot badge-dot dot-primary"></span>
+                    <span class="spin-dot badge-dot dot-primary"></span>
+                </div>
             </div>
         </span>
     </div>
