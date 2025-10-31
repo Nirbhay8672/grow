@@ -9,6 +9,8 @@ interface Props {
         cities: number;
         districts: number;
         localities: number;
+        talukas: number;
+        villages: number;
     };
 }
 
@@ -76,6 +78,28 @@ onMounted(() => {
                 </Link>
             </div>
 
+            <!-- Localities Card -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <Link href="/localities" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm hover-shadow transition">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="text-muted mb-2">Localities</h6>
+                                    <h3 class="mb-0 color-dark fw-bold">{{ stats.localities }}</h3>
+                                </div>
+                                <div class="bg-danger bg-opacity-10 rounded-circle p-3">
+                                    <span data-feather="map-pin" class="text-danger" style="width: 32px; height: 32px;"></span>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-danger small">Manage localities →</span>
+                            </div>
+                        </div>
+                    </div>
+                </Link>
+            </div>
+
             <!-- Districts Card -->
             <div class="col-md-6 col-lg-4 mb-4">
                 <Link href="/districts" class="text-decoration-none">
@@ -98,22 +122,44 @@ onMounted(() => {
                 </Link>
             </div>
 
-            <!-- Localities Card -->
+            <!-- Talukas Card -->
             <div class="col-md-6 col-lg-4 mb-4">
-                <Link href="/localities" class="text-decoration-none">
+                <Link href="/talukas" class="text-decoration-none">
                     <div class="card h-100 shadow-sm hover-shadow transition">
                         <div class="card-body">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
-                                    <h6 class="text-muted mb-2">Localities</h6>
-                                    <h3 class="mb-0 color-dark fw-bold">{{ stats.localities }}</h3>
+                                    <h6 class="text-muted mb-2">Talukas</h6>
+                                    <h3 class="mb-0 color-dark fw-bold">{{ stats.talukas ?? 0 }}</h3>
                                 </div>
-                                <div class="bg-danger bg-opacity-10 rounded-circle p-3">
-                                    <span data-feather="map-pin" class="text-danger" style="width: 32px; height: 32px;"></span>
+                                <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                    <span data-feather="layers" class="text-success" style="width: 32px; height: 32px;"></span>
                                 </div>
                             </div>
                             <div class="mt-3">
-                                <span class="text-danger small">Manage localities →</span>
+                                <span class="text-success small">Manage talukas →</span>
+                            </div>
+                        </div>
+                    </div>
+                </Link>
+            </div>
+
+            <!-- Villages Card -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <Link href="/villages" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm hover-shadow transition">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="text-muted mb-2">Villages</h6>
+                                    <h3 class="mb-0 color-dark fw-bold">{{ stats.villages ?? 0 }}</h3>
+                                </div>
+                                <div class="bg-secondary bg-opacity-10 rounded-circle p-3">
+                                    <span data-feather="home" class="text-secondary" style="width: 32px; height: 32px;"></span>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-secondary small">Manage villages →</span>
                             </div>
                         </div>
                     </div>

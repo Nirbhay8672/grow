@@ -1018,7 +1018,7 @@
                                 <div class="nav-author__options">
                                     <ul>
                                         <li>
-                                            <a href="/profile">
+                                            <a href="/profile" data-inertia-link>
                                                 <span data-feather="user"></span> Profile</a>
                                         </li>
                                     </ul>
@@ -1060,19 +1060,19 @@
                             <span>Main menu</span>
                         </li>
                         <li>
-                            <a href="/dashboard" class="{{ request()->is('dashboard') ? 'active' : '' }}">
+                            <a href="/dashboard" data-inertia-link class="{{ request()->is('dashboard') ? 'active' : '' }}">
                                 <span data-feather="home" class="nav-icon" style="color: #3b82f6;"></span>
                                 <span class="menu-text" style="{{ request()->is('dashboard') ? 'font-weight: bold;' : '' }}">Dashboard</span>
                             </a>
                         </li>
                         <li>
-                            <a href="/management/locations" class="{{ request()->is('management/locations') ? 'active' : '' }}">
+                            <a href="/management/locations" data-inertia-link class="{{ request()->is('management/locations') ? 'active' : '' }}">
                                 <span data-feather="map" class="nav-icon" style="color: #0ea5e9;"></span>
                                 <span class="menu-text" style="{{ request()->is('management/locations') ? 'font-weight: bold;' : '' }}">Location Management</span>
                             </a>
                         </li>
                         <li>
-                            <a href="/management/users" class="{{ request()->is('management/users') ? 'active' : '' }}">
+                            <a href="/management/users" data-inertia-link class="{{ request()->is('management/users') ? 'active' : '' }}">
                                 <span data-feather="users" class="nav-icon" style="color: #f59e0b;"></span>
                                 <span class="menu-text" style="{{ request()->is('management/users') ? 'font-weight: bold;' : '' }}">User Management</span>
                             </a>
@@ -1236,5 +1236,20 @@
         <script src="/assets/theme_assets/js/leaflet-init.js"></script>
         <script src="/assets/theme_assets/js/main.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            // Handle Inertia links in sidebar
+            document.addEventListener('DOMContentLoaded', function() {
+                document.addEventListener('click', function(e) {
+                    const link = e.target.closest('[data-inertia-link]');
+                    if (link && link.href && link.href.startsWith(window.location.origin)) {
+                        e.preventDefault();
+                        const href = link.getAttribute('href');
+                        if (window.Inertia) {
+                            window.Inertia.visit(href);
+                        }
+                    }
+                });
+            });
+        </script>
     </body>
 </html>

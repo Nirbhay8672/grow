@@ -35,6 +35,8 @@ Route::get('management/locations', function () {
         'cities' => \App\Models\City::count(),
         'districts' => \App\Models\District::count(),
         'localities' => \App\Models\Locality::count(),
+        'talukas' => \App\Models\Taluka::count(),
+        'villages' => \App\Models\Village::count(),
     ];
 
     return Inertia::render('LocationManagement', [
