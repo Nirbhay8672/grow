@@ -138,6 +138,7 @@ const isResourcePartiallySelected = (resource: string) => {
                                 type="button"
                                 @click="selectAllForResource(resource)"
                                 class="btn btn-sm btn-outline-primary"
+                                style="line-height: 2rem;"
                             >
                                 {{ isResourceFullySelected(resource) ? 'Deselect All' : 'Select All' }}
                             </button>

@@ -139,7 +139,27 @@ const handleSubmit = async () => {
     errors.value = {};
 
     try {
-        const response = await axios.put('/profile', form);
+        const formData: any = {
+            name: form.name,
+            username: form.username,
+            first_name: form.first_name,
+            last_name: form.last_name,
+            middle_name: form.middle_name || null,
+            mobile: form.mobile || null,
+            email: form.email,
+            company_name: form.company_name || null,
+            birth_date: form.birth_date || null,
+            state_id: form.state_id ? parseInt(form.state_id) : null,
+            city_id: form.city_id ? parseInt(form.city_id) : null,
+        };
+        
+        if (form.password) {
+            formData.password = form.password;
+            formData.password_confirmation = form.password_confirmation;
+        }
+
+        const response = await axios.put('/profile', formData);
+        
         showToast('Profile updated successfully!');
         
         // Update the user data
@@ -179,17 +199,17 @@ const resetForm = () => {
     <Head title="Profile" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="row mt-4">
+        <div class="row">
             <div class="col-12">
-                <h4 class="color-dark fw-500 mb-4">My Profile</h4>
+                <h5 class="color-dark fw-500 mb-3" style="font-size: 1.25rem;">My Profile</h5>
             </div>
         </div>
 
         <div class="row">
             <div class="col-12">
                 <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Profile Information</h5>
+                    <div class="card-header py-2">
+                        <h6 class="card-title mb-0" style="font-size: 1rem; font-weight: 600;">Profile Information</h6>
                     </div>
                     <div class="card-body">
                         <form @submit.prevent="handleSubmit">
@@ -449,6 +469,7 @@ const resetForm = () => {
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
 
                             <div class="d-flex justify-content-end gap-2">

@@ -24,8 +24,8 @@ class UserStoreRequest extends FormRequest
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'company_name' => ['nullable', 'string', 'max:255'],
             'birth_date' => ['nullable', 'date'],
-            'state_id' => ['nullable', 'exists:states,id'],
-            'city_id' => ['nullable', 'exists:cities,id'],
+            'state_id' => ['required', 'exists:states,id'],
+            'city_id' => ['required', 'exists:cities,id'],
             'is_active' => ['boolean'],
             'password' => ['required', 'string', 'min:8'],
         ];

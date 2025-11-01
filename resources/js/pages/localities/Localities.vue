@@ -3,6 +3,7 @@ import { ref, reactive } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import AppLayout from '@/layouts/AppLayout.vue';
+import Modal from '@/components/custom/modal/Modal.vue';
 import { dashboard } from '@/routes';
 import LocalityForm from '@/pages/localities/components/LocalityForm.vue';
 import LocalityTable from '@/pages/localities/components/LocalityTable.vue';
@@ -151,28 +152,17 @@ const removeRow = async (row: Locality) => {
                 </LocalityTable>
 
                 <!-- Modal -->
-                <div v-if="showForm" class="modal fade show d-block" tabindex="-1" role="dialog" aria-hidden="false" style="background-color: rgba(0,0,0,0.5);">
-                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header py-2 px-3">
-                                <h5 class="modal-title mb-0" style="font-size: 16px; font-weight: 600;">{{ editingLocality ? 'Edit Locality' : 'Create Locality' }}</h5>
-                                <button type="button" class="btn-close" @click="resetForm" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body py-3 px-3">
-                                <LocalityForm :form="form" :states="props.states" :editing-locality="editingLocality" :errors="errors" />
-                            </div>
-                            <div class="modal-footer py-2 px-3">
-                                <button type="button" class="btn btn-secondary btn-sm" @click="resetForm" style="font-size: 13px;">Cancel</button>
-                                <button type="button" class="btn btn-primary btn-sm" @click="submit" :disabled="loading" style="font-size: 13px;">
-                                    <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
-                                    {{ editingLocality ? 'Update Locality' : 'Create Locality' }}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <Modal
+                    :show="showForm"
+                    :title="editingLocality ? 'Edit Locality' : 'Create Locality'"
+                    :loading="loading"
+                    :submit-label="editingLocality ? 'Update Locality' : 'Create Locality'"
+                    size="sm"
+                    @close="resetForm"
+                    @submit="submit"
+                >
+                    <LocalityForm :form="form" :states="props.states" :editing-locality="editingLocality" :errors="errors" />
+                </Modal>
             </div>
         </div>
         <div

@@ -59,6 +59,15 @@ const formatDate = (dateString: string) => {
     });
 };
 
+const getInitials = (name: string) => {
+    if (!name) return 'U';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+};
+
 // Initialize Feather icons
 onMounted(() => {
     if (typeof window !== 'undefined' && (window as any).feather) {
@@ -76,31 +85,31 @@ onMounted(() => {
         <div class="card-body p-0">
             <div class="table4 p-25 bg-white mb-30">
                 <div class="table-responsive">
-                    <table class="table mb-0">
+                    <table class="table mb-0 align-middle">
                         <thead>
                             <tr class="userDatatable-header">
-                                <th>
+                                <th class="align-middle">
                                     <span class="userDatatable-title">Name</span>
                                 </th>
-                                <th>
+                                <th class="align-middle">
                                     <span class="userDatatable-title">Username</span>
                                 </th>
-                                <th>
+                                <th class="align-middle">
                                     <span class="userDatatable-title">Email</span>
                                 </th>
-                                <th>
+                                <th class="align-middle">
                                     <span class="userDatatable-title">Location</span>
                                 </th>
-                                <th>
+                                <th class="align-middle">
                                     <span class="userDatatable-title">Mobile</span>
                                 </th>
-                                <th>
+                                <th class="align-middle">
                                     <span class="userDatatable-title">Status</span>
                                 </th>
-                                <th>
+                                <th class="align-middle">
                                     <span class="userDatatable-title">Created</span>
                                 </th>
-                                <th>
+                                <th class="align-middle">
                                     <span class="userDatatable-title">Actions</span>
                                 </th>
                             </tr>
@@ -108,37 +117,39 @@ onMounted(() => {
                         <tbody>
                             <tr v-for="user in users" :key="user.id">
                                 <!-- Name -->
-                                <td>
+                                <td class="align-middle">
                                     <div class="userDatatable-content">
-                                        <div class="d-flex align-items-center">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="profile-image-placeholder rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" 
+                                                style="width: 40px; height: 40px; background-color: #6c757d; font-size: 14px;"
+                                            >
+                                                {{ getInitials(user.name) }}
+                                            </div>
                                             <div class="userDatatable-inline-title">
                                                 <a href="#" class="text-dark fw-500">
                                                     {{ user.name }}
                                                 </a>
-                                                <p class="d-block mb-0">
-                                                    <span class="text-muted">{{ user.first_name }} {{ user.middle_name || '' }} {{ user.last_name }}</span>
-                                                </p>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
 
                                 <!-- Username -->
-                                <td>
+                                <td class="align-middle">
                                     <div class="userDatatable-content">
                                         {{ user.username }}
                                     </div>
                                 </td>
 
                                 <!-- Email -->
-                                <td>
-                                    <div class="userDatatable-content">
+                                <td class="align-middle">
+                                    <div class="userDatatable-content text-lowercase">
                                         {{ user.email }}
                                     </div>
                                 </td>
 
                                 <!-- Location -->
-                                <td>
+                                <td class="align-middle">
                                     <div class="userDatatable-content">
                                         <span v-if="user.city && user.state" class="text-muted">
                                             {{ user.city.name }}, {{ user.state.name }}
@@ -148,14 +159,14 @@ onMounted(() => {
                                 </td>
 
                                 <!-- Mobile -->
-                                <td>
+                                <td class="align-middle">
                                     <div class="userDatatable-content">
                                         {{ user.mobile || '-' }}
                                     </div>
                                 </td>
 
                                 <!-- Status Toggle -->
-                                <td>
+                                <td class="align-middle">
                                     <div class="userDatatable-content">
                                         <div class="form-check form-switch">
                                             <input
@@ -182,14 +193,14 @@ onMounted(() => {
                                 </td>
 
                                 <!-- Created Date -->
-                                <td>
+                                <td class="align-middle">
                                     <div class="userDatatable-content">
                                         {{ formatDate(user.created_at) }}
                                     </div>
                                 </td>
 
                                 <!-- Actions -->
-                                <td>
+                                <td class="align-middle">
                                     <div class="userDatatable-content">
                                         <div class="d-flex align-items-center gap-2">
                                             <button

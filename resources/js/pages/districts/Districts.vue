@@ -3,6 +3,7 @@ import { ref, reactive } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import AppLayout from '@/layouts/AppLayout.vue';
+import Modal from '@/components/custom/modal/Modal.vue';
 import DistrictForm from '@/pages/districts/components/DistrictForm.vue';
 import DistrictTable from '@/pages/districts/components/DistrictTable.vue';
 import { dashboard } from '@/routes';
@@ -178,63 +179,24 @@ const deleteDistrict = async (district: District) => {
                 </DistrictTable>
 
                 <!-- District Form Modal -->
-                <div
-                    v-if="showForm"
-                    class="modal fade show d-block"
-                    tabindex="-1"
-                    role="dialog"
-                    aria-labelledby="districtModalLabel"
-                    aria-hidden="false"
-                    style="background-color: rgba(0,0,0,0.5);"
+                <Modal
+                    :show="showForm"
+                    :title="editingDistrict ? 'Edit District' : 'Create District'"
+                    :loading="loading"
+                    :submit-label="editingDistrict ? 'Update District' : 'Create District'"
+                    size="sm"
+                    @close="resetForm"
+                    @submit="handleSubmit"
                 >
-                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header py-2 px-3">
-                                <h5 class="modal-title mb-0" id="districtModalLabel" style="font-size: 16px; font-weight: 600;">
-                                    {{ editingDistrict ? 'Edit District' : 'Create District' }}
-                                </h5>
-                                <button
-                                    type="button"
-                                    class="btn-close"
-                                    @click="resetForm"
-                                    aria-label="Close"
-                                >
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body py-3 px-3">
-                                <DistrictForm
-                                    :form="form"
-                                    :states="states"
-                                    :editing-district="editingDistrict"
-                                    :errors="errors"
-                                    @submit="handleSubmit"
-                                    @cancel="resetForm"
-                                />
-                            </div>
-                            <div class="modal-footer py-2 px-3">
-                                <button
-                                    type="button"
-                                    class="btn btn-secondary btn-sm"
-                                    @click="resetForm"
-                                    style="font-size: 13px;"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="button"
-                                    class="btn btn-primary btn-sm"
-                                    @click="handleSubmit"
-                                    :disabled="loading"
-                                    style="font-size: 13px;"
-                                >
-                                    <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
-                                    {{ editingDistrict ? 'Update District' : 'Create District' }}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <DistrictForm
+                        :form="form"
+                        :states="states"
+                        :editing-district="editingDistrict"
+                        :errors="errors"
+                        @submit="handleSubmit"
+                        @cancel="resetForm"
+                    />
+                </Modal>
             </div>
         </div>
 

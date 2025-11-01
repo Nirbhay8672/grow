@@ -88,11 +88,8 @@ onMounted(() => {
                                         <div class="d-flex align-items-center">
                                             <div class="userDatatable-inline-title">
                                                 <a href="#" class="text-dark fw-500">
-                                                    {{ role.name }}
+                                                    {{ role.name }} <span class="text-muted">( {{ role.guard_name }} )</span>
                                                 </a>
-                                                <p class="d-block mb-0">
-                                                    <span class="text-muted">{{ role.guard_name }}</span>
-                                                </p>
                                             </div>
                                         </div>
                                     </div>

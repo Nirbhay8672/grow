@@ -3,6 +3,7 @@ import { ref, reactive } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import AppLayout from '@/layouts/AppLayout.vue';
+import Modal from '@/components/custom/modal/Modal.vue';
 import UserForm from '@/pages/users/components/UserForm.vue';
 import UserTable from '@/pages/users/components/UserTable.vue';
 import { dashboard } from '@/routes';
@@ -66,6 +67,7 @@ const showForm = ref(false);
 const editingUser = ref<User | null>(null);
 const loading = ref(false);
 const errors = ref<Record<string, string[]>>({});
+const userFormRef = ref<any>(null);
 const toast = ref<{ show: boolean; message: string; type: 'success' | 'error' }>({
     show: false,
     message: '',
@@ -148,10 +150,23 @@ const handleSubmit = async () => {
 
     try {
         const formData: any = {
-            ...form,
+            name: form.name,
+            username: form.username,
+            first_name: form.first_name,
+            last_name: form.last_name,
+            middle_name: form.middle_name || null,
+            mobile: form.mobile || null,
+            email: form.email,
+            company_name: form.company_name || null,
+            birth_date: form.birth_date || null,
             state_id: form.state_id ? parseInt(form.state_id) : null,
             city_id: form.city_id ? parseInt(form.city_id) : null,
+            is_active: form.is_active,
         };
+        
+        if (form.password) {
+            formData.password = form.password;
+        }
 
         if (editingUser.value) {
             if (!formData.password) {
@@ -243,63 +258,25 @@ const toggleActive = async (user: User) => {
                 </UserTable>
 
                 <!-- User Form Modal -->
-                <div
-                    v-if="showForm"
-                    class="modal fade show d-block"
-                    tabindex="-1"
-                    role="dialog"
-                    aria-labelledby="userModalLabel"
-                    aria-hidden="false"
-                    style="background-color: rgba(0,0,0,0.5);"
+                <Modal
+                    :show="showForm"
+                    :title="editingUser ? 'Edit User' : 'Create User'"
+                    :loading="loading"
+                    :submit-label="editingUser ? 'Update User' : 'Create User'"
+                    size="xl"
+                    @close="resetForm"
+                    @submit="handleSubmit"
                 >
-                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header py-2 px-3">
-                                <h5 class="modal-title mb-0" id="userModalLabel" style="font-size: 16px; font-weight: 600;">
-                                    {{ editingUser ? 'Edit User' : 'Create User' }}
-                                </h5>
-                                <button
-                                    type="button"
-                                    class="btn-close"
-                                    @click="resetForm"
-                                    aria-label="Close"
-                                >
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body py-3 px-3">
-                                <UserForm
-                                    :form="form"
-                                    :states="states"
-                                    :editing-user="editingUser"
-                                    :errors="errors"
-                                    @submit="handleSubmit"
-                                    @cancel="resetForm"
-                                />
-                            </div>
-                            <div class="modal-footer py-2 px-3">
-                                <button
-                                    type="button"
-                                    class="btn btn-secondary btn-sm"
-                                    @click="resetForm"
-                                    style="font-size: 13px;"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="button"
-                                    class="btn btn-primary btn-sm"
-                                    @click="handleSubmit"
-                                    :disabled="loading"
-                                    style="font-size: 13px;"
-                                >
-                                    <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
-                                    {{ editingUser ? 'Update User' : 'Create User' }}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <UserForm
+                        ref="userFormRef"
+                        :form="form"
+                        :states="states"
+                        :editing-user="editingUser"
+                        :errors="errors"
+                        @submit="handleSubmit"
+                        @cancel="resetForm"
+                    />
+                </Modal>
             </div>
         </div>
 

@@ -1,5 +1,16 @@
 <script setup lang="ts">
-// Static navbar cloned from /html/blank.html. Hook up actions as needed.
+import { usePage } from '@inertiajs/vue3';
+
+const page = usePage();
+
+const getInitials = (name: string) => {
+    if (!name) return 'U';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+};
 </script>
 
 <template>
@@ -43,7 +54,20 @@
                     </li>
                     <li class="nav-author">
                         <a href="#" class="nav-item-toggle">
-                            <img src="/html/img/author-nav.jpg" alt="user" class="rounded-circle" />
+                            <img 
+                                v-if="page.props.auth?.user?.avatar" 
+                                :src="page.props.auth.user.avatar" 
+                                alt="user" 
+                                class="rounded-circle"
+                                style="width: 40px; height: 40px; object-fit: cover;"
+                            />
+                            <div 
+                                v-else
+                                class="rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold"
+                                style="width: 40px; height: 40px; background-color: #6c757d; font-size: 14px;"
+                            >
+                                {{ getInitials(page.props.auth?.user?.name || 'U') }}
+                            </div>
                         </a>
                     </li>
                 </ul>

@@ -119,9 +119,9 @@ watch(() => props.form.state_id, async (newStateId, oldStateId) => {
     <div>
         <div class="row">
             <!-- Full Name -->
-            <div class="col-md-6 mb-2">
+            <div class="col-md-4 mb-2">
                 <div class="form-group">
-                    <label for="name" class="form-label mb-1" style="font-size: 14px;">Full Name</label>
+                    <label for="name" class="form-label mb-1" style="font-size: 14px;">Full Name <span class="text-danger">*</span></label>
                     <input
                         id="name"
                         v-model="form.name"
@@ -138,9 +138,9 @@ watch(() => props.form.state_id, async (newStateId, oldStateId) => {
             </div>
 
             <!-- Username -->
-            <div class="col-md-6 mb-2">
+            <div class="col-md-4 mb-2">
                 <div class="form-group">
-                    <label for="username" class="form-label mb-1" style="font-size: 14px;">Username</label>
+                    <label for="username" class="form-label mb-1" style="font-size: 14px;">Username <span class="text-danger">*</span></label>
                     <input
                         id="username"
                         v-model="form.username"
@@ -157,9 +157,9 @@ watch(() => props.form.state_id, async (newStateId, oldStateId) => {
             </div>
 
             <!-- First Name -->
-            <div class="col-md-6 mb-2">
+            <div class="col-md-4 mb-2">
                 <div class="form-group">
-                    <label for="first_name" class="form-label mb-1" style="font-size: 14px;">First Name</label>
+                    <label for="first_name" class="form-label mb-1" style="font-size: 14px;">First Name <span class="text-danger">*</span></label>
                     <input
                         id="first_name"
                         v-model="form.first_name"
@@ -176,9 +176,9 @@ watch(() => props.form.state_id, async (newStateId, oldStateId) => {
             </div>
 
             <!-- Last Name -->
-            <div class="col-md-6 mb-2">
+            <div class="col-md-4 mb-2">
                 <div class="form-group">
-                    <label for="last_name" class="form-label mb-1" style="font-size: 14px;">Last Name</label>
+                    <label for="last_name" class="form-label mb-1" style="font-size: 14px;">Last Name <span class="text-danger">*</span></label>
                     <input
                         id="last_name"
                         v-model="form.last_name"
@@ -195,7 +195,7 @@ watch(() => props.form.state_id, async (newStateId, oldStateId) => {
             </div>
 
             <!-- Middle Name -->
-            <div class="col-md-6 mb-2">
+            <div class="col-md-4 mb-2">
                 <div class="form-group">
                     <label for="middle_name" class="form-label mb-1" style="font-size: 14px;">Middle Name</label>
                     <input
@@ -213,9 +213,9 @@ watch(() => props.form.state_id, async (newStateId, oldStateId) => {
             </div>
 
             <!-- Email -->
-            <div class="col-md-6 mb-2">
+            <div class="col-md-4 mb-2">
                 <div class="form-group">
-                    <label for="email" class="form-label mb-1" style="font-size: 14px;">Email</label>
+                    <label for="email" class="form-label mb-1" style="font-size: 14px;">Email <span class="text-danger">*</span></label>
                     <input
                         id="email"
                         v-model="form.email"
@@ -233,7 +233,7 @@ watch(() => props.form.state_id, async (newStateId, oldStateId) => {
             </div>
 
             <!-- Mobile -->
-            <div class="col-md-6 mb-2">
+            <div class="col-md-4 mb-2">
                 <div class="form-group">
                     <label for="mobile" class="form-label mb-1" style="font-size: 14px;">Mobile</label>
                     <input
@@ -251,7 +251,7 @@ watch(() => props.form.state_id, async (newStateId, oldStateId) => {
             </div>
 
             <!-- Company Name -->
-            <div class="col-md-6 mb-2">
+            <div class="col-md-4 mb-2">
                 <div class="form-group">
                     <label for="company_name" class="form-label mb-1" style="font-size: 14px;">Company Name</label>
                     <input
@@ -269,7 +269,7 @@ watch(() => props.form.state_id, async (newStateId, oldStateId) => {
             </div>
 
             <!-- Birth Date -->
-            <div class="col-md-6 mb-2">
+            <div class="col-md-4 mb-2">
                 <div class="form-group">
                     <label for="birth_date" class="form-label mb-1" style="font-size: 14px;">Birth Date</label>
                     <input
@@ -286,10 +286,10 @@ watch(() => props.form.state_id, async (newStateId, oldStateId) => {
             </div>
 
             <!-- Password -->
-            <div class="col-md-6 mb-2">
+            <div class="col-md-4 mb-2">
                 <div class="form-group">
                     <label for="password" class="form-label mb-1" style="font-size: 14px;">
-                        Password
+                        Password <span v-if="!editingUser" class="text-danger">*</span>
                     </label>
                     <input
                         id="password"
@@ -307,15 +307,16 @@ watch(() => props.form.state_id, async (newStateId, oldStateId) => {
             </div>
 
             <!-- State Selection -->
-            <div class="col-md-6 mb-2">
+            <div class="col-md-4 mb-2">
                 <div class="form-group">
-                    <label for="state_id" class="form-label mb-1" style="font-size: 14px;">State</label>
+                    <label for="state_id" class="form-label mb-1" style="font-size: 14px;">State <span class="text-danger">*</span></label>
                     <select
                         id="state_id"
                         v-model="form.state_id"
                         class="form-control form-control-sm"
                         :class="{ 'is-invalid': errors.state_id }"
                         @change="form.city_id = ''"
+                        required
                     >
                         <option value="">Select a state</option>
                         <option
@@ -333,15 +334,16 @@ watch(() => props.form.state_id, async (newStateId, oldStateId) => {
             </div>
 
             <!-- City Selection (Dependent on State) -->
-            <div class="col-md-6 mb-2">
+            <div class="col-md-4 mb-2">
                 <div class="form-group">
-                    <label for="city_id" class="form-label mb-1" style="font-size: 14px;">City</label>
+                    <label for="city_id" class="form-label mb-1" style="font-size: 14px;">City <span class="text-danger">*</span></label>
                     <select
                         id="city_id"
                         v-model="form.city_id"
                         class="form-control form-control-sm"
                         :class="{ 'is-invalid': errors.city_id }"
                         :disabled="!form.state_id || loadingCities"
+                        required
                     >
                         <option value="">Select a city</option>
                         <option
@@ -360,7 +362,7 @@ watch(() => props.form.state_id, async (newStateId, oldStateId) => {
             </div>
 
             <!-- Active Status -->
-            <div class="col-md-6 mb-2">
+            <div class="col-md-4 mb-2">
                 <div class="form-group">
                     <label class="form-label mb-1" style="font-size: 14px;">Status</label>
                     <div class="form-check mt-2">

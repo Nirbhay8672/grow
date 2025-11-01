@@ -39,8 +39,8 @@ class UserUpdateRequest extends FormRequest
             ],
             'company_name' => ['nullable', 'string', 'max:255'],
             'birth_date' => ['nullable', 'date'],
-            'state_id' => ['nullable', 'exists:states,id'],
-            'city_id' => ['nullable', 'exists:cities,id'],
+            'state_id' => ['sometimes', 'required', 'exists:states,id'],
+            'city_id' => ['sometimes', 'required', 'exists:cities,id'],
             'is_active' => ['sometimes', 'boolean'],
             'password' => ['nullable', 'string', 'min:8'],
         ];

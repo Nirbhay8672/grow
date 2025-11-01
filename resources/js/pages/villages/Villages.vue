@@ -3,6 +3,7 @@ import { ref, reactive } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import AppLayout from '@/layouts/AppLayout.vue';
+import Modal from '@/components/custom/modal/Modal.vue';
 import VillageForm from '@/pages/villages/components/VillageForm.vue';
 import VillageTable from '@/pages/villages/components/VillageTable.vue';
 import { dashboard } from '@/routes';
@@ -191,63 +192,24 @@ const deleteVillage = async (village: Village) => {
                 </VillageTable>
 
                 <!-- Village Form Modal -->
-                <div
-                    v-if="showForm"
-                    class="modal fade show d-block"
-                    tabindex="-1"
-                    role="dialog"
-                    aria-labelledby="villageModalLabel"
-                    aria-hidden="false"
-                    style="background-color: rgba(0,0,0,0.5);"
+                <Modal
+                    :show="showForm"
+                    :title="editingVillage ? 'Edit Village' : 'Create Village'"
+                    :loading="loading"
+                    :submit-label="editingVillage ? 'Update Village' : 'Create Village'"
+                    size="sm"
+                    @close="resetForm"
+                    @submit="handleSubmit"
                 >
-                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header py-2 px-3">
-                                <h5 class="modal-title mb-0" id="villageModalLabel" style="font-size: 16px; font-weight: 600;">
-                                    {{ editingVillage ? 'Edit Village' : 'Create Village' }}
-                                </h5>
-                                <button
-                                    type="button"
-                                    class="btn-close"
-                                    @click="resetForm"
-                                    aria-label="Close"
-                                >
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body py-3 px-3">
-                                <VillageForm
-                                    :form="form"
-                                    :districts="districts"
-                                    :editing-village="editingVillage"
-                                    :errors="errors"
-                                    @submit="handleSubmit"
-                                    @cancel="resetForm"
-                                />
-                            </div>
-                            <div class="modal-footer py-2 px-3">
-                                <button
-                                    type="button"
-                                    class="btn btn-secondary btn-sm"
-                                    @click="resetForm"
-                                    style="font-size: 13px;"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="button"
-                                    class="btn btn-primary btn-sm"
-                                    @click="handleSubmit"
-                                    :disabled="loading"
-                                    style="font-size: 13px;"
-                                >
-                                    <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
-                                    {{ editingVillage ? 'Update Village' : 'Create Village' }}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <VillageForm
+                        :form="form"
+                        :districts="districts"
+                        :editing-village="editingVillage"
+                        :errors="errors"
+                        @submit="handleSubmit"
+                        @cancel="resetForm"
+                    />
+                </Modal>
             </div>
         </div>
 

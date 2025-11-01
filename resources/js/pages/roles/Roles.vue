@@ -3,6 +3,7 @@ import { ref, reactive } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import AppLayout from '@/layouts/AppLayout.vue';
+import Modal from '@/components/custom/modal/Modal.vue';
 import RoleForm from '@/pages/roles/components/RoleForm.vue';
 import RoleTable from '@/pages/roles/components/RoleTable.vue';
 import { dashboard } from '@/routes';
@@ -168,63 +169,23 @@ const deleteRole = async (role: Role) => {
                 </RoleTable>
 
                 <!-- Role Form Modal -->
-                <div
-                    v-if="showForm"
-                    class="modal fade show d-block"
-                    tabindex="-1"
-                    role="dialog"
-                    aria-labelledby="roleModalLabel"
-                    aria-hidden="false"
-                    style="background-color: rgba(0,0,0,0.5);"
+                <Modal
+                    :show="showForm"
+                    :title="editingRole ? 'Edit Role' : 'Create Role'"
+                    :loading="loading"
+                    :submit-label="editingRole ? 'Update Role' : 'Create Role'"
+                    @close="resetForm"
+                    @submit="handleSubmit"
                 >
-                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header py-2 px-3">
-                                <h5 class="modal-title mb-0" id="roleModalLabel" style="font-size: 16px; font-weight: 600;">
-                                    {{ editingRole ? 'Edit Role' : 'Create Role' }}
-                                </h5>
-                                <button
-                                    type="button"
-                                    class="btn-close"
-                                    @click="resetForm"
-                                    aria-label="Close"
-                                >
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body py-3 px-3">
-                                <RoleForm
-                                    :form="form"
-                                    :permissions="permissions"
-                                    :editing-role="editingRole"
-                                    :errors="errors"
-                                    @submit="handleSubmit"
-                                    @cancel="resetForm"
-                                />
-                            </div>
-                            <div class="modal-footer py-2 px-3">
-                                <button
-                                    type="button"
-                                    class="btn btn-secondary btn-sm"
-                                    @click="resetForm"
-                                    style="font-size: 13px;"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="button"
-                                    class="btn btn-primary btn-sm"
-                                    @click="handleSubmit"
-                                    :disabled="loading"
-                                    style="font-size: 13px;"
-                                >
-                                    <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
-                                    {{ editingRole ? 'Update Role' : 'Create Role' }}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <RoleForm
+                        :form="form"
+                        :permissions="permissions"
+                        :editing-role="editingRole"
+                        :errors="errors"
+                        @submit="handleSubmit"
+                        @cancel="resetForm"
+                    />
+                </Modal>
             </div>
         </div>
 
