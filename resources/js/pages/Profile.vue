@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted, nextTick } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { profile } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 
 interface State {
@@ -135,8 +135,11 @@ const showToast = (message: string, type: 'success' | 'error' = 'success') => {
 };
 
 const handleSubmit = async () => {
-    loading.value = true;
     errors.value = {};
+    loading.value = true;
+    
+    // Ensure DOM updates before async operation
+    await nextTick();
 
     try {
         const formData: any = {
@@ -149,8 +152,8 @@ const handleSubmit = async () => {
             email: form.email,
             company_name: form.company_name || null,
             birth_date: form.birth_date || null,
-            state_id: form.state_id ? String(form.state_id) : null,
-            city_id: form.city_id ? String(form.city_id) : null,
+            state_id: form.state_id ? parseInt(String(form.state_id)) : null,
+            city_id: form.city_id ? parseInt(String(form.city_id)) : null,
         };
         
         if (form.password) {
@@ -162,16 +165,18 @@ const handleSubmit = async () => {
         
         showToast('Profile updated successfully!');
         
-        // Update the user data
-        Object.assign(props.user, response.data);
+        // Reload the page to refresh data and show page loader
+        // Don't set loading to false here as the page will reload
+        router.reload({ only: ['user'] });
     } catch (error: any) {
+        // Set loading to false on error so button is enabled again
+        loading.value = false;
+        
         if (error.response?.status === 422) {
             errors.value = error.response.data.errors;
         } else {
             showToast('Error updating profile. Please try again.', 'error');
         }
-    } finally {
-        loading.value = false;
     }
 };
 
@@ -479,8 +484,9 @@ const resetForm = () => {
                                     class="btn btn-primary"
                                     :disabled="loading"
                                 >
-                                    <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
-                                    {{ loading ? 'Updating...' : 'Update Profile' }}
+                                    <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    <span v-if="loading">Updating...</span>
+                                    <span v-else>Update Profile</span>
                                 </button>
                             </div>
                         </form>
