@@ -103,8 +103,8 @@
   --bs-tertiary-bg: #f8f9fa;
   --bs-tertiary-bg-rgb: 248, 249, 250;
   --bs-heading-color: #272b41;
-  --bs-link-color: #5f63f2;
-  --bs-link-color-rgb: 95, 99, 242;
+  --bs-link-color: #1c467b;
+  --bs-link-color-rgb: 28, 70, 123;
   --bs-link-decoration: underline;
   --bs-link-hover-color: rgb(10.4, 88, 202.4);
   --bs-link-hover-color-rgb: 10, 88, 202;
@@ -3883,19 +3883,19 @@ textarea.form-control-lg {
 
 .btn-primary {
   --bs-btn-color: #fff;
-  --bs-btn-bg: #5f63f2;
-  --bs-btn-border-color: #5f63f2;
+  --bs-btn-bg: #1c467b;
+  --bs-btn-border-color: #1c467b;
   --bs-btn-hover-color: #fff;
-  --bs-btn-hover-bg: rgb(80.75, 84.15, 205.7);
-  --bs-btn-hover-border-color: rgb(76, 79.2, 193.6);
-  --bs-btn-focus-shadow-rgb: 119, 122, 244;
+  --bs-btn-hover-bg: rgb(22, 57, 99);
+  --bs-btn-hover-border-color: rgb(20, 52, 91);
+  --bs-btn-focus-shadow-rgb: 28, 70, 123;
   --bs-btn-active-color: #fff;
-  --bs-btn-active-bg: rgb(76, 79.2, 193.6);
-  --bs-btn-active-border-color: rgb(71.25, 74.25, 181.5);
+  --bs-btn-active-bg: rgb(20, 52, 91);
+  --bs-btn-active-border-color: rgb(18, 47, 83);
   --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
   --bs-btn-disabled-color: #fff;
-  --bs-btn-disabled-bg: #5f63f2;
-  --bs-btn-disabled-border-color: #5f63f2;
+  --bs-btn-disabled-bg: #1c467b;
+  --bs-btn-disabled-border-color: #1c467b;
 }
 
 .btn-secondary {
