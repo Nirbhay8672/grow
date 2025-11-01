@@ -3,8 +3,8 @@ import { ref, reactive } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import AppLayout from '@/layouts/AppLayout.vue';
-import StateForm from '@/components/StateForm.vue';
-import StateTable from '@/components/StateTable.vue';
+import StateForm from '@/pages/states/components/StateForm.vue';
+import StateTable from '@/pages/states/components/StateTable.vue';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 

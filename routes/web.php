@@ -80,7 +80,7 @@ Route::get('roles', function () {
 Route::get('states', function () {
     $states = \App\Models\State::orderBy('name')->get();
     
-    return Inertia::render('States', [
+    return Inertia::render('states/States', [
         'states' => $states,
     ]);
 })->middleware(['auth', 'verified', 'permission:role.read'])->name('states.index');
