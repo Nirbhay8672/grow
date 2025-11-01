@@ -149,8 +149,8 @@ const handleSubmit = async () => {
             email: form.email,
             company_name: form.company_name || null,
             birth_date: form.birth_date || null,
-            state_id: form.state_id ? parseInt(form.state_id) : null,
-            city_id: form.city_id ? parseInt(form.city_id) : null,
+            state_id: form.state_id ? String(form.state_id) : null,
+            city_id: form.city_id ? String(form.city_id) : null,
         };
         
         if (form.password) {
@@ -314,7 +314,6 @@ const resetForm = () => {
                                             class="form-control form-control-sm"
                                             :class="{ 'is-invalid': errors.email }"
                                             placeholder="Enter email"
-                                            @input="form.email = $event.target.value.toLowerCase()"
                                             required
                                         />
                                         <div v-if="errors.email" class="invalid-feedback" style="font-size: 12px;">
