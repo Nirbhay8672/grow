@@ -32,16 +32,16 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <div class="space-y-4">
+    <div>
         <!-- State Selection -->
-        <div class="form-group">
-            <label for="state_id" class="form-label">
+        <div class="form-group mb-2">
+            <label for="state_id" class="form-label mb-1" style="font-size: 14px;">
                 State
             </label>
             <select
                 id="state_id"
                 v-model="form.state_id"
-                class="form-control"
+                class="form-control form-control-sm"
                 :class="{ 'is-invalid': errors.state_id }"
                 required
             >
@@ -54,40 +54,41 @@ const emit = defineEmits<{
                     {{ state.name }} ({{ state.code }})
                 </option>
             </select>
-            <div v-if="errors.state_id" class="invalid-feedback">
+            <div v-if="errors.state_id" class="invalid-feedback" style="font-size: 12px;">
                 {{ errors.state_id[0] }}
             </div>
         </div>
 
         <!-- District Name -->
-        <div class="form-group">
-            <label for="name" class="form-label">
+        <div class="form-group mb-2">
+            <label for="name" class="form-label mb-1" style="font-size: 14px;">
                 District Name
             </label>
             <input
                 id="name"
                 v-model="form.name"
                 type="text"
-                class="form-control"
+                class="form-control form-control-sm"
                 :class="{ 'is-invalid': errors.name }"
                 placeholder="Enter district name"
                 required
             />
-            <div v-if="errors.name" class="invalid-feedback">
+            <div v-if="errors.name" class="invalid-feedback" style="font-size: 12px;">
                 {{ errors.name[0] }}
             </div>
         </div>
 
         <!-- Active Status -->
-        <div class="form-group">
+        <div class="form-group mb-0">
             <div class="form-check">
                 <input
                     id="is_active"
                     v-model="form.is_active"
                     type="checkbox"
                     class="form-check-input"
+                    style="width: 16px; height: 16px;"
                 />
-                <label for="is_active" class="form-check-label">
+                <label for="is_active" class="form-check-label ms-2" style="font-size: 14px;">
                     Active
                 </label>
             </div>

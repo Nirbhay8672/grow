@@ -116,204 +116,204 @@ watch(() => props.form.state_id, async (newStateId, oldStateId) => {
 </script>
 
 <template>
-    <div class="space-y-4">
+    <div>
         <div class="row">
             <!-- Full Name -->
-            <div class="col-md-6 mb-3">
+            <div class="col-md-6 mb-2">
                 <div class="form-group">
-                    <label for="name" class="form-label">Full Name</label>
+                    <label for="name" class="form-label mb-1" style="font-size: 14px;">Full Name</label>
                     <input
                         id="name"
                         v-model="form.name"
                         type="text"
-                        class="form-control"
+                        class="form-control form-control-sm"
                         :class="{ 'is-invalid': errors.name }"
                         placeholder="Enter full name"
                         required
                     />
-                    <div v-if="errors.name" class="invalid-feedback">
+                    <div v-if="errors.name" class="invalid-feedback" style="font-size: 12px;">
                         {{ errors.name[0] }}
                     </div>
                 </div>
             </div>
 
             <!-- Username -->
-            <div class="col-md-6 mb-3">
+            <div class="col-md-6 mb-2">
                 <div class="form-group">
-                    <label for="username" class="form-label">Username</label>
+                    <label for="username" class="form-label mb-1" style="font-size: 14px;">Username</label>
                     <input
                         id="username"
                         v-model="form.username"
                         type="text"
-                        class="form-control"
+                        class="form-control form-control-sm"
                         :class="{ 'is-invalid': errors.username }"
                         placeholder="Enter username"
                         required
                     />
-                    <div v-if="errors.username" class="invalid-feedback">
+                    <div v-if="errors.username" class="invalid-feedback" style="font-size: 12px;">
                         {{ errors.username[0] }}
                     </div>
                 </div>
             </div>
 
             <!-- First Name -->
-            <div class="col-md-6 mb-3">
+            <div class="col-md-6 mb-2">
                 <div class="form-group">
-                    <label for="first_name" class="form-label">First Name</label>
+                    <label for="first_name" class="form-label mb-1" style="font-size: 14px;">First Name</label>
                     <input
                         id="first_name"
                         v-model="form.first_name"
                         type="text"
-                        class="form-control"
+                        class="form-control form-control-sm"
                         :class="{ 'is-invalid': errors.first_name }"
                         placeholder="Enter first name"
                         required
                     />
-                    <div v-if="errors.first_name" class="invalid-feedback">
+                    <div v-if="errors.first_name" class="invalid-feedback" style="font-size: 12px;">
                         {{ errors.first_name[0] }}
                     </div>
                 </div>
             </div>
 
             <!-- Last Name -->
-            <div class="col-md-6 mb-3">
+            <div class="col-md-6 mb-2">
                 <div class="form-group">
-                    <label for="last_name" class="form-label">Last Name</label>
+                    <label for="last_name" class="form-label mb-1" style="font-size: 14px;">Last Name</label>
                     <input
                         id="last_name"
                         v-model="form.last_name"
                         type="text"
-                        class="form-control"
+                        class="form-control form-control-sm"
                         :class="{ 'is-invalid': errors.last_name }"
                         placeholder="Enter last name"
                         required
                     />
-                    <div v-if="errors.last_name" class="invalid-feedback">
+                    <div v-if="errors.last_name" class="invalid-feedback" style="font-size: 12px;">
                         {{ errors.last_name[0] }}
                     </div>
                 </div>
             </div>
 
             <!-- Middle Name -->
-            <div class="col-md-6 mb-3">
+            <div class="col-md-6 mb-2">
                 <div class="form-group">
-                    <label for="middle_name" class="form-label">Middle Name</label>
+                    <label for="middle_name" class="form-label mb-1" style="font-size: 14px;">Middle Name</label>
                     <input
                         id="middle_name"
                         v-model="form.middle_name"
                         type="text"
-                        class="form-control"
+                        class="form-control form-control-sm"
                         :class="{ 'is-invalid': errors.middle_name }"
                         placeholder="Enter middle name (optional)"
                     />
-                    <div v-if="errors.middle_name" class="invalid-feedback">
+                    <div v-if="errors.middle_name" class="invalid-feedback" style="font-size: 12px;">
                         {{ errors.middle_name[0] }}
                     </div>
                 </div>
             </div>
 
             <!-- Email -->
-            <div class="col-md-6 mb-3">
+            <div class="col-md-6 mb-2">
                 <div class="form-group">
-                    <label for="email" class="form-label">Email</label>
+                    <label for="email" class="form-label mb-1" style="font-size: 14px;">Email</label>
                     <input
                         id="email"
                         v-model="form.email"
                         type="email"
-                        class="form-control"
+                        class="form-control form-control-sm"
                         :class="{ 'is-invalid': errors.email }"
                         placeholder="Enter email"
                         @input="form.email = $event.target.value.toLowerCase()"
                         required
                     />
-                    <div v-if="errors.email" class="invalid-feedback">
+                    <div v-if="errors.email" class="invalid-feedback" style="font-size: 12px;">
                         {{ errors.email[0] }}
                     </div>
                 </div>
             </div>
 
             <!-- Mobile -->
-            <div class="col-md-6 mb-3">
+            <div class="col-md-6 mb-2">
                 <div class="form-group">
-                    <label for="mobile" class="form-label">Mobile</label>
+                    <label for="mobile" class="form-label mb-1" style="font-size: 14px;">Mobile</label>
                     <input
                         id="mobile"
                         v-model="form.mobile"
                         type="text"
-                        class="form-control"
+                        class="form-control form-control-sm"
                         :class="{ 'is-invalid': errors.mobile }"
                         placeholder="Enter mobile number (optional)"
                     />
-                    <div v-if="errors.mobile" class="invalid-feedback">
+                    <div v-if="errors.mobile" class="invalid-feedback" style="font-size: 12px;">
                         {{ errors.mobile[0] }}
                     </div>
                 </div>
             </div>
 
             <!-- Company Name -->
-            <div class="col-md-6 mb-3">
+            <div class="col-md-6 mb-2">
                 <div class="form-group">
-                    <label for="company_name" class="form-label">Company Name</label>
+                    <label for="company_name" class="form-label mb-1" style="font-size: 14px;">Company Name</label>
                     <input
                         id="company_name"
                         v-model="form.company_name"
                         type="text"
-                        class="form-control"
+                        class="form-control form-control-sm"
                         :class="{ 'is-invalid': errors.company_name }"
                         placeholder="Enter company name (optional)"
                     />
-                    <div v-if="errors.company_name" class="invalid-feedback">
+                    <div v-if="errors.company_name" class="invalid-feedback" style="font-size: 12px;">
                         {{ errors.company_name[0] }}
                     </div>
                 </div>
             </div>
 
             <!-- Birth Date -->
-            <div class="col-md-6 mb-3">
+            <div class="col-md-6 mb-2">
                 <div class="form-group">
-                    <label for="birth_date" class="form-label">Birth Date</label>
+                    <label for="birth_date" class="form-label mb-1" style="font-size: 14px;">Birth Date</label>
                     <input
                         id="birth_date"
                         v-model="formattedBirthDate"
                         type="date"
-                        class="form-control"
+                        class="form-control form-control-sm"
                         :class="{ 'is-invalid': errors.birth_date }"
                     />
-                    <div v-if="errors.birth_date" class="invalid-feedback">
+                    <div v-if="errors.birth_date" class="invalid-feedback" style="font-size: 12px;">
                         {{ errors.birth_date[0] }}
                     </div>
                 </div>
             </div>
 
             <!-- Password -->
-            <div class="col-md-6 mb-3">
+            <div class="col-md-6 mb-2">
                 <div class="form-group">
-                    <label for="password" class="form-label">
+                    <label for="password" class="form-label mb-1" style="font-size: 14px;">
                         Password
                     </label>
                     <input
                         id="password"
                         v-model="form.password"
                         type="password"
-                        class="form-control"
+                        class="form-control form-control-sm"
                         :class="{ 'is-invalid': errors.password }"
                         :placeholder="editingUser ? 'Enter new password (optional)' : 'Enter password'"
                         :required="!editingUser"
                     />
-                    <div v-if="errors.password" class="invalid-feedback">
+                    <div v-if="errors.password" class="invalid-feedback" style="font-size: 12px;">
                         {{ errors.password[0] }}
                     </div>
                 </div>
             </div>
 
             <!-- State Selection -->
-            <div class="col-md-6 mb-3">
+            <div class="col-md-6 mb-2">
                 <div class="form-group">
-                    <label for="state_id" class="form-label">State</label>
+                    <label for="state_id" class="form-label mb-1" style="font-size: 14px;">State</label>
                     <select
                         id="state_id"
                         v-model="form.state_id"
-                        class="form-control"
+                        class="form-control form-control-sm"
                         :class="{ 'is-invalid': errors.state_id }"
                         @change="form.city_id = ''"
                     >
@@ -326,20 +326,20 @@ watch(() => props.form.state_id, async (newStateId, oldStateId) => {
                             {{ state.name }} ({{ state.code }})
                         </option>
                     </select>
-                    <div v-if="errors.state_id" class="invalid-feedback">
+                    <div v-if="errors.state_id" class="invalid-feedback" style="font-size: 12px;">
                         {{ errors.state_id[0] }}
                     </div>
                 </div>
             </div>
 
             <!-- City Selection (Dependent on State) -->
-            <div class="col-md-6 mb-3">
+            <div class="col-md-6 mb-2">
                 <div class="form-group">
-                    <label for="city_id" class="form-label">City</label>
+                    <label for="city_id" class="form-label mb-1" style="font-size: 14px;">City</label>
                     <select
                         id="city_id"
                         v-model="form.city_id"
-                        class="form-control"
+                        class="form-control form-control-sm"
                         :class="{ 'is-invalid': errors.city_id }"
                         :disabled="!form.state_id || loadingCities"
                     >
@@ -352,25 +352,26 @@ watch(() => props.form.state_id, async (newStateId, oldStateId) => {
                             {{ city.name }}
                         </option>
                     </select>
-                    <div v-if="loadingCities" class="form-text">Loading cities...</div>
-                    <div v-if="errors.city_id" class="invalid-feedback">
+                    <div v-if="loadingCities" class="form-text" style="font-size: 12px;">Loading cities...</div>
+                    <div v-if="errors.city_id" class="invalid-feedback" style="font-size: 12px;">
                         {{ errors.city_id[0] }}
                     </div>
                 </div>
             </div>
 
             <!-- Active Status -->
-            <div class="col-md-6 mb-3">
+            <div class="col-md-6 mb-2">
                 <div class="form-group">
-                    <label class="form-label">Status</label>
+                    <label class="form-label mb-1" style="font-size: 14px;">Status</label>
                     <div class="form-check mt-2">
                         <input
                             id="is_active"
                             v-model="form.is_active"
                             type="checkbox"
                             class="form-check-input"
+                            style="width: 16px; height: 16px;"
                         />
-                        <label for="is_active" class="form-check-label">
+                        <label for="is_active" class="form-check-label ms-2" style="font-size: 14px;">
                             Active
                         </label>
                     </div>

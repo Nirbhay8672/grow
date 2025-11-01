@@ -160,27 +160,22 @@ const deleteTaluka = async (taluka: Taluka) => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="row">
             <div class="col-12">
-                <!-- Header -->
-                <div class="d-flex justify-content-between align-items-center mb-30 mt-4">
-                    <div>
-                        <h4 class="color-dark fw-500">Talukas Management</h4>
-                        <p class="text-muted mb-0">Manage talukas and their districts</p>
-                    </div>
-                    <button
-                        @click="createTaluka"
-                        class="btn btn-primary btn-default btn-squared text-capitalize lh-normal px-50 py-15"
-                    >
-                        <span data-feather="plus" class="me-1"></span>
-                        Add Taluka
-                    </button>
-                </div>
-
                 <!-- Taluka Table -->
                 <TalukaTable
                     :talukas="talukas"
                     @edit="editTaluka"
                     @delete="deleteTaluka"
-                />
+                >
+                    <template #header-action>
+                        <button
+                            @click="createTaluka"
+                            class="btn btn-primary btn-sm btn-default btn-squared text-capitalize lh-normal px-3 py-2"
+                        >
+                            <span data-feather="plus" class="me-1"></span>
+                            Add Taluka
+                        </button>
+                    </template>
+                </TalukaTable>
 
                 <!-- Taluka Form Modal -->
                 <div
@@ -194,8 +189,8 @@ const deleteTaluka = async (taluka: Taluka) => {
                 >
                     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                         <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="talukaModalLabel">
+                            <div class="modal-header py-2 px-3">
+                                <h5 class="modal-title mb-0" id="talukaModalLabel" style="font-size: 16px; font-weight: 600;">
                                     {{ editingTaluka ? 'Edit Taluka' : 'Create Taluka' }}
                                 </h5>
                                 <button
@@ -207,7 +202,7 @@ const deleteTaluka = async (taluka: Taluka) => {
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body py-3 px-3">
                                 <TalukaForm
                                     :form="form"
                                     :districts="districts"
@@ -217,19 +212,21 @@ const deleteTaluka = async (taluka: Taluka) => {
                                     @cancel="resetForm"
                                 />
                             </div>
-                            <div class="modal-footer">
+                            <div class="modal-footer py-2 px-3">
                                 <button
                                     type="button"
-                                    class="btn btn-secondary"
+                                    class="btn btn-secondary btn-sm"
                                     @click="resetForm"
+                                    style="font-size: 13px;"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="button"
-                                    class="btn btn-primary"
+                                    class="btn btn-primary btn-sm"
                                     @click="handleSubmit"
                                     :disabled="loading"
+                                    style="font-size: 13px;"
                                 >
                                     <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
                                     {{ editingTaluka ? 'Update Taluka' : 'Create Taluka' }}

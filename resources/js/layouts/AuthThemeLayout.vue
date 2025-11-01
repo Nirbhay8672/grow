@@ -17,21 +17,12 @@ withDefaults(defineProps<Props>(), {
                 <div class="row justify-content-center">
                     <div class="col-xl-4 col-lg-5 col-md-5 p-0">
                         <div class="signUP-admin-left signIn-admin-left position-relative">
-                            <div class="signUP-overlay">
-                                <img class="svg signupTop" src="https://demo.dashboardmarket.com/strikingdash-html/img/svg/signuptop.svg" alt="img" />
-                            </div>
                             <div class="signUP-admin-left__content">
-                                <div class="text-capitalize mb-md-30 mb-15 d-flex align-items-center justify-content-md-start justify-content-center">
-                                    <a href="/" class="me-10">
-                                        <img src="https://growedgerealty.com/assets/images/logo/logo_1.png" alt="logo" class="img-fluid" style="height: 40px;" />
+                                <div class="text-capitalize mb-md-30 mb-15 d-flex align-items-center justify-content-center">
+                                    <a href="/">
+                                        <img src="https://growedgerealty.com/assets/images/logo/logo_1.png" alt="logo" class="img-fluid" style="height: 80px;" />
                                     </a>
-                                    <span class="text-dark">admin</span>
                                 </div>
-                                <h1 class="mb-0">{{ title }}</h1>
-                                <p class="mb-0" v-if="description">{{ description }}</p>
-                            </div>
-                            <div class="signUP-admin-left__img">
-                                <img class="img-fluid svg" src="https://demo.dashboardmarket.com/strikingdash-html/img/svg/signupIllustration.svg" alt="img" />
                             </div>
                         </div>
                     </div>

@@ -160,27 +160,22 @@ const deleteCity = async (city: City) => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="row">
             <div class="col-12">
-                <!-- Header -->
-                <div class="d-flex justify-content-between align-items-center mb-30 mt-4">
-                    <div>
-                        <h4 class="color-dark fw-500">Cities Management</h4>
-                        <p class="text-muted mb-0">Manage cities and their states</p>
-                    </div>
-                    <button
-                        @click="createCity"
-                        class="btn btn-primary btn-default btn-squared text-capitalize lh-normal px-50 py-15"
-                    >
-                        <span data-feather="plus" class="me-1"></span>
-                        Add City
-                    </button>
-                </div>
-
                 <!-- City Table -->
                 <CityTable
                     :cities="cities"
                     @edit="editCity"
                     @delete="deleteCity"
-                />
+                >
+                    <template #header-action>
+                        <button
+                            @click="createCity"
+                            class="btn btn-primary btn-sm btn-default btn-squared text-capitalize lh-normal px-3 py-2"
+                        >
+                            <span data-feather="plus" class="me-1"></span>
+                            Add City
+                        </button>
+                    </template>
+                </CityTable>
 
                 <!-- City Form Modal -->
                 <div
@@ -194,8 +189,8 @@ const deleteCity = async (city: City) => {
                 >
                     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                         <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="cityModalLabel">
+                            <div class="modal-header py-2 px-3">
+                                <h5 class="modal-title mb-0" id="cityModalLabel" style="font-size: 16px; font-weight: 600;">
                                     {{ editingCity ? 'Edit City' : 'Create City' }}
                                 </h5>
                                 <button
@@ -207,7 +202,7 @@ const deleteCity = async (city: City) => {
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body py-3 px-3">
                                 <CityForm
                                     :form="form"
                                     :states="states"
@@ -217,19 +212,21 @@ const deleteCity = async (city: City) => {
                                     @cancel="resetForm"
                                 />
                             </div>
-                            <div class="modal-footer">
+                            <div class="modal-footer py-2 px-3">
                                 <button
                                     type="button"
-                                    class="btn btn-secondary"
+                                    class="btn btn-secondary btn-sm"
                                     @click="resetForm"
+                                    style="font-size: 13px;"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="button"
-                                    class="btn btn-primary"
+                                    class="btn btn-primary btn-sm"
                                     @click="handleSubmit"
                                     :disabled="loading"
+                                    style="font-size: 13px;"
                                 >
                                     <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
                                     {{ editingCity ? 'Update City' : 'Create City' }}

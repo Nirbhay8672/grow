@@ -224,28 +224,23 @@ const toggleActive = async (user: User) => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="row">
             <div class="col-12">
-                <!-- Header -->
-                <div class="d-flex justify-content-between align-items-center mb-30 mt-4">
-                    <div>
-                        <h4 class="color-dark fw-500">Users Management</h4>
-                        <p class="text-muted mb-0">Manage users and their information</p>
-                    </div>
-                    <button
-                        @click="createUser"
-                        class="btn btn-primary btn-default btn-squared text-capitalize lh-normal px-50 py-15"
-                    >
-                        <span data-feather="plus" class="me-1"></span>
-                        Add User
-                    </button>
-                </div>
-
                 <!-- User Table -->
                 <UserTable
                     :users="users"
                     @edit="editUser"
                     @delete="deleteUser"
                     @toggle-active="toggleActive"
-                />
+                >
+                    <template #header-action>
+                        <button
+                            @click="createUser"
+                            class="btn btn-primary btn-sm btn-default btn-squared text-capitalize lh-normal px-3 py-2"
+                        >
+                            <span data-feather="plus" class="me-1"></span>
+                            Add User
+                        </button>
+                    </template>
+                </UserTable>
 
                 <!-- User Form Modal -->
                 <div
@@ -259,8 +254,8 @@ const toggleActive = async (user: User) => {
                 >
                     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                         <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="userModalLabel">
+                            <div class="modal-header py-2 px-3">
+                                <h5 class="modal-title mb-0" id="userModalLabel" style="font-size: 16px; font-weight: 600;">
                                     {{ editingUser ? 'Edit User' : 'Create User' }}
                                 </h5>
                                 <button
@@ -272,7 +267,7 @@ const toggleActive = async (user: User) => {
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body py-3 px-3">
                                 <UserForm
                                     :form="form"
                                     :states="states"
@@ -282,19 +277,21 @@ const toggleActive = async (user: User) => {
                                     @cancel="resetForm"
                                 />
                             </div>
-                            <div class="modal-footer">
+                            <div class="modal-footer py-2 px-3">
                                 <button
                                     type="button"
-                                    class="btn btn-secondary"
+                                    class="btn btn-secondary btn-sm"
                                     @click="resetForm"
+                                    style="font-size: 13px;"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="button"
-                                    class="btn btn-primary"
+                                    class="btn btn-primary btn-sm"
                                     @click="handleSubmit"
                                     :disabled="loading"
+                                    style="font-size: 13px;"
                                 >
                                     <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
                                     {{ editingUser ? 'Update User' : 'Create User' }}

@@ -54,7 +54,7 @@
             <div class="navbar-left">
                 <a href="" class="sidebar-toggle">
                     <img class="svg" src="/img/svg/bars.svg" alt="img"></a>
-                <a class="navbar-brand" href="/dashboard"><img src="https://growedgerealty.com/assets/images/logo/logo_1.png" alt="logo" class="img-fluid"></a>
+                <a class="navbar-brand" href="/dashboard" data-inertia-link><img src="https://growedgerealty.com/assets/images/logo/logo_1.png" alt="logo" class="img-fluid"></a>
                 <form action="../index.html" class="search-form">
                     <span data-feather="search"></span>
                     <input class="form-control me-sm-2 box-shadow-none" type="text" placeholder="Search...">

@@ -97,29 +97,29 @@ const isResourcePartiallySelected = (resource: string) => {
 </script>
 
 <template>
-    <div class="space-y-4">
+    <div>
         <!-- Role Name -->
-        <div class="form-group">
-            <label for="name" class="form-label">
+        <div class="form-group mb-2">
+            <label for="name" class="form-label mb-1" style="font-size: 14px;">
                 Role Name
             </label>
             <input
                 id="name"
                 v-model="form.name"
                 type="text"
-                class="form-control"
+                class="form-control form-control-sm"
                 :class="{ 'is-invalid': errors.name }"
                 placeholder="Enter role name"
                 required
             />
-            <div v-if="errors.name" class="invalid-feedback">
+            <div v-if="errors.name" class="invalid-feedback" style="font-size: 12px;">
                 {{ errors.name[0] }}
             </div>
         </div>
 
         <!-- Permissions -->
-        <div class="form-group">
-            <label class="form-label">
+        <div class="form-group mb-0">
+            <label class="form-label mb-1" style="font-size: 14px;">
                 Permissions
             </label>
             
@@ -156,10 +156,12 @@ const isResourcePartiallySelected = (resource: string) => {
                                             :checked="isPermissionChecked(permission.name)"
                                             @change="togglePermission(permission.name)"
                                             class="form-check-input"
+                                            style="width: 16px; height: 16px;"
                                         />
                                         <label
                                             :for="`permission-${permission.id}`"
-                                            class="form-check-label"
+                                            class="form-check-label ms-2"
+                                            style="font-size: 14px;"
                                         >
                                             {{ permission.name.split('.')[1] }}
                                         </label>

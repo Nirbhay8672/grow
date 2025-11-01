@@ -40,9 +40,10 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="card mb-3">
-        <div class="card-header color-dark fw-500">
-            States Management
+    <div class="card mb-4 mt-4">
+        <div class="card-header color-dark fw-500 d-flex justify-content-between align-items-center">
+            <span>States Management</span>
+            <slot name="header-action" />
         </div>
         <div class="card-body p-0">
             <div class="table4 p-25 bg-white mb-30">

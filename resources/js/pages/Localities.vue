@@ -141,35 +141,31 @@ const removeRow = async (row: Locality) => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="row">
             <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center mb-30 mt-4">
-                    <div>
-                        <h4 class="color-dark fw-500">Localities Management</h4>
-                        <p class="text-muted mb-0">Manage localities (name, zip, state, city)</p>
-                    </div>
-                    <button @click="openCreate" class="btn btn-primary btn-default btn-squared text-capitalize lh-normal px-50 py-15">
-                        <span data-feather="plus" class="me-1"></span>
-                        Add Locality
-                    </button>
-                </div>
-
-                <LocalityTable :localities="props.localities" @edit="openEdit" @delete="removeRow" />
+                <LocalityTable :localities="props.localities" @edit="openEdit" @delete="removeRow">
+                    <template #header-action>
+                        <button @click="openCreate" class="btn btn-primary btn-sm btn-default btn-squared text-capitalize lh-normal px-3 py-2">
+                            <span data-feather="plus" class="me-1"></span>
+                            Add Locality
+                        </button>
+                    </template>
+                </LocalityTable>
 
                 <!-- Modal -->
                 <div v-if="showForm" class="modal fade show d-block" tabindex="-1" role="dialog" aria-hidden="false" style="background-color: rgba(0,0,0,0.5);">
                     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                         <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">{{ editingLocality ? 'Edit Locality' : 'Create Locality' }}</h5>
+                            <div class="modal-header py-2 px-3">
+                                <h5 class="modal-title mb-0" style="font-size: 16px; font-weight: 600;">{{ editingLocality ? 'Edit Locality' : 'Create Locality' }}</h5>
                                 <button type="button" class="btn-close" @click="resetForm" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body py-3 px-3">
                                 <LocalityForm :form="form" :states="props.states" :editing-locality="editingLocality" :errors="errors" />
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" @click="resetForm">Cancel</button>
-                                <button type="button" class="btn btn-primary" @click="submit" :disabled="loading">
+                            <div class="modal-footer py-2 px-3">
+                                <button type="button" class="btn btn-secondary btn-sm" @click="resetForm" style="font-size: 13px;">Cancel</button>
+                                <button type="button" class="btn btn-primary btn-sm" @click="submit" :disabled="loading" style="font-size: 13px;">
                                     <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
                                     {{ editingLocality ? 'Update Locality' : 'Create Locality' }}
                                 </button>

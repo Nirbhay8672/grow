@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import AuthThemeLayout from '@/layouts/AuthThemeLayout.vue';
-import { register } from '@/routes';
 import { store } from '@/routes/login';
-import { request } from '@/routes/password';
 import { Form, Head, useForm } from '@inertiajs/vue3';
 
 defineProps<{

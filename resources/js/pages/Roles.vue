@@ -150,27 +150,22 @@ const deleteRole = async (role: Role) => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="row">
             <div class="col-12">
-                <!-- Header -->
-                <div class="d-flex justify-content-between align-items-center mb-30 mt-4">
-                    <div>
-                        <h4 class="color-dark fw-500">Roles Management</h4>
-                        <p class="text-muted mb-0">Manage user roles and their permissions</p>
-                    </div>
-                    <button
-                        @click="createRole"
-                        class="btn btn-primary btn-default btn-squared text-capitalize lh-normal px-50 py-15"
-                    >
-                        <span data-feather="plus" class="me-1"></span>
-                        Add Role
-                    </button>
-                </div>
-
                 <!-- Role Table -->
                 <RoleTable
                     :roles="roles"
                     @edit="editRole"
                     @delete="deleteRole"
-                />
+                >
+                    <template #header-action>
+                        <button
+                            @click="createRole"
+                            class="btn btn-primary btn-sm btn-default btn-squared text-capitalize lh-normal px-3 py-2"
+                        >
+                            <span data-feather="plus" class="me-1"></span>
+                            Add Role
+                        </button>
+                    </template>
+                </RoleTable>
 
                 <!-- Role Form Modal -->
                 <div
@@ -184,8 +179,8 @@ const deleteRole = async (role: Role) => {
                 >
                     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                         <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="roleModalLabel">
+                            <div class="modal-header py-2 px-3">
+                                <h5 class="modal-title mb-0" id="roleModalLabel" style="font-size: 16px; font-weight: 600;">
                                     {{ editingRole ? 'Edit Role' : 'Create Role' }}
                                 </h5>
                                 <button
@@ -197,7 +192,7 @@ const deleteRole = async (role: Role) => {
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body py-3 px-3">
                                 <RoleForm
                                     :form="form"
                                     :permissions="permissions"
@@ -207,19 +202,21 @@ const deleteRole = async (role: Role) => {
                                     @cancel="resetForm"
                                 />
                             </div>
-                            <div class="modal-footer">
+                            <div class="modal-footer py-2 px-3">
                                 <button
                                     type="button"
-                                    class="btn btn-secondary"
+                                    class="btn btn-secondary btn-sm"
                                     @click="resetForm"
+                                    style="font-size: 13px;"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="button"
-                                    class="btn btn-primary"
+                                    class="btn btn-primary btn-sm"
                                     @click="handleSubmit"
                                     :disabled="loading"
+                                    style="font-size: 13px;"
                                 >
                                     <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
                                     {{ editingRole ? 'Update Role' : 'Create Role' }}

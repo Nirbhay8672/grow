@@ -89,16 +89,16 @@ if (props.editingVillage && props.form.district_id) {
 </script>
 
 <template>
-    <div class="space-y-4">
+    <div>
         <!-- District Selection -->
-        <div class="form-group">
-            <label for="district_id" class="form-label">
+        <div class="form-group mb-2">
+            <label for="district_id" class="form-label mb-1" style="font-size: 14px;">
                 District
             </label>
             <select
                 id="district_id"
                 v-model="form.district_id"
-                class="form-control"
+                class="form-control form-control-sm"
                 :class="{ 'is-invalid': errors.district_id }"
                 required
             >
@@ -111,20 +111,20 @@ if (props.editingVillage && props.form.district_id) {
                     {{ district.name }}
                 </option>
             </select>
-            <div v-if="errors.district_id" class="invalid-feedback">
+            <div v-if="errors.district_id" class="invalid-feedback" style="font-size: 12px;">
                 {{ errors.district_id[0] }}
             </div>
         </div>
 
         <!-- Taluka Selection -->
-        <div class="form-group">
-            <label for="taluka_id" class="form-label">
+        <div class="form-group mb-2">
+            <label for="taluka_id" class="form-label mb-1" style="font-size: 14px;">
                 Taluka
             </label>
             <select
                 id="taluka_id"
                 v-model="form.taluka_id"
-                class="form-control"
+                class="form-control form-control-sm"
                 :class="{ 'is-invalid': errors.taluka_id }"
                 :disabled="!form.district_id || loadingTalukas"
                 required
@@ -138,40 +138,41 @@ if (props.editingVillage && props.form.district_id) {
                     {{ taluka.name }}
                 </option>
             </select>
-            <div v-if="errors.taluka_id" class="invalid-feedback">
+            <div v-if="errors.taluka_id" class="invalid-feedback" style="font-size: 12px;">
                 {{ errors.taluka_id[0] }}
             </div>
         </div>
 
         <!-- Village Name -->
-        <div class="form-group">
-            <label for="name" class="form-label">
+        <div class="form-group mb-2">
+            <label for="name" class="form-label mb-1" style="font-size: 14px;">
                 Village Name
             </label>
             <input
                 id="name"
                 v-model="form.name"
                 type="text"
-                class="form-control"
+                class="form-control form-control-sm"
                 :class="{ 'is-invalid': errors.name }"
                 placeholder="Enter village name"
                 required
             />
-            <div v-if="errors.name" class="invalid-feedback">
+            <div v-if="errors.name" class="invalid-feedback" style="font-size: 12px;">
                 {{ errors.name[0] }}
             </div>
         </div>
 
         <!-- Active Status -->
-        <div class="form-group">
+        <div class="form-group mb-0">
             <div class="form-check">
                 <input
                     id="is_active"
                     v-model="form.is_active"
                     type="checkbox"
                     class="form-check-input"
+                    style="width: 16px; height: 16px;"
                 />
-                <label for="is_active" class="form-check-label">
+                <label for="is_active" class="form-check-label ms-2" style="font-size: 14px;">
                     Active
                 </label>
             </div>
