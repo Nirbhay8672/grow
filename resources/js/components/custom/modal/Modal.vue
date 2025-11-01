@@ -77,7 +77,7 @@ const handleSubmit = () => {
                 <div class="modal-footer py-2 px-3">
                     <button
                         type="button"
-                        class="btn btn-secondary btn-sm"
+                        class="btn btn-warning btn-sm"
                         @click="handleClose"
                         :disabled="loading"
                         style="font-size: 13px;"
