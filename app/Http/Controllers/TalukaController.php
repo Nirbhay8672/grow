@@ -8,6 +8,7 @@ use App\Models\District;
 use App\Models\Taluka;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Inertia\Inertia;
 
 class TalukaController extends Controller
 {
@@ -69,6 +70,17 @@ class TalukaController extends Controller
             ->get();
 
         return response($talukas);
+    }
+
+    public function showPage()
+    {
+        $talukas = Taluka::with('district')->orderBy('name')->get();
+        $districts = District::where('is_active', true)->orderBy('name')->get();
+        
+        return Inertia::render('talukas/Talukas', [
+            'talukas' => $talukas,
+            'districts' => $districts,
+        ]);
     }
 }
 

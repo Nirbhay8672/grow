@@ -9,6 +9,7 @@ use App\Models\Locality;
 use App\Models\State;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Inertia\Inertia;
 
 class LocalityController extends Controller
 {
@@ -70,6 +71,17 @@ class LocalityController extends Controller
             ->get();
 
         return response($localities);
+    }
+
+    public function showPage()
+    {
+        $localities = Locality::with(['state', 'city'])->orderBy('name')->get();
+        $states = State::where('is_active', true)->orderBy('name')->get();
+        
+        return Inertia::render('localities/Localities', [
+            'localities' => $localities,
+            'states' => $states,
+        ]);
     }
 }
 

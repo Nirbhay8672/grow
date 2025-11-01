@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ManagementController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StateController;
 use App\Http\Controllers\CityController;
@@ -13,137 +14,23 @@ use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return redirect()->route('login');
-    })->name('home');
+})->name('home');
 
-Route::get('dashboard', function () {
-    $stats = [
-        'roles' => \Spatie\Permission\Models\Role::count(),
-        'users' => \App\Models\User::count(),
-        'states' => \App\Models\State::count(),
-        'cities' => \App\Models\City::count(),
-    ];
-    
-    return Inertia::render('Dashboard', [
-        'stats' => $stats,
-    ]);
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
-// Management landing pages
-Route::get('management/locations', function () {
-    $stats = [
-        'states' => \App\Models\State::count(),
-        'cities' => \App\Models\City::count(),
-        'districts' => \App\Models\District::count(),
-        'localities' => \App\Models\Locality::count(),
-        'talukas' => \App\Models\Taluka::count(),
-        'villages' => \App\Models\Village::count(),
-    ];
+Route::get('management/locations', [ManagementController::class, 'locations'])->middleware(['auth', 'verified'])->name('management.locations');
+Route::get('management/users', [ManagementController::class, 'users'])->middleware(['auth', 'verified'])->name('management.users');
 
-    return Inertia::render('LocationManagement', [
-        'stats' => $stats,
-    ]);
-})->middleware(['auth', 'verified'])->name('management.locations');
+Route::get('profile', [UserController::class, 'showProfile'])->middleware(['auth', 'verified'])->name('profile');
 
-Route::get('management/users', function () {
-    $stats = [
-        'users' => \App\Models\User::count(),
-        'roles' => \Spatie\Permission\Models\Role::count(),
-    ];
-
-    return Inertia::render('UserManagement', [
-        'stats' => $stats,
-    ]);
-})->middleware(['auth', 'verified'])->name('management.users');
-
-Route::get('profile', function () {
-    $user = \Illuminate\Support\Facades\Auth::user();
-    /** @var \App\Models\User|null $user */
-    $user?->load(['state', 'city']);
-    $states = \App\Models\State::where('is_active', true)->orderBy('name')->get();
-    
-    return Inertia::render('Profile', [
-        'user' => $user,
-        'states' => $states,
-    ]);
-})->middleware(['auth', 'verified'])->name('profile');
-
-Route::get('roles', function () {
-    $roles = \Spatie\Permission\Models\Role::with('permissions')->get();
-    $permissions = \Spatie\Permission\Models\Permission::all();
-    
-    return Inertia::render('roles/Roles', [
-        'roles' => $roles,
-        'permissions' => $permissions,
-    ]);
-})->middleware(['auth', 'verified', 'permission:role.read'])->name('roles.index');
-
-Route::get('states', function () {
-    $states = \App\Models\State::orderBy('name')->get();
-    
-    return Inertia::render('states/States', [
-        'states' => $states,
-    ]);
-})->middleware(['auth', 'verified', 'permission:role.read'])->name('states.index');
-
-Route::get('cities', function () {
-    $cities = \App\Models\City::with('state')->orderBy('name')->get();
-    $states = \App\Models\State::where('is_active', true)->orderBy('name')->get();
-    
-    return Inertia::render('cities/Cities', [
-        'cities' => $cities,
-        'states' => $states,
-    ]);
-})->middleware(['auth', 'verified', 'permission:role.read'])->name('cities.index');
-
-Route::get('districts', function () {
-    $districts = \App\Models\District::with('state')->orderBy('name')->get();
-    $states = \App\Models\State::where('is_active', true)->orderBy('name')->get();
-    
-    return Inertia::render('districts/Districts', [
-        'districts' => $districts,
-        'states' => $states,
-    ]);
-})->middleware(['auth', 'verified', 'permission:role.read'])->name('districts.index');
-
-Route::get('localities', function () {
-    $localities = \App\Models\Locality::with(['state', 'city'])->orderBy('name')->get();
-    $states = \App\Models\State::where('is_active', true)->orderBy('name')->get();
-    
-    return Inertia::render('localities/Localities', [
-        'localities' => $localities,
-        'states' => $states,
-    ]);
-})->middleware(['auth', 'verified', 'permission:role.read'])->name('localities.index');
-
-Route::get('talukas', function () {
-    $talukas = \App\Models\Taluka::with('district')->orderBy('name')->get();
-    $districts = \App\Models\District::where('is_active', true)->orderBy('name')->get();
-    
-    return Inertia::render('talukas/Talukas', [
-        'talukas' => $talukas,
-        'districts' => $districts,
-    ]);
-})->middleware(['auth', 'verified', 'permission:role.read'])->name('talukas.index');
-
-Route::get('villages', function () {
-    $villages = \App\Models\Village::with(['district', 'taluka'])->orderBy('name')->get();
-    $districts = \App\Models\District::where('is_active', true)->orderBy('name')->get();
-    
-    return Inertia::render('villages/Villages', [
-        'villages' => $villages,
-        'districts' => $districts,
-    ]);
-})->middleware(['auth', 'verified', 'permission:role.read'])->name('villages.index');
-
-Route::get('users', function () {
-    $users = \App\Models\User::with(['state', 'city', 'roles'])->orderBy('created_at', 'desc')->get();
-    $states = \App\Models\State::where('is_active', true)->orderBy('name')->get();
-    
-    return Inertia::render('users/Users', [
-        'users' => $users,
-        'states' => $states,
-    ]);
-})->middleware(['auth', 'verified', 'permission:user.read'])->name('users.index');
+Route::get('roles', [RoleController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('roles.index');
+Route::get('states', [StateController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('states.index');
+Route::get('cities', [CityController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('cities.index');
+Route::get('districts', [DistrictController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('districts.index');
+Route::get('localities', [LocalityController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('localities.index');
+Route::get('talukas', [TalukaController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('talukas.index');
+Route::get('villages', [VillageController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('villages.index');
+Route::get('users', [UserController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:user.read'])->name('users.index');
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/roles', [RoleController::class, 'store'])->name('roles.store')->middleware('permission:role.create');

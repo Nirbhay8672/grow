@@ -9,6 +9,7 @@ use App\Models\State;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Inertia\Inertia;
 
 class CityController extends Controller
 {
@@ -70,5 +71,16 @@ class CityController extends Controller
             ->get();
 
         return response($cities);
+    }
+
+    public function showPage()
+    {
+        $cities = City::with('state')->orderBy('name')->get();
+        $states = State::where('is_active', true)->orderBy('name')->get();
+        
+        return Inertia::render('cities/Cities', [
+            'cities' => $cities,
+            'states' => $states,
+        ]);
     }
 }

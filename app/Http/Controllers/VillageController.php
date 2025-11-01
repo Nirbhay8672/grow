@@ -9,6 +9,7 @@ use App\Models\Taluka;
 use App\Models\Village;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Inertia\Inertia;
 
 class VillageController extends Controller
 {
@@ -70,6 +71,17 @@ class VillageController extends Controller
             ->get();
 
         return response($villages);
+    }
+
+    public function showPage()
+    {
+        $villages = Village::with(['district', 'taluka'])->orderBy('name')->get();
+        $districts = District::where('is_active', true)->orderBy('name')->get();
+        
+        return Inertia::render('villages/Villages', [
+            'villages' => $villages,
+            'districts' => $districts,
+        ]);
     }
 }
 

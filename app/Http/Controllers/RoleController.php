@@ -7,6 +7,7 @@ use App\Http\Requests\RoleUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Inertia\Inertia;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -62,6 +63,17 @@ class RoleController extends Controller
         $role->delete();
 
         return response(null, 204);
+    }
+
+    public function showPage()
+    {
+        $roles = Role::with('permissions')->get();
+        $permissions = Permission::all();
+        
+        return Inertia::render('roles/Roles', [
+            'roles' => $roles,
+            'permissions' => $permissions,
+        ]);
     }
 }
 

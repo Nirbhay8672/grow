@@ -8,6 +8,7 @@ use App\Models\State;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Inertia\Inertia;
 
 class StateController extends Controller
 {
@@ -48,5 +49,14 @@ class StateController extends Controller
         $state->delete();
 
         return response(null, 204);
+    }
+
+    public function showPage()
+    {
+        $states = State::orderBy('name')->get();
+        
+        return Inertia::render('states/States', [
+            'states' => $states,
+        ]);
     }
 }

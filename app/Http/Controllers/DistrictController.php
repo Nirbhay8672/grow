@@ -9,6 +9,7 @@ use App\Models\State;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Inertia\Inertia;
 
 class DistrictController extends Controller
 {
@@ -70,6 +71,17 @@ class DistrictController extends Controller
             ->get();
 
         return response($districts);
+    }
+
+    public function showPage()
+    {
+        $districts = District::with('state')->orderBy('name')->get();
+        $states = State::where('is_active', true)->orderBy('name')->get();
+        
+        return Inertia::render('districts/Districts', [
+            'districts' => $districts,
+            'states' => $states,
+        ]);
     }
 }
 

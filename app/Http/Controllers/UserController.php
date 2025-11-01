@@ -10,6 +10,8 @@ use App\Models\City;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class UserController extends Controller
 {
@@ -72,6 +74,30 @@ class UserController extends Controller
         $user->load(['state', 'city']);
 
         return response($user);
+    }
+
+    public function showPage()
+    {
+        $users = User::with(['state', 'city', 'roles'])->orderBy('created_at', 'desc')->get();
+        $states = State::where('is_active', true)->orderBy('name')->get();
+        
+        return Inertia::render('users/Users', [
+            'users' => $users,
+            'states' => $states,
+        ]);
+    }
+
+    public function showProfile()
+    {
+        $user = Auth::user();
+        /** @var \App\Models\User|null $user */
+        $user?->load(['state', 'city']);
+        $states = State::where('is_active', true)->orderBy('name')->get();
+        
+        return Inertia::render('Profile', [
+            'user' => $user,
+            'states' => $states,
+        ]);
     }
 
     public function updateProfile(Request $request): Response
