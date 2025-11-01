@@ -3,31 +3,29 @@ import { ref, reactive } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import AppLayout from '@/layouts/AppLayout.vue';
-import CityForm from '@/components/CityForm.vue';
-import CityTable from '@/components/CityTable.vue';
+import RoleForm from '@/pages/roles/components/RoleForm.vue';
+import RoleTable from '@/pages/roles/components/RoleTable.vue';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 
-interface State {
+interface Permission {
     id: number;
     name: string;
-    code: string;
-    is_active: boolean;
+    guard_name: string;
 }
 
-interface City {
+interface Role {
     id: number;
     name: string;
-    state_id: number;
-    is_active: boolean;
+    guard_name: string;
+    permissions: Permission[];
     created_at: string;
     updated_at: string;
-    state: State;
 }
 
 interface Props {
-    cities: City[];
-    states: State[];
+    roles: Role[];
+    permissions: Permission[];
 }
 
 const props = defineProps<Props>();
@@ -38,13 +36,13 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: dashboard().url,
     },
     {
-        title: 'Cities',
-        href: '/cities',
+        title: 'Roles',
+        href: '/roles',
     },
 ];
 
 const showForm = ref(false);
-const editingCity = ref<City | null>(null);
+const editingRole = ref<Role | null>(null);
 const loading = ref(false);
 const errors = ref<Record<string, string[]>>({});
 const toast = ref<{ show: boolean; message: string; type: 'success' | 'error' }>({
@@ -55,16 +53,14 @@ const toast = ref<{ show: boolean; message: string; type: 'success' | 'error' }>
 
 const form = reactive({
     name: '',
-    state_id: '',
-    is_active: true,
+    permissions: [] as string[],
 });
 
 const resetForm = () => {
     form.name = '';
-    form.state_id = '';
-    form.is_active = true;
+    form.permissions = [];
     errors.value = {};
-    editingCity.value = null;
+    editingRole.value = null;
     showForm.value = false;
 };
 
@@ -79,16 +75,15 @@ const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     }, 3000);
 };
 
-const editCity = (city: City) => {
-    editingCity.value = city;
-    form.name = city.name;
-    form.state_id = city.state_id.toString();
-    form.is_active = city.is_active;
+const editRole = (role: Role) => {
+    editingRole.value = role;
+    form.name = role.name;
+    form.permissions = role.permissions.map(p => p.name);
     errors.value = {};
     showForm.value = true;
 };
 
-const createCity = () => {
+const createRole = () => {
     resetForm();
     showForm.value = true;
 };
@@ -98,17 +93,12 @@ const handleSubmit = async () => {
     errors.value = {};
 
     try {
-        const formData = {
-            ...form,
-            state_id: parseInt(form.state_id),
-        };
-
-        if (editingCity.value) {
-            await axios.put(`/cities/${editingCity.value.id}`, formData);
-            showToast('City updated successfully!');
+        if (editingRole.value) {
+            await axios.put(`/roles/${editingRole.value.id}`, form);
+            showToast('Role updated successfully!');
         } else {
-            await axios.post('/cities', formData);
-            showToast('City created successfully!');
+            await axios.post('/roles', form);
+            showToast('Role created successfully!');
         }
         
         resetForm();
@@ -118,20 +108,20 @@ const handleSubmit = async () => {
             errors.value = error.response.data.errors;
             showToast('Please fix the validation errors.', 'error');
         } else {
-            console.error('Error saving city:', error);
-            showToast('An error occurred while saving the city.', 'error');
+            console.error('Error saving role:', error);
+            showToast('An error occurred while saving the role.', 'error');
         }
     } finally {
         loading.value = false;
     }
 };
 
-const deleteCity = async (city: City) => {
+const deleteRole = async (role: Role) => {
     const Swal = (window as any).Swal;
     
     const result = await Swal.fire({
         title: 'Are you sure?',
-        text: `You are about to delete the city "${city.name}". This action cannot be undone!`,
+        text: `You are about to delete the role "${role.name}". This action cannot be undone!`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#dc3545',
@@ -143,55 +133,55 @@ const deleteCity = async (city: City) => {
 
     if (result.isConfirmed) {
         try {
-            await axios.delete(`/cities/${city.id}`);
-            showToast('City deleted successfully!');
+            await axios.delete(`/roles/${role.id}`);
+            showToast('Role deleted successfully!');
             router.reload();
         } catch (error) {
-            console.error('Error deleting city:', error);
-            showToast('An error occurred while deleting the city.', 'error');
+            console.error('Error deleting role:', error);
+            showToast('An error occurred while deleting the role.', 'error');
         }
     }
 };
 </script>
 
 <template>
-    <Head title="Cities Management" />
+    <Head title="Roles Management" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="row">
             <div class="col-12">
-                <!-- City Table -->
-                <CityTable
-                    :cities="cities"
-                    @edit="editCity"
-                    @delete="deleteCity"
+                <!-- Role Table -->
+                <RoleTable
+                    :roles="roles"
+                    @edit="editRole"
+                    @delete="deleteRole"
                 >
                     <template #header-action>
                         <button
-                            @click="createCity"
+                            @click="createRole"
                             class="btn btn-primary btn-sm btn-default btn-squared text-capitalize lh-normal px-3 py-2"
                         >
                             <span data-feather="plus" class="me-1"></span>
-                            Add City
+                            Add Role
                         </button>
                     </template>
-                </CityTable>
+                </RoleTable>
 
-                <!-- City Form Modal -->
+                <!-- Role Form Modal -->
                 <div
                     v-if="showForm"
                     class="modal fade show d-block"
                     tabindex="-1"
                     role="dialog"
-                    aria-labelledby="cityModalLabel"
+                    aria-labelledby="roleModalLabel"
                     aria-hidden="false"
                     style="background-color: rgba(0,0,0,0.5);"
                 >
                     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                         <div class="modal-content">
                             <div class="modal-header py-2 px-3">
-                                <h5 class="modal-title mb-0" id="cityModalLabel" style="font-size: 16px; font-weight: 600;">
-                                    {{ editingCity ? 'Edit City' : 'Create City' }}
+                                <h5 class="modal-title mb-0" id="roleModalLabel" style="font-size: 16px; font-weight: 600;">
+                                    {{ editingRole ? 'Edit Role' : 'Create Role' }}
                                 </h5>
                                 <button
                                     type="button"
@@ -203,10 +193,10 @@ const deleteCity = async (city: City) => {
                                 </button>
                             </div>
                             <div class="modal-body py-3 px-3">
-                                <CityForm
+                                <RoleForm
                                     :form="form"
-                                    :states="states"
-                                    :editing-city="editingCity"
+                                    :permissions="permissions"
+                                    :editing-role="editingRole"
                                     :errors="errors"
                                     @submit="handleSubmit"
                                     @cancel="resetForm"
@@ -229,7 +219,7 @@ const deleteCity = async (city: City) => {
                                     style="font-size: 13px;"
                                 >
                                     <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
-                                    {{ editingCity ? 'Update City' : 'Create City' }}
+                                    {{ editingRole ? 'Update Role' : 'Create Role' }}
                                 </button>
                             </div>
                         </div>
@@ -279,5 +269,4 @@ const deleteCity = async (city: City) => {
     }
 }
 </style>
-
 

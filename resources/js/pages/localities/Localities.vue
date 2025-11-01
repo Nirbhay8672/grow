@@ -4,8 +4,8 @@ import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
-import LocalityForm from '@/components/LocalityForm.vue';
-import LocalityTable from '@/components/LocalityTable.vue';
+import LocalityForm from '@/pages/localities/components/LocalityForm.vue';
+import LocalityTable from '@/pages/localities/components/LocalityTable.vue';
 import { type BreadcrumbItem } from '@/types';
 
 interface State { id: number; name: string; code?: string; is_active?: boolean }
@@ -200,3 +200,4 @@ const removeRow = async (row: Locality) => {
   to { transform: translateX(0); opacity: 1; }
 }
 </style>
+

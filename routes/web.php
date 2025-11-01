@@ -71,7 +71,7 @@ Route::get('roles', function () {
     $roles = \Spatie\Permission\Models\Role::with('permissions')->get();
     $permissions = \Spatie\Permission\Models\Permission::all();
     
-    return Inertia::render('Roles', [
+    return Inertia::render('roles/Roles', [
         'roles' => $roles,
         'permissions' => $permissions,
     ]);
@@ -89,7 +89,7 @@ Route::get('cities', function () {
     $cities = \App\Models\City::with('state')->orderBy('name')->get();
     $states = \App\Models\State::where('is_active', true)->orderBy('name')->get();
     
-    return Inertia::render('Cities', [
+    return Inertia::render('cities/Cities', [
         'cities' => $cities,
         'states' => $states,
     ]);
@@ -99,7 +99,7 @@ Route::get('districts', function () {
     $districts = \App\Models\District::with('state')->orderBy('name')->get();
     $states = \App\Models\State::where('is_active', true)->orderBy('name')->get();
     
-    return Inertia::render('Districts', [
+    return Inertia::render('districts/Districts', [
         'districts' => $districts,
         'states' => $states,
     ]);
@@ -109,7 +109,7 @@ Route::get('localities', function () {
     $localities = \App\Models\Locality::with(['state', 'city'])->orderBy('name')->get();
     $states = \App\Models\State::where('is_active', true)->orderBy('name')->get();
     
-    return Inertia::render('Localities', [
+    return Inertia::render('localities/Localities', [
         'localities' => $localities,
         'states' => $states,
     ]);
@@ -119,7 +119,7 @@ Route::get('talukas', function () {
     $talukas = \App\Models\Taluka::with('district')->orderBy('name')->get();
     $districts = \App\Models\District::where('is_active', true)->orderBy('name')->get();
     
-    return Inertia::render('Talukas', [
+    return Inertia::render('talukas/Talukas', [
         'talukas' => $talukas,
         'districts' => $districts,
     ]);
@@ -129,7 +129,7 @@ Route::get('villages', function () {
     $villages = \App\Models\Village::with(['district', 'taluka'])->orderBy('name')->get();
     $districts = \App\Models\District::where('is_active', true)->orderBy('name')->get();
     
-    return Inertia::render('Villages', [
+    return Inertia::render('villages/Villages', [
         'villages' => $villages,
         'districts' => $districts,
     ]);
@@ -139,7 +139,7 @@ Route::get('users', function () {
     $users = \App\Models\User::with(['state', 'city', 'roles'])->orderBy('created_at', 'desc')->get();
     $states = \App\Models\State::where('is_active', true)->orderBy('name')->get();
     
-    return Inertia::render('Users', [
+    return Inertia::render('users/Users', [
         'users' => $users,
         'states' => $states,
     ]);

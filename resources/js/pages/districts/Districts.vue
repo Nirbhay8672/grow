@@ -3,29 +3,31 @@ import { ref, reactive } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import AppLayout from '@/layouts/AppLayout.vue';
-import RoleForm from '@/components/RoleForm.vue';
-import RoleTable from '@/components/RoleTable.vue';
+import DistrictForm from '@/pages/districts/components/DistrictForm.vue';
+import DistrictTable from '@/pages/districts/components/DistrictTable.vue';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 
-interface Permission {
+interface State {
     id: number;
     name: string;
-    guard_name: string;
+    code: string;
+    is_active: boolean;
 }
 
-interface Role {
+interface District {
     id: number;
     name: string;
-    guard_name: string;
-    permissions: Permission[];
+    state_id: number;
+    is_active: boolean;
     created_at: string;
     updated_at: string;
+    state: State;
 }
 
 interface Props {
-    roles: Role[];
-    permissions: Permission[];
+    districts: District[];
+    states: State[];
 }
 
 const props = defineProps<Props>();
@@ -36,13 +38,13 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: dashboard().url,
     },
     {
-        title: 'Roles',
-        href: '/roles',
+        title: 'Districts',
+        href: '/districts',
     },
 ];
 
 const showForm = ref(false);
-const editingRole = ref<Role | null>(null);
+const editingDistrict = ref<District | null>(null);
 const loading = ref(false);
 const errors = ref<Record<string, string[]>>({});
 const toast = ref<{ show: boolean; message: string; type: 'success' | 'error' }>({
@@ -53,14 +55,16 @@ const toast = ref<{ show: boolean; message: string; type: 'success' | 'error' }>
 
 const form = reactive({
     name: '',
-    permissions: [] as string[],
+    state_id: '',
+    is_active: true,
 });
 
 const resetForm = () => {
     form.name = '';
-    form.permissions = [];
+    form.state_id = '';
+    form.is_active = true;
     errors.value = {};
-    editingRole.value = null;
+    editingDistrict.value = null;
     showForm.value = false;
 };
 
@@ -75,15 +79,16 @@ const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     }, 3000);
 };
 
-const editRole = (role: Role) => {
-    editingRole.value = role;
-    form.name = role.name;
-    form.permissions = role.permissions.map(p => p.name);
+const editDistrict = (district: District) => {
+    editingDistrict.value = district;
+    form.name = district.name;
+    form.state_id = district.state_id.toString();
+    form.is_active = district.is_active;
     errors.value = {};
     showForm.value = true;
 };
 
-const createRole = () => {
+const createDistrict = () => {
     resetForm();
     showForm.value = true;
 };
@@ -93,12 +98,17 @@ const handleSubmit = async () => {
     errors.value = {};
 
     try {
-        if (editingRole.value) {
-            await axios.put(`/roles/${editingRole.value.id}`, form);
-            showToast('Role updated successfully!');
+        const formData = {
+            ...form,
+            state_id: parseInt(form.state_id),
+        };
+
+        if (editingDistrict.value) {
+            await axios.put(`/districts/${editingDistrict.value.id}`, formData);
+            showToast('District updated successfully!');
         } else {
-            await axios.post('/roles', form);
-            showToast('Role created successfully!');
+            await axios.post('/districts', formData);
+            showToast('District created successfully!');
         }
         
         resetForm();
@@ -108,20 +118,20 @@ const handleSubmit = async () => {
             errors.value = error.response.data.errors;
             showToast('Please fix the validation errors.', 'error');
         } else {
-            console.error('Error saving role:', error);
-            showToast('An error occurred while saving the role.', 'error');
+            console.error('Error saving district:', error);
+            showToast('An error occurred while saving the district.', 'error');
         }
     } finally {
         loading.value = false;
     }
 };
 
-const deleteRole = async (role: Role) => {
+const deleteDistrict = async (district: District) => {
     const Swal = (window as any).Swal;
     
     const result = await Swal.fire({
         title: 'Are you sure?',
-        text: `You are about to delete the role "${role.name}". This action cannot be undone!`,
+        text: `You are about to delete the district "${district.name}". This action cannot be undone!`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#dc3545',
@@ -133,55 +143,55 @@ const deleteRole = async (role: Role) => {
 
     if (result.isConfirmed) {
         try {
-            await axios.delete(`/roles/${role.id}`);
-            showToast('Role deleted successfully!');
+            await axios.delete(`/districts/${district.id}`);
+            showToast('District deleted successfully!');
             router.reload();
         } catch (error) {
-            console.error('Error deleting role:', error);
-            showToast('An error occurred while deleting the role.', 'error');
+            console.error('Error deleting district:', error);
+            showToast('An error occurred while deleting the district.', 'error');
         }
     }
 };
 </script>
 
 <template>
-    <Head title="Roles Management" />
+    <Head title="Districts Management" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="row">
             <div class="col-12">
-                <!-- Role Table -->
-                <RoleTable
-                    :roles="roles"
-                    @edit="editRole"
-                    @delete="deleteRole"
+                <!-- District Table -->
+                <DistrictTable
+                    :districts="districts"
+                    @edit="editDistrict"
+                    @delete="deleteDistrict"
                 >
                     <template #header-action>
                         <button
-                            @click="createRole"
+                            @click="createDistrict"
                             class="btn btn-primary btn-sm btn-default btn-squared text-capitalize lh-normal px-3 py-2"
                         >
                             <span data-feather="plus" class="me-1"></span>
-                            Add Role
+                            Add District
                         </button>
                     </template>
-                </RoleTable>
+                </DistrictTable>
 
-                <!-- Role Form Modal -->
+                <!-- District Form Modal -->
                 <div
                     v-if="showForm"
                     class="modal fade show d-block"
                     tabindex="-1"
                     role="dialog"
-                    aria-labelledby="roleModalLabel"
+                    aria-labelledby="districtModalLabel"
                     aria-hidden="false"
                     style="background-color: rgba(0,0,0,0.5);"
                 >
                     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                         <div class="modal-content">
                             <div class="modal-header py-2 px-3">
-                                <h5 class="modal-title mb-0" id="roleModalLabel" style="font-size: 16px; font-weight: 600;">
-                                    {{ editingRole ? 'Edit Role' : 'Create Role' }}
+                                <h5 class="modal-title mb-0" id="districtModalLabel" style="font-size: 16px; font-weight: 600;">
+                                    {{ editingDistrict ? 'Edit District' : 'Create District' }}
                                 </h5>
                                 <button
                                     type="button"
@@ -193,10 +203,10 @@ const deleteRole = async (role: Role) => {
                                 </button>
                             </div>
                             <div class="modal-body py-3 px-3">
-                                <RoleForm
+                                <DistrictForm
                                     :form="form"
-                                    :permissions="permissions"
-                                    :editing-role="editingRole"
+                                    :states="states"
+                                    :editing-district="editingDistrict"
                                     :errors="errors"
                                     @submit="handleSubmit"
                                     @cancel="resetForm"
@@ -219,7 +229,7 @@ const deleteRole = async (role: Role) => {
                                     style="font-size: 13px;"
                                 >
                                     <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
-                                    {{ editingRole ? 'Update Role' : 'Create Role' }}
+                                    {{ editingDistrict ? 'Update District' : 'Create District' }}
                                 </button>
                             </div>
                         </div>
@@ -269,3 +279,4 @@ const deleteRole = async (role: Role) => {
     }
 }
 </style>
+

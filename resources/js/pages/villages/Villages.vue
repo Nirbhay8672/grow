@@ -3,8 +3,8 @@ import { ref, reactive } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import AppLayout from '@/layouts/AppLayout.vue';
-import VillageForm from '@/components/VillageForm.vue';
-import VillageTable from '@/components/VillageTable.vue';
+import VillageForm from '@/pages/villages/components/VillageForm.vue';
+import VillageTable from '@/pages/villages/components/VillageTable.vue';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 

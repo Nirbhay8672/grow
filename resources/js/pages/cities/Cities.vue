@@ -3,8 +3,8 @@ import { ref, reactive } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import AppLayout from '@/layouts/AppLayout.vue';
-import DistrictForm from '@/components/DistrictForm.vue';
-import DistrictTable from '@/components/DistrictTable.vue';
+import CityForm from '@/pages/cities/components/CityForm.vue';
+import CityTable from '@/pages/cities/components/CityTable.vue';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 
@@ -15,7 +15,7 @@ interface State {
     is_active: boolean;
 }
 
-interface District {
+interface City {
     id: number;
     name: string;
     state_id: number;
@@ -26,7 +26,7 @@ interface District {
 }
 
 interface Props {
-    districts: District[];
+    cities: City[];
     states: State[];
 }
 
@@ -38,13 +38,13 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: dashboard().url,
     },
     {
-        title: 'Districts',
-        href: '/districts',
+        title: 'Cities',
+        href: '/cities',
     },
 ];
 
 const showForm = ref(false);
-const editingDistrict = ref<District | null>(null);
+const editingCity = ref<City | null>(null);
 const loading = ref(false);
 const errors = ref<Record<string, string[]>>({});
 const toast = ref<{ show: boolean; message: string; type: 'success' | 'error' }>({
@@ -64,7 +64,7 @@ const resetForm = () => {
     form.state_id = '';
     form.is_active = true;
     errors.value = {};
-    editingDistrict.value = null;
+    editingCity.value = null;
     showForm.value = false;
 };
 
@@ -79,16 +79,16 @@ const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     }, 3000);
 };
 
-const editDistrict = (district: District) => {
-    editingDistrict.value = district;
-    form.name = district.name;
-    form.state_id = district.state_id.toString();
-    form.is_active = district.is_active;
+const editCity = (city: City) => {
+    editingCity.value = city;
+    form.name = city.name;
+    form.state_id = city.state_id.toString();
+    form.is_active = city.is_active;
     errors.value = {};
     showForm.value = true;
 };
 
-const createDistrict = () => {
+const createCity = () => {
     resetForm();
     showForm.value = true;
 };
@@ -103,12 +103,12 @@ const handleSubmit = async () => {
             state_id: parseInt(form.state_id),
         };
 
-        if (editingDistrict.value) {
-            await axios.put(`/districts/${editingDistrict.value.id}`, formData);
-            showToast('District updated successfully!');
+        if (editingCity.value) {
+            await axios.put(`/cities/${editingCity.value.id}`, formData);
+            showToast('City updated successfully!');
         } else {
-            await axios.post('/districts', formData);
-            showToast('District created successfully!');
+            await axios.post('/cities', formData);
+            showToast('City created successfully!');
         }
         
         resetForm();
@@ -118,20 +118,20 @@ const handleSubmit = async () => {
             errors.value = error.response.data.errors;
             showToast('Please fix the validation errors.', 'error');
         } else {
-            console.error('Error saving district:', error);
-            showToast('An error occurred while saving the district.', 'error');
+            console.error('Error saving city:', error);
+            showToast('An error occurred while saving the city.', 'error');
         }
     } finally {
         loading.value = false;
     }
 };
 
-const deleteDistrict = async (district: District) => {
+const deleteCity = async (city: City) => {
     const Swal = (window as any).Swal;
     
     const result = await Swal.fire({
         title: 'Are you sure?',
-        text: `You are about to delete the district "${district.name}". This action cannot be undone!`,
+        text: `You are about to delete the city "${city.name}". This action cannot be undone!`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#dc3545',
@@ -143,55 +143,55 @@ const deleteDistrict = async (district: District) => {
 
     if (result.isConfirmed) {
         try {
-            await axios.delete(`/districts/${district.id}`);
-            showToast('District deleted successfully!');
+            await axios.delete(`/cities/${city.id}`);
+            showToast('City deleted successfully!');
             router.reload();
         } catch (error) {
-            console.error('Error deleting district:', error);
-            showToast('An error occurred while deleting the district.', 'error');
+            console.error('Error deleting city:', error);
+            showToast('An error occurred while deleting the city.', 'error');
         }
     }
 };
 </script>
 
 <template>
-    <Head title="Districts Management" />
+    <Head title="Cities Management" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="row">
             <div class="col-12">
-                <!-- District Table -->
-                <DistrictTable
-                    :districts="districts"
-                    @edit="editDistrict"
-                    @delete="deleteDistrict"
+                <!-- City Table -->
+                <CityTable
+                    :cities="cities"
+                    @edit="editCity"
+                    @delete="deleteCity"
                 >
                     <template #header-action>
                         <button
-                            @click="createDistrict"
+                            @click="createCity"
                             class="btn btn-primary btn-sm btn-default btn-squared text-capitalize lh-normal px-3 py-2"
                         >
                             <span data-feather="plus" class="me-1"></span>
-                            Add District
+                            Add City
                         </button>
                     </template>
-                </DistrictTable>
+                </CityTable>
 
-                <!-- District Form Modal -->
+                <!-- City Form Modal -->
                 <div
                     v-if="showForm"
                     class="modal fade show d-block"
                     tabindex="-1"
                     role="dialog"
-                    aria-labelledby="districtModalLabel"
+                    aria-labelledby="cityModalLabel"
                     aria-hidden="false"
                     style="background-color: rgba(0,0,0,0.5);"
                 >
                     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                         <div class="modal-content">
                             <div class="modal-header py-2 px-3">
-                                <h5 class="modal-title mb-0" id="districtModalLabel" style="font-size: 16px; font-weight: 600;">
-                                    {{ editingDistrict ? 'Edit District' : 'Create District' }}
+                                <h5 class="modal-title mb-0" id="cityModalLabel" style="font-size: 16px; font-weight: 600;">
+                                    {{ editingCity ? 'Edit City' : 'Create City' }}
                                 </h5>
                                 <button
                                     type="button"
@@ -203,10 +203,10 @@ const deleteDistrict = async (district: District) => {
                                 </button>
                             </div>
                             <div class="modal-body py-3 px-3">
-                                <DistrictForm
+                                <CityForm
                                     :form="form"
                                     :states="states"
-                                    :editing-district="editingDistrict"
+                                    :editing-city="editingCity"
                                     :errors="errors"
                                     @submit="handleSubmit"
                                     @cancel="resetForm"
@@ -229,7 +229,7 @@ const deleteDistrict = async (district: District) => {
                                     style="font-size: 13px;"
                                 >
                                     <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
-                                    {{ editingDistrict ? 'Update District' : 'Create District' }}
+                                    {{ editingCity ? 'Update City' : 'Create City' }}
                                 </button>
                             </div>
                         </div>
