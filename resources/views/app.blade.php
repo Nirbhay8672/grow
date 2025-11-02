@@ -1059,27 +1059,27 @@
                             <span>Main menu</span>
                         </li>
                         <li>
-                            <a href="/dashboard" data-inertia-link class="{{ request()->is('dashboard') ? 'active' : '' }}">
-                                <span data-feather="home" class="nav-icon" style="color: #3b82f6;"></span>
-                                <span class="menu-text" style="{{ request()->is('dashboard') ? 'font-weight: bold;' : '' }}">Dashboard</span>
+                            <a href="/dashboard" data-inertia-link data-icon-color="#3b82f6" class="{{ request()->is('dashboard') ? 'active' : '' }}" style="{{ request()->is('dashboard') ? 'background-color: #3b82f6; color: #ffffff; border-radius: 6px; margin-left: 8px; margin-right: 8px; padding: 8px 12px;' : '' }}">
+                                <span data-feather="home" class="nav-icon" style="color: {{ request()->is('dashboard') ? '#ffffff' : '#3b82f6' }};"></span>
+                                <span class="menu-text" style="{{ request()->is('dashboard') ? 'font-weight: 500; color: #ffffff;' : '' }}">Dashboard</span>
                             </a>
                         </li>
                         <li>
-                            <a href="/management/locations" data-inertia-link class="{{ request()->is('management/locations') ? 'active' : '' }}">
-                                <span data-feather="map" class="nav-icon" style="color: #0ea5e9;"></span>
-                                <span class="menu-text" style="{{ request()->is('management/locations') ? 'font-weight: bold;' : '' }}">Location Management</span>
+                            <a href="/management/locations" data-inertia-link data-icon-color="#0ea5e9" class="{{ request()->is('management/locations') ? 'active' : '' }}" style="{{ request()->is('management/locations') ? 'background-color: #0ea5e9; color: #ffffff; border-radius: 6px; margin-left: 8px; margin-right: 8px; padding: 8px 12px;' : '' }}">
+                                <span data-feather="map" class="nav-icon" style="color: {{ request()->is('management/locations') ? '#ffffff' : '#0ea5e9' }};"></span>
+                                <span class="menu-text" style="{{ request()->is('management/locations') ? 'font-weight: 500; color: #ffffff;' : '' }}">Location Management</span>
                             </a>
                         </li>
                         <li>
-                            <a href="/management/users" data-inertia-link class="{{ request()->is('management/users') ? 'active' : '' }}">
-                                <span data-feather="users" class="nav-icon" style="color: #f59e0b;"></span>
-                                <span class="menu-text" style="{{ request()->is('management/users') ? 'font-weight: bold;' : '' }}">User Management</span>
+                            <a href="/management/users" data-inertia-link data-icon-color="#f59e0b" class="{{ request()->is('management/users') ? 'active' : '' }}" style="{{ request()->is('management/users') ? 'background-color: #f59e0b; color: #ffffff; border-radius: 6px; margin-left: 8px; margin-right: 8px; padding: 8px 12px;' : '' }}">
+                                <span data-feather="users" class="nav-icon" style="color: {{ request()->is('management/users') ? '#ffffff' : '#f59e0b' }};"></span>
+                                <span class="menu-text" style="{{ request()->is('management/users') ? 'font-weight: 500; color: #ffffff;' : '' }}">User Management</span>
                             </a>
                         </li>
                         <li>
-                            <a href="/management/configuration" data-inertia-link class="{{ request()->is('management/configuration') || request()->is('measurement-units*') ? 'active' : '' }}">
-                                <span data-feather="settings" class="nav-icon" style="color: #10b981;"></span>
-                                <span class="menu-text" style="{{ request()->is('management/configuration') || request()->is('measurement-units*') ? 'font-weight: bold;' : '' }}">Configuration</span>
+                            <a href="/management/configuration" data-inertia-link data-icon-color="#10b981" class="{{ request()->is('management/configuration') || request()->is('measurement-units*') || request()->is('builders*') ? 'active' : '' }}" style="{{ request()->is('management/configuration') || request()->is('measurement-units*') || request()->is('builders*') ? 'background-color: #10b981; color: #ffffff; border-radius: 6px; margin-left: 8px; margin-right: 8px; padding: 8px 12px;' : '' }}">
+                                <span data-feather="settings" class="nav-icon" style="color: {{ (request()->is('management/configuration') || request()->is('measurement-units*') || request()->is('builders*')) ? '#ffffff' : '#10b981' }};"></span>
+                                <span class="menu-text" style="{{ (request()->is('management/configuration') || request()->is('measurement-units*') || request()->is('builders*')) ? 'font-weight: 500; color: #ffffff;' : '' }}">Configuration</span>
                             </a>
                         </li>
                     </ul>
@@ -1242,18 +1242,129 @@
         <script src="/assets/theme_assets/js/main.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
+            // Function to update active states in sidebar
+            function updateSidebarActiveState() {
+                const currentPath = window.location.pathname;
+                const sidebarLinks = document.querySelectorAll('.sidebar_nav [data-inertia-link]');
+                
+                // Define which routes should activate each menu item
+                const routePatterns = {
+                    '/dashboard': ['/dashboard'],
+                    '/management/locations': ['/management/locations', '/states', '/cities', '/districts', '/localities', '/talukas', '/villages'],
+                    '/management/users': ['/management/users', '/users'],
+                    '/management/configuration': ['/management/configuration', '/measurement-units', '/builders']
+                };
+                
+                sidebarLinks.forEach(link => {
+                    const href = link.getAttribute('href');
+                    const iconColor = link.getAttribute('data-icon-color') || '#1c467b';
+                    const navIcon = link.querySelector('.nav-icon');
+                    const menuText = link.querySelector('.menu-text');
+                    
+                    // Remove active state
+                    link.classList.remove('active');
+                    link.style.backgroundColor = '';
+                    link.style.color = '';
+                    link.style.borderRadius = '';
+                    link.style.marginLeft = '';
+                    link.style.marginRight = '';
+                    link.style.padding = '';
+                    
+                    if (menuText) {
+                        menuText.style.fontWeight = 'normal';
+                        menuText.style.color = '';
+                    }
+                    
+                    if (navIcon) {
+                        navIcon.style.color = iconColor;
+                    }
+                    
+                    // Check if current path matches this link or its patterns
+                    let isActive = false;
+                    
+                    if (routePatterns[href]) {
+                        // Check against patterns
+                        isActive = routePatterns[href].some(pattern => {
+                            if (pattern === currentPath) return true;
+                            if (currentPath.startsWith(pattern + '/')) return true;
+                            return false;
+                        });
+                    } else {
+                        // Exact match
+                        isActive = href === currentPath;
+                    }
+                    
+                    if (isActive) {
+                        link.classList.add('active');
+                        // Apply active styles: background color from icon color, white text
+                        link.style.backgroundColor = iconColor;
+                        link.style.color = '#ffffff';
+                        link.style.borderRadius = '6px';
+                        link.style.transition = 'all 0.3s ease';
+                        link.style.marginLeft = '8px';
+                        link.style.marginRight = '8px';
+                        link.style.padding = '8px 12px';
+                        
+                        if (menuText) {
+                            menuText.style.fontWeight = '500';
+                            menuText.style.color = '#ffffff';
+                        }
+                        
+                        if (navIcon) {
+                            navIcon.style.color = '#ffffff';
+                        }
+                    } else {
+                        // Reset margin and padding for inactive items
+                        link.style.marginLeft = '';
+                        link.style.marginRight = '';
+                        link.style.padding = '';
+                    }
+                });
+            }
+            
             // Handle Inertia links in sidebar
             document.addEventListener('DOMContentLoaded', function() {
+                // Update active state on initial load
+                updateSidebarActiveState();
+                
+                // Handle clicks on Inertia links
                 document.addEventListener('click', function(e) {
                     const link = e.target.closest('[data-inertia-link]');
                     if (link && link.href && link.href.startsWith(window.location.origin)) {
                         e.preventDefault();
                         const href = link.getAttribute('href');
                         if (window.Inertia) {
-                            window.Inertia.visit(href);
+                            window.Inertia.visit(href, {
+                                onSuccess: function() {
+                                    // Update active state after navigation
+                                    setTimeout(updateSidebarActiveState, 100);
+                                }
+                            });
                         }
                     }
                 });
+            });
+            
+            // Listen for URL changes (including Inertia navigation)
+            let lastUrl = window.location.pathname;
+            
+            // Check for URL changes periodically (fallback method)
+            setInterval(function() {
+                const currentUrl = window.location.pathname;
+                if (currentUrl !== lastUrl) {
+                    lastUrl = currentUrl;
+                    updateSidebarActiveState();
+                }
+            }, 100);
+            
+            // Update on popstate (back/forward buttons)
+            window.addEventListener('popstate', function() {
+                setTimeout(updateSidebarActiveState, 100);
+            });
+            
+            // Update when hash changes
+            window.addEventListener('hashchange', function() {
+                setTimeout(updateSidebarActiveState, 100);
             });
         </script>
     </body>
