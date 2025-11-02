@@ -1076,6 +1076,12 @@
                                 <span class="menu-text" style="{{ request()->is('management/users') ? 'font-weight: bold;' : '' }}">User Management</span>
                             </a>
                         </li>
+                        <li>
+                            <a href="/management/configuration" data-inertia-link class="{{ request()->is('management/configuration') || request()->is('measurement-units*') ? 'active' : '' }}">
+                                <span data-feather="settings" class="nav-icon" style="color: #10b981;"></span>
+                                <span class="menu-text" style="{{ request()->is('management/configuration') || request()->is('measurement-units*') ? 'font-weight: bold;' : '' }}">Configuration</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>

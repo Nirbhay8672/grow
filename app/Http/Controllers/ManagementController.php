@@ -33,5 +33,16 @@ class ManagementController extends Controller
             'stats' => $stats,
         ]);
     }
+
+    public function configuration()
+    {
+        $stats = [
+            'measurementUnits' => \App\Models\MeasurementUnit::count(),
+        ];
+
+        return Inertia::render('ConfigurationManagement', [
+            'stats' => $stats,
+        ]);
+    }
 }
 

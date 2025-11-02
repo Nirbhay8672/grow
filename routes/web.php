@@ -11,6 +11,7 @@ use App\Http\Controllers\LocalityController;
 use App\Http\Controllers\TalukaController;
 use App\Http\Controllers\VillageController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\MeasurementUnitController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -20,6 +21,7 @@ Route::get('dashboard', [DashboardController::class, 'index'])->middleware(['aut
 
 Route::get('management/locations', [ManagementController::class, 'locations'])->middleware(['auth', 'verified'])->name('management.locations');
 Route::get('management/users', [ManagementController::class, 'users'])->middleware(['auth', 'verified'])->name('management.users');
+Route::get('management/configuration', [ManagementController::class, 'configuration'])->middleware(['auth', 'verified'])->name('management.configuration');
 
 Route::get('profile', [UserController::class, 'showProfile'])->middleware(['auth', 'verified'])->name('profile');
 
@@ -31,6 +33,7 @@ Route::get('localities', [LocalityController::class, 'showPage'])->middleware(['
 Route::get('talukas', [TalukaController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('talukas.index');
 Route::get('villages', [VillageController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('villages.index');
 Route::get('users', [UserController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:user.read'])->name('users.index');
+Route::get('measurement-units', [MeasurementUnitController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('measurement-units.index');
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/roles', [RoleController::class, 'store'])->name('roles.store')->middleware('permission:role.create');
@@ -78,6 +81,11 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update')->middleware('permission:user.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy')->middleware('permission:user.delete');
     Route::patch('/users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggle-active')->middleware('permission:user.update');
+    
+    Route::post('/measurement-units', [MeasurementUnitController::class, 'store'])->name('measurement-units.store')->middleware('permission:role.create');
+    Route::get('/measurement-units/{measurementUnit}', [MeasurementUnitController::class, 'show'])->name('measurement-units.show')->middleware('permission:role.read');
+    Route::put('/measurement-units/{measurementUnit}', [MeasurementUnitController::class, 'update'])->name('measurement-units.update')->middleware('permission:role.update');
+    Route::delete('/measurement-units/{measurementUnit}', [MeasurementUnitController::class, 'destroy'])->name('measurement-units.destroy')->middleware('permission:role.delete');
     
     // Profile routes (users can update their own profile)
     Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update.simple');
