@@ -23,6 +23,15 @@ class DatabaseSeeder extends Seeder
             MeasurementUnitSeeder::class,
             BuilderSeeder::class,
             ConstructionTypeSeeder::class,
+            CategorySeeder::class,
+            SubCategorySeeder::class,
+            PriorityTypeSeeder::class,
+            PropertySourceSeeder::class,
+            OwnerTypeSeeder::class,
+            FurnitureTypeSeeder::class,
+            PropertyZoneSeeder::class,
+            AmenitySeeder::class,
+            PropertyConstructionDocumentSeeder::class,
         ]);
     }
 }

@@ -16,6 +16,13 @@ use App\Http\Controllers\BuilderController;
 use App\Http\Controllers\ConstructionTypeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SubCategoryController;
+use App\Http\Controllers\PriorityTypeController;
+use App\Http\Controllers\PropertySourceController;
+use App\Http\Controllers\OwnerTypeController;
+use App\Http\Controllers\FurnitureTypeController;
+use App\Http\Controllers\PropertyZoneController;
+use App\Http\Controllers\AmenityController;
+use App\Http\Controllers\PropertyConstructionDocumentController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -43,6 +50,13 @@ Route::get('builders', [BuilderController::class, 'showPage'])->middleware(['aut
 Route::get('construction-types', [ConstructionTypeController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('construction-types.index');
 Route::get('categories', [CategoryController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('categories.index');
 Route::get('sub-categories', [SubCategoryController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('sub-categories.index');
+Route::get('priority-types', [PriorityTypeController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('priority-types.index');
+Route::get('property-sources', [PropertySourceController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('property-sources.index');
+Route::get('owner-types', [OwnerTypeController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('owner-types.index');
+Route::get('furniture-types', [FurnitureTypeController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('furniture-types.index');
+Route::get('property-zones', [PropertyZoneController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('property-zones.index');
+Route::get('amenities', [AmenityController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('amenities.index');
+Route::get('property-construction-documents', [PropertyConstructionDocumentController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('property-construction-documents.index');
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/roles', [RoleController::class, 'store'])->name('roles.store')->middleware('permission:role.create');
@@ -116,6 +130,41 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/sub-categories/{subCategory}', [SubCategoryController::class, 'update'])->name('sub-categories.update')->middleware('permission:role.update');
     Route::delete('/sub-categories/{subCategory}', [SubCategoryController::class, 'destroy'])->name('sub-categories.destroy')->middleware('permission:role.delete');
     Route::get('/categories/{category}/sub-categories', [SubCategoryController::class, 'getByCategory'])->name('sub-categories.by-category')->middleware('permission:role.read');
+    
+    Route::post('/priority-types', [PriorityTypeController::class, 'store'])->name('priority-types.store')->middleware('permission:role.create');
+    Route::get('/priority-types/{priorityType}', [PriorityTypeController::class, 'show'])->name('priority-types.show')->middleware('permission:role.read');
+    Route::put('/priority-types/{priorityType}', [PriorityTypeController::class, 'update'])->name('priority-types.update')->middleware('permission:role.update');
+    Route::delete('/priority-types/{priorityType}', [PriorityTypeController::class, 'destroy'])->name('priority-types.destroy')->middleware('permission:role.delete');
+    
+    Route::post('/property-sources', [PropertySourceController::class, 'store'])->name('property-sources.store')->middleware('permission:role.create');
+    Route::get('/property-sources/{propertySource}', [PropertySourceController::class, 'show'])->name('property-sources.show')->middleware('permission:role.read');
+    Route::put('/property-sources/{propertySource}', [PropertySourceController::class, 'update'])->name('property-sources.update')->middleware('permission:role.update');
+    Route::delete('/property-sources/{propertySource}', [PropertySourceController::class, 'destroy'])->name('property-sources.destroy')->middleware('permission:role.delete');
+    
+    Route::post('/owner-types', [OwnerTypeController::class, 'store'])->name('owner-types.store')->middleware('permission:role.create');
+    Route::get('/owner-types/{ownerType}', [OwnerTypeController::class, 'show'])->name('owner-types.show')->middleware('permission:role.read');
+    Route::put('/owner-types/{ownerType}', [OwnerTypeController::class, 'update'])->name('owner-types.update')->middleware('permission:role.update');
+    Route::delete('/owner-types/{ownerType}', [OwnerTypeController::class, 'destroy'])->name('owner-types.destroy')->middleware('permission:role.delete');
+    
+    Route::post('/furniture-types', [FurnitureTypeController::class, 'store'])->name('furniture-types.store')->middleware('permission:role.create');
+    Route::get('/furniture-types/{furnitureType}', [FurnitureTypeController::class, 'show'])->name('furniture-types.show')->middleware('permission:role.read');
+    Route::put('/furniture-types/{furnitureType}', [FurnitureTypeController::class, 'update'])->name('furniture-types.update')->middleware('permission:role.update');
+    Route::delete('/furniture-types/{furnitureType}', [FurnitureTypeController::class, 'destroy'])->name('furniture-types.destroy')->middleware('permission:role.delete');
+    
+    Route::post('/property-zones', [PropertyZoneController::class, 'store'])->name('property-zones.store')->middleware('permission:role.create');
+    Route::get('/property-zones/{propertyZone}', [PropertyZoneController::class, 'show'])->name('property-zones.show')->middleware('permission:role.read');
+    Route::put('/property-zones/{propertyZone}', [PropertyZoneController::class, 'update'])->name('property-zones.update')->middleware('permission:role.update');
+    Route::delete('/property-zones/{propertyZone}', [PropertyZoneController::class, 'destroy'])->name('property-zones.destroy')->middleware('permission:role.delete');
+    
+    Route::post('/amenities', [AmenityController::class, 'store'])->name('amenities.store')->middleware('permission:role.create');
+    Route::get('/amenities/{amenity}', [AmenityController::class, 'show'])->name('amenities.show')->middleware('permission:role.read');
+    Route::put('/amenities/{amenity}', [AmenityController::class, 'update'])->name('amenities.update')->middleware('permission:role.update');
+    Route::delete('/amenities/{amenity}', [AmenityController::class, 'destroy'])->name('amenities.destroy')->middleware('permission:role.delete');
+    
+    Route::post('/property-construction-documents', [PropertyConstructionDocumentController::class, 'store'])->name('property-construction-documents.store')->middleware('permission:role.create');
+    Route::get('/property-construction-documents/{propertyConstructionDocument}', [PropertyConstructionDocumentController::class, 'show'])->name('property-construction-documents.show')->middleware('permission:role.read');
+    Route::put('/property-construction-documents/{propertyConstructionDocument}', [PropertyConstructionDocumentController::class, 'update'])->name('property-construction-documents.update')->middleware('permission:role.update');
+    Route::delete('/property-construction-documents/{propertyConstructionDocument}', [PropertyConstructionDocumentController::class, 'destroy'])->name('property-construction-documents.destroy')->middleware('permission:role.delete');
     
     // Profile routes (users can update their own profile)
     Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update.simple');

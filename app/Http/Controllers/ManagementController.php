@@ -52,6 +52,13 @@ class ManagementController extends Controller
             'constructionTypes' => \App\Models\ConstructionType::count(),
             'categories' => \App\Models\Category::count(),
             'subCategories' => \App\Models\SubCategory::count(),
+            'priorityTypes' => \App\Models\PriorityType::count(),
+            'propertySources' => \App\Models\PropertySource::count(),
+            'ownerTypes' => \App\Models\OwnerType::count(),
+            'furnitureTypes' => \App\Models\FurnitureType::count(),
+            'propertyZones' => \App\Models\PropertyZone::count(),
+            'amenities' => \App\Models\Amenity::count(),
+            'propertyConstructionDocuments' => \App\Models\PropertyConstructionDocument::count(),
         ];
 
         return Inertia::render('PropertyConfigurationManagement', [
