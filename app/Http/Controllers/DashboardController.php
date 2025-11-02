@@ -14,6 +14,12 @@ class DashboardController extends Controller
             'users' => \App\Models\User::count(),
             'states' => \App\Models\State::count(),
             'cities' => \App\Models\City::count(),
+            'districts' => \App\Models\District::count(),
+            'localities' => \App\Models\Locality::count(),
+            'talukas' => \App\Models\Taluka::count(),
+            'villages' => \App\Models\Village::count(),
+            'builders' => \App\Models\Builder::count(),
+            'measurementUnits' => \App\Models\MeasurementUnit::count(),
         ];
         
         return Inertia::render('Dashboard', [
