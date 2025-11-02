@@ -44,6 +44,7 @@ class CitySeeder extends Seeder
                         'name' => $cityName,
                         'state_id' => $state->id,
                         'is_active' => true,
+                        'user_id' => 1,
                     ]);
                 }
             }

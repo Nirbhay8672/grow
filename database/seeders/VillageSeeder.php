@@ -163,6 +163,7 @@ class VillageSeeder extends Seeder
                                     'district_id' => $district->id,
                                     'taluka_id' => $taluka->id,
                                     'is_active' => true,
+                                    'user_id' => 1,
                                 ]);
                             }
                         }

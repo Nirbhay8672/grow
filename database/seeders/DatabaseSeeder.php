@@ -16,13 +16,13 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RolesAndPermissionsSeeder::class,
+            UserSeeder::class,
             StateSeeder::class,
             CitySeeder::class,
             DistrictSeeder::class,
             TalukaSeeder::class,
             LocalitySeeder::class,
             VillageSeeder::class,
-            UserSeeder::class,
             MeasurementUnitSeeder::class,
             BuilderSeeder::class,
         ]);

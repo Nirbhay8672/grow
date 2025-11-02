@@ -32,6 +32,7 @@ class TalukaController extends Controller
     public function store(TalukaStoreRequest $request): Response
     {
         $validated = $request->validated();
+        $validated['user_id'] = auth()->id();
 
         $taluka = Taluka::create($validated);
         $taluka->load('district');

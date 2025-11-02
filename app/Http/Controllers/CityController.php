@@ -33,6 +33,7 @@ class CityController extends Controller
     public function store(CityStoreRequest $request): Response
     {
         $validated = $request->validated();
+        $validated['user_id'] = auth()->id();
 
         $city = City::create($validated);
         $city->load('state');

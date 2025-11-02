@@ -223,6 +223,7 @@ class DistrictSeeder extends Seeder
                             'name' => $districtName,
                             'state_id' => $state->id,
                             'is_active' => true,
+                            'user_id' => 1,
                         ]);
                     }
                 }

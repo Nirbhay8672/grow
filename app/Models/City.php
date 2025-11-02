@@ -12,6 +12,7 @@ class City extends Model
         'name',
         'state_id',
         'is_active',
+        'user_id',
     ];
 
     protected function casts(): array
@@ -29,5 +30,10 @@ class City extends Model
     public function localities(): HasMany
     {
         return $this->hasMany(Locality::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

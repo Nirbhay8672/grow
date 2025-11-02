@@ -33,6 +33,7 @@ class VillageController extends Controller
     public function store(VillageStoreRequest $request): Response
     {
         $validated = $request->validated();
+        $validated['user_id'] = auth()->id();
 
         $village = Village::create($validated);
         $village->load(['district', 'taluka']);

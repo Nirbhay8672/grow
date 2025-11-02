@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class State extends Model
@@ -11,6 +12,7 @@ class State extends Model
         'name',
         'code',
         'is_active',
+        'user_id',
     ];
 
     protected function casts(): array
@@ -28,5 +30,10 @@ class State extends Model
     public function districts(): HasMany
     {
         return $this->hasMany(District::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

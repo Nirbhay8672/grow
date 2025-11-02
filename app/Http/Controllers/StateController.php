@@ -24,6 +24,7 @@ class StateController extends Controller
     public function store(StateStoreRequest $request): Response
     {
         $validated = $request->validated();
+        $validated['user_id'] = auth()->id();
 
         $state = State::create($validated);
 

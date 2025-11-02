@@ -14,7 +14,6 @@ class BuilderController extends Controller
     public function index(Request $request): Response
     {
         $builders = Builder::query()
-            ->with('user')
             ->orderBy('name')
             ->get();
 
@@ -27,14 +26,12 @@ class BuilderController extends Controller
         $validated['user_id'] = auth()->id();
 
         $builder = Builder::create($validated);
-        $builder->load('user');
 
         return response($builder, 201);
     }
 
     public function show(Builder $builder): Response
     {
-        $builder->load('user');
         return response($builder);
     }
 
@@ -43,7 +40,6 @@ class BuilderController extends Controller
         $validated = $request->validated();
 
         $builder->update($validated);
-        $builder->load('user');
 
         return response($builder);
     }
@@ -57,8 +53,7 @@ class BuilderController extends Controller
 
     public function showPage()
     {
-        $builders = Builder::with('user')
-            ->orderBy('name')
+        $builders = Builder::orderBy('name')
             ->get();
         
         return Inertia::render('builders/Builders', [

@@ -12,6 +12,7 @@ class Taluka extends Model
         'name',
         'district_id',
         'is_active',
+        'user_id',
     ];
 
     protected function casts(): array
@@ -29,6 +30,11 @@ class Taluka extends Model
     public function villages(): HasMany
     {
         return $this->hasMany(Village::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
 

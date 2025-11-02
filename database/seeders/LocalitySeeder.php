@@ -309,6 +309,7 @@ class LocalitySeeder extends Seeder
                                         'city_id' => $city->id,
                                         'zip_code' => $localityInfo['zip_code'],
                                         'is_active' => true,
+                                        'user_id' => 1,
                                     ]);
                                 }
                             }

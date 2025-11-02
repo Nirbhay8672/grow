@@ -33,6 +33,7 @@ class LocalityController extends Controller
     public function store(LocalityStoreRequest $request): Response
     {
         $validated = $request->validated();
+        $validated['user_id'] = auth()->id();
 
         $locality = Locality::create($validated);
         $locality->load(['state', 'city']);

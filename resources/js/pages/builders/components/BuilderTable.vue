@@ -6,10 +6,6 @@ interface Builder {
     name: string;
     is_active: boolean;
     user_id: number;
-    user?: {
-        id: number;
-        name: string;
-    };
     created_at: string;
     updated_at: string;
 }
@@ -59,9 +55,6 @@ onMounted(() => {
                                     <span class="userDatatable-title">Builder Name</span>
                                 </th>
                                 <th>
-                                    <span class="userDatatable-title">Created By</span>
-                                </th>
-                                <th>
                                     <span class="userDatatable-title">Status</span>
                                 </th>
                                 <th>
@@ -84,15 +77,6 @@ onMounted(() => {
                                                 </a>
                                             </div>
                                         </div>
-                                    </div>
-                                </td>
-
-                                <!-- Created By -->
-                                <td>
-                                    <div class="userDatatable-content">
-                                        <span class="text-muted">
-                                            {{ builder.user?.name || 'N/A' }}
-                                        </span>
                                     </div>
                                 </td>
 

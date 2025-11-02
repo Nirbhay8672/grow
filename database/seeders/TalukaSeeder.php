@@ -139,6 +139,7 @@ class TalukaSeeder extends Seeder
                             'name' => $talukaName,
                             'district_id' => $district->id,
                             'is_active' => true,
+                            'user_id' => 1,
                         ]);
                     }
                 }

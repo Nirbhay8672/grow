@@ -33,6 +33,7 @@ class DistrictController extends Controller
     public function store(DistrictStoreRequest $request): Response
     {
         $validated = $request->validated();
+        $validated['user_id'] = auth()->id();
 
         $district = District::create($validated);
         $district->load('state');

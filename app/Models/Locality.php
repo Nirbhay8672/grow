@@ -13,6 +13,7 @@ class Locality extends Model
         'city_id',
         'zip_code',
         'is_active',
+        'user_id',
     ];
 
     protected function casts(): array
@@ -30,6 +31,11 @@ class Locality extends Model
     public function city(): BelongsTo
     {
         return $this->belongsTo(City::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
 

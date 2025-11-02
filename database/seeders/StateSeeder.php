@@ -48,6 +48,7 @@ class StateSeeder extends Seeder
                 'name' => $state['name'],
                 'code' => $state['code'],
                 'is_active' => true,
+                'user_id' => 1,
             ]);
         }
     }

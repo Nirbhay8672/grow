@@ -12,6 +12,7 @@ class Village extends Model
         'district_id',
         'taluka_id',
         'is_active',
+        'user_id',
     ];
 
     protected function casts(): array
@@ -29,6 +30,11 @@ class Village extends Model
     public function taluka(): BelongsTo
     {
         return $this->belongsTo(Taluka::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
 

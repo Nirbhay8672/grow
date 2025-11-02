@@ -14,7 +14,6 @@ class MeasurementUnitController extends Controller
     public function index(Request $request): Response
     {
         $measurementUnits = MeasurementUnit::query()
-            ->with('user')
             ->orderBy('name')
             ->get();
 
@@ -27,14 +26,12 @@ class MeasurementUnitController extends Controller
         $validated['user_id'] = auth()->id();
 
         $measurementUnit = MeasurementUnit::create($validated);
-        $measurementUnit->load('user');
 
         return response($measurementUnit, 201);
     }
 
     public function show(MeasurementUnit $measurementUnit): Response
     {
-        $measurementUnit->load('user');
         return response($measurementUnit);
     }
 
@@ -43,7 +40,6 @@ class MeasurementUnitController extends Controller
         $validated = $request->validated();
 
         $measurementUnit->update($validated);
-        $measurementUnit->load('user');
 
         return response($measurementUnit);
     }
@@ -57,8 +53,7 @@ class MeasurementUnitController extends Controller
 
     public function showPage()
     {
-        $measurementUnits = MeasurementUnit::with('user')
-            ->orderBy('name')
+        $measurementUnits = MeasurementUnit::orderBy('name')
             ->get();
         
         return Inertia::render('measurement-units/MeasurementUnits', [

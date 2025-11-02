@@ -14,10 +14,6 @@ interface MeasurementUnit {
     name: string;
     is_active: boolean;
     user_id: number;
-    user?: {
-        id: number;
-        name: string;
-    };
     created_at: string;
     updated_at: string;
 }
