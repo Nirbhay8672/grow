@@ -12,6 +12,7 @@ use App\Http\Controllers\TalukaController;
 use App\Http\Controllers\VillageController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MeasurementUnitController;
+use App\Http\Controllers\BuilderController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -34,6 +35,7 @@ Route::get('talukas', [TalukaController::class, 'showPage'])->middleware(['auth'
 Route::get('villages', [VillageController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('villages.index');
 Route::get('users', [UserController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:user.read'])->name('users.index');
 Route::get('measurement-units', [MeasurementUnitController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('measurement-units.index');
+Route::get('builders', [BuilderController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('builders.index');
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/roles', [RoleController::class, 'store'])->name('roles.store')->middleware('permission:role.create');
@@ -86,6 +88,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/measurement-units/{measurementUnit}', [MeasurementUnitController::class, 'show'])->name('measurement-units.show')->middleware('permission:role.read');
     Route::put('/measurement-units/{measurementUnit}', [MeasurementUnitController::class, 'update'])->name('measurement-units.update')->middleware('permission:role.update');
     Route::delete('/measurement-units/{measurementUnit}', [MeasurementUnitController::class, 'destroy'])->name('measurement-units.destroy')->middleware('permission:role.delete');
+    
+    Route::post('/builders', [BuilderController::class, 'store'])->name('builders.store')->middleware('permission:role.create');
+    Route::get('/builders/{builder}', [BuilderController::class, 'show'])->name('builders.show')->middleware('permission:role.read');
+    Route::put('/builders/{builder}', [BuilderController::class, 'update'])->name('builders.update')->middleware('permission:role.update');
+    Route::delete('/builders/{builder}', [BuilderController::class, 'destroy'])->name('builders.destroy')->middleware('permission:role.delete');
     
     // Profile routes (users can update their own profile)
     Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update.simple');

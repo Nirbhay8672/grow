@@ -6,6 +6,7 @@ import { Head, Link } from '@inertiajs/vue3';
 interface Props {
     stats: {
         measurementUnits: number;
+        builders: number;
     };
 }
 
@@ -45,6 +46,28 @@ onMounted(() => {
                             </div>
                             <div class="mt-3">
                                 <span class="text-success small">Manage measurement units →</span>
+                            </div>
+                        </div>
+                    </div>
+                </Link>
+            </div>
+
+            <!-- Builders Card -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <Link href="/builders" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm hover-shadow transition">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="text-muted mb-2">Builders</h6>
+                                    <h3 class="mb-0 color-dark fw-bold">{{ stats.builders }}</h3>
+                                </div>
+                                <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                    <span data-feather="tool" class="text-primary" style="width: 32px; height: 32px;"></span>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-primary small">Manage builders →</span>
                             </div>
                         </div>
                     </div>

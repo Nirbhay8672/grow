@@ -38,6 +38,7 @@ class ManagementController extends Controller
     {
         $stats = [
             'measurementUnits' => \App\Models\MeasurementUnit::count(),
+            'builders' => \App\Models\Builder::count(),
         ];
 
         return Inertia::render('ConfigurationManagement', [
