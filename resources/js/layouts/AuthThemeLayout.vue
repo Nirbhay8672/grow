@@ -14,7 +14,7 @@ withDefaults(defineProps<Props>(), {
     <main class="main-content">
         <div class="signUP-admin">
             <div class="container-fluid">
-                <div class="row justify-content-center"  style="min-height: 100vh; background-image: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0.80) 40%, rgba(255,255,255,0.20) 100%), url('https://www.itl.cat/pngfile/big/9-92452_original-resolution-popular-4k-dubai.jpg'); background-size: cover; background-position: center center; background-repeat: no-repeat; background-attachment: scroll;">
+                <div class="row justify-content-center"  style="min-height: 100vh; background-image: linear-gradient(to bottom, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.50) 30%, rgba(255,255,255,0.15) 100%), url('https://www.itl.cat/pngfile/big/9-92452_original-resolution-popular-4k-dubai.jpg'); background-size: cover; background-position: center center; background-repeat: no-repeat; background-attachment: scroll;">
                     <div class="col-xl-4 col-lg-5 col-md-5 p-0">
                         <div class="signUP-admin-left signIn-admin-left position-relative" style="background: linear-gradient(135deg, #f9eff8 0%, #f3e8f3 100%); overflow: hidden;">
                             <!-- Decorative Background Elements -->
