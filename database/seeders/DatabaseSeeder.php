@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             VillageSeeder::class,
             MeasurementUnitSeeder::class,
             BuilderSeeder::class,
+            ConstructionTypeSeeder::class,
         ]);
     }
 }

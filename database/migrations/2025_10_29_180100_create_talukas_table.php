@@ -16,7 +16,9 @@ return new class extends Migration
             $table->string('name');
             $table->foreignId('district_id')->constrained()->onDelete('cascade');
             $table->boolean('is_active')->default(true);
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->timestamps();
+            $table->unique(['name', 'district_id'], 'talukas_name_district_id_unique');
         });
     }
 

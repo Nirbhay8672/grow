@@ -13,6 +13,9 @@ use App\Http\Controllers\VillageController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MeasurementUnitController;
 use App\Http\Controllers\BuilderController;
+use App\Http\Controllers\ConstructionTypeController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SubCategoryController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -23,6 +26,7 @@ Route::get('dashboard', [DashboardController::class, 'index'])->middleware(['aut
 Route::get('management/locations', [ManagementController::class, 'locations'])->middleware(['auth', 'verified'])->name('management.locations');
 Route::get('management/users', [ManagementController::class, 'users'])->middleware(['auth', 'verified'])->name('management.users');
 Route::get('management/configuration', [ManagementController::class, 'configuration'])->middleware(['auth', 'verified'])->name('management.configuration');
+Route::get('management/property-configuration', [ManagementController::class, 'propertyConfiguration'])->middleware(['auth', 'verified'])->name('management.property-configuration');
 
 Route::get('profile', [UserController::class, 'showProfile'])->middleware(['auth', 'verified'])->name('profile');
 
@@ -36,6 +40,9 @@ Route::get('villages', [VillageController::class, 'showPage'])->middleware(['aut
 Route::get('users', [UserController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:user.read'])->name('users.index');
 Route::get('measurement-units', [MeasurementUnitController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('measurement-units.index');
 Route::get('builders', [BuilderController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('builders.index');
+Route::get('construction-types', [ConstructionTypeController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('construction-types.index');
+Route::get('categories', [CategoryController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('categories.index');
+Route::get('sub-categories', [SubCategoryController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('sub-categories.index');
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/roles', [RoleController::class, 'store'])->name('roles.store')->middleware('permission:role.create');
@@ -93,6 +100,22 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/builders/{builder}', [BuilderController::class, 'show'])->name('builders.show')->middleware('permission:role.read');
     Route::put('/builders/{builder}', [BuilderController::class, 'update'])->name('builders.update')->middleware('permission:role.update');
     Route::delete('/builders/{builder}', [BuilderController::class, 'destroy'])->name('builders.destroy')->middleware('permission:role.delete');
+    
+    Route::post('/construction-types', [ConstructionTypeController::class, 'store'])->name('construction-types.store')->middleware('permission:role.create');
+    Route::get('/construction-types/{constructionType}', [ConstructionTypeController::class, 'show'])->name('construction-types.show')->middleware('permission:role.read');
+    Route::put('/construction-types/{constructionType}', [ConstructionTypeController::class, 'update'])->name('construction-types.update')->middleware('permission:role.update');
+    Route::delete('/construction-types/{constructionType}', [ConstructionTypeController::class, 'destroy'])->name('construction-types.destroy')->middleware('permission:role.delete');
+    
+    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store')->middleware('permission:role.create');
+    Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show')->middleware('permission:role.read');
+    Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update')->middleware('permission:role.update');
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy')->middleware('permission:role.delete');
+    
+    Route::post('/sub-categories', [SubCategoryController::class, 'store'])->name('sub-categories.store')->middleware('permission:role.create');
+    Route::get('/sub-categories/{subCategory}', [SubCategoryController::class, 'show'])->name('sub-categories.show')->middleware('permission:role.read');
+    Route::put('/sub-categories/{subCategory}', [SubCategoryController::class, 'update'])->name('sub-categories.update')->middleware('permission:role.update');
+    Route::delete('/sub-categories/{subCategory}', [SubCategoryController::class, 'destroy'])->name('sub-categories.destroy')->middleware('permission:role.delete');
+    Route::get('/categories/{category}/sub-categories', [SubCategoryController::class, 'getByCategory'])->name('sub-categories.by-category')->middleware('permission:role.read');
     
     // Profile routes (users can update their own profile)
     Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update.simple');

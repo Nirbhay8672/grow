@@ -18,7 +18,11 @@ return new class extends Migration
             $table->foreignId('city_id')->constrained()->onDelete('cascade');
             $table->string('zip_code', 10);
             $table->boolean('is_active')->default(true);
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->timestamps();
+            $table->unique(['state_id', 'city_id', 'zip_code'], 'localities_state_city_zip_unique');
+            $table->unique('zip_code', 'localities_zip_code_unique');
+            $table->unique(['state_id', 'city_id', 'zip_code', 'name'], 'localities_state_city_zip_name_unique');
         });
     }
 

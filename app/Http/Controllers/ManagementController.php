@@ -45,5 +45,18 @@ class ManagementController extends Controller
             'stats' => $stats,
         ]);
     }
+
+    public function propertyConfiguration()
+    {
+        $stats = [
+            'constructionTypes' => \App\Models\ConstructionType::count(),
+            'categories' => \App\Models\Category::count(),
+            'subCategories' => \App\Models\SubCategory::count(),
+        ];
+
+        return Inertia::render('PropertyConfigurationManagement', [
+            'stats' => $stats,
+        ]);
+    }
 }
 
