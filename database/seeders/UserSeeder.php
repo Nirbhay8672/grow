@@ -33,7 +33,7 @@ class UserSeeder extends Seeder
                 'state_id' => $state?->id,
                 'city_id' => $city?->id,
                 'parent_id' => null,
-                'password' => bcrypt('123123'),
+                'password' => bcrypt('mrweb@2025'),
                 'email_verified_at' => now(),
                 'is_active' => true,
             ],
