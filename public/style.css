@@ -1375,34 +1375,34 @@ a:hover h6 {
 }
 
 .color-secondary, .upload-product-img span a, .product-item__body .product-discount, .atbd-tag.tag-secondary.tag-transparented, .signUp-admin-right .card .card-header h6 span, .avatar .avatar-badge-wrap .badge-icon.badge-icon-secondary, .badge.badge-outlined.badge-secondary {
-  color: #ff69a5;
+  color: #1c467b;
 }
 
 .bg-secondary, .fc-daygrid-day .fc-daygrid-event.secondary, .atbd-tag.tag-secondary, .ffw:hover button:hover, .ffw:hover button, .btn.btn-transparent-secondary:hover {
-  background: #ff69a5;
+  background: #1c467b;
 }
 
 .iborder-secondary {
-  color: #ff69a5;
+  color: #1c467b;
 }
 
 .outline-secondary {
-  border: 1px solid #ff69a5;
-  color: #ff69a5;
+  border: 1px solid #1c467b;
+  color: #1c467b;
 }
 
 .active-color-secondary label input:checked + span {
-  background: #ff69a5;
-  border-color: #ff69a5;
+  background: #1c467b;
+  border-color: #1c467b;
 }
 
 .circle-secondary {
-  color: #ff69a5;
+  color: #1c467b;
   background: rgba(255, 105, 165, 0.1);
 }
 
 .border-secondary, .badge.badge-outlined.badge-secondary {
-  border: 1px solid #ff69a5;
+  border: 1px solid #1c467b;
 }
 
 .bg-opacity-secondary {
@@ -1414,7 +1414,7 @@ a:hover h6 {
 }
 
 .hover-secondary:hover {
-  background: #ff69a5;
+  background: #1c467b;
   color: #ffffff;
 }
 
@@ -2257,9 +2257,9 @@ table.fc-scrollgrid thead .fc-scroller-harness .card.fc-scroller .card-body, .sl
 }
 
 .outline-lg-secondary {
-  border: 2px solid #ff69a5;
+  border: 2px solid #1c467b;
   background: none;
-  color: #ff69a5;
+  color: #1c467b;
 }
 
 .outline-lg-success {
@@ -2335,7 +2335,7 @@ table.fc-scrollgrid thead .fc-scroller-harness .card.fc-scroller .card-body, .sl
 
 .btn-transparent-secondary {
   background: rgba(255, 105, 165, 0.15);
-  color: #ff69a5;
+  color: #1c467b;
 }
 
 .btn-transparent-success {
@@ -2405,11 +2405,11 @@ table.fc-scrollgrid thead .fc-scroller-harness .card.fc-scroller .card-body, .sl
 }
 
 .checkbox-secondary .custom-control-label::before {
-  background: #ff69a5;
+  background: #1c467b;
 }
 .checkbox-secondary .custom-control-input:checked ~ .custom-control-label::before {
-  background: #ff69a5;
-  border: 1px solid #ff69a5;
+  background: #1c467b;
+  border: 1px solid #1c467b;
 }
 .checkbox-secondary .custom-control-input:checked ~ .custom-control-label::after {
   color: #9299b8;
@@ -2551,8 +2551,8 @@ table.fc-scrollgrid thead .fc-scroller-harness .card.fc-scroller .card-body, .sl
   border: 1px solid #e3e6ef;
 }
 .checkbox-outline-secondary .custom-control-input:checked ~ .custom-control-label::before {
-  border: 1px solid #ff69a5;
-  background: #ff69a5;
+  border: 1px solid #1c467b;
+  background: #1c467b;
 }
 .checkbox-outline-secondary .custom-control-input:checked ~ .custom-control-label::after {
   color: #fff;
@@ -2829,24 +2829,24 @@ table.fc-scrollgrid thead .fc-scroller-harness .card.fc-scroller .card-body, .sl
 
 .gradient1 {
   background: #1c467b;
-  background: -webkit-linear-gradient(to right, #1c467b, #ff69a5);
-  background: -o-linear-gradient(to right, #1c467b, #ff69a5);
-  background: -webkit-gradient(linear, left top, right top, from(#1c467b), to(#ff69a5));
-  background: -webkit-linear-gradient(left, #1c467b, #ff69a5);
-  background: -o-linear-gradient(left, #1c467b, #ff69a5);
-  background: linear-gradient(to right, #1c467b, #ff69a5);
-  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#1c467b, endColorstr=#ff69a5);
+  background: -webkit-linear-gradient(to right, #1c467b, #1c467b);
+  background: -o-linear-gradient(to right, #1c467b, #1c467b);
+  background: -webkit-gradient(linear, left top, right top, from(#1c467b), to(#1c467b));
+  background: -webkit-linear-gradient(left, #1c467b, #1c467b);
+  background: -o-linear-gradient(left, #1c467b, #1c467b);
+  background: linear-gradient(to right, #1c467b, #1c467b);
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#1c467b, endColorstr=#1c467b);
 }
 
 .gradient2 {
-  background: #ff69a5;
-  background: -webkit-linear-gradient(to right, #ff69a5, #fa8b0c);
-  background: -o-linear-gradient(to right, #ff69a5, #fa8b0c);
-  background: -webkit-gradient(linear, left top, right top, from(#ff69a5), to(#fa8b0c));
-  background: -webkit-linear-gradient(left, #ff69a5, #fa8b0c);
-  background: -o-linear-gradient(left, #ff69a5, #fa8b0c);
-  background: linear-gradient(to right, #ff69a5, #fa8b0c);
-  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#ff69a5, endColorstr=#fa8b0c);
+  background: #1c467b;
+  background: -webkit-linear-gradient(to right, #1c467b, #fa8b0c);
+  background: -o-linear-gradient(to right, #1c467b, #fa8b0c);
+  background: -webkit-gradient(linear, left top, right top, from(#1c467b), to(#fa8b0c));
+  background: -webkit-linear-gradient(left, #1c467b, #fa8b0c);
+  background: -o-linear-gradient(left, #1c467b, #fa8b0c);
+  background: linear-gradient(to right, #1c467b, #fa8b0c);
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#1c467b, endColorstr=#fa8b0c);
 }
 
 .gradient3 {
@@ -4688,7 +4688,7 @@ ul {
   background: theme-color-level(primary, -10);
 }
 .navbar-right__menu .nav-notification__type--secondary {
-  color: #ff69a5;
+  color: #1c467b;
   background: theme-color-level(secondary, -10);
 }
 .navbar-right__menu .nav-notification__type--success {
@@ -6130,7 +6130,7 @@ ul {
   border-color: transparent;
 }
 .btn.btn-transparent-secondary {
-  color: #ff69a5 !important;
+  color: #1c467b !important;
 }
 .btn.btn-transparent-secondary:hover {
   color: #ffffff !important;
@@ -6742,8 +6742,8 @@ ul {
   border-color: #2c99ff;
 }
 .form-switch.switch-secondary .form-check-input:checked {
-  background-color: #ff69a5;
-  border-color: #ff69a5;
+  background-color: #1c467b;
+  border-color: #1c467b;
 }
 .form-switch.switch-success .form-check-input:checked {
   background-color: #20c997;
@@ -7101,10 +7101,10 @@ table.table-basic tr td.card .card-body,
   }
 }
 .card-overview-progress .card-header {
-  background: -webkit-gradient(linear, left top, right top, from(#ff69a5), to(#fa8b0c));
-  background: -webkit-linear-gradient(left, #ff69a5, #fa8b0c);
-  background: -o-linear-gradient(left, #ff69a5, #fa8b0c);
-  background: linear-gradient(to right, #ff69a5, #fa8b0c);
+  background: -webkit-gradient(linear, left top, right top, from(#1c467b), to(#fa8b0c));
+  background: -webkit-linear-gradient(left, #1c467b, #fa8b0c);
+  background: -o-linear-gradient(left, #1c467b, #fa8b0c);
+  background: linear-gradient(to right, #1c467b, #fa8b0c);
   min-height: 215px;
   padding-top: 15px;
   -webkit-box-align: start;
@@ -15781,14 +15781,14 @@ table.fc-scrollgrid thead .fc-scroller-harness .fc-scroller {
 }
 .fc-timegrid-event.secondary {
   background-color: #fff0f6 !important;
-  border-left-color: #ff69a5;
+  border-left-color: #1c467b;
   border-left-width: 2px;
-  color: #ff69a5;
+  color: #1c467b;
 }
 .fc-timegrid-event.secondary .fc-event-main,
 .fc-timegrid-event.secondary .fc-event-time,
 .fc-timegrid-event.secondary .fc-event-title {
-  color: #ff69a5;
+  color: #1c467b;
 }
 .fc-timegrid-event.secondary:hover {
   background-color: #fff0f6 !important;
@@ -15842,7 +15842,7 @@ table.fc-scrollgrid thead .fc-scroller-harness .fc-scroller {
   border-color: #1c467b;
 }
 .fc-daygrid-day .fc-daygrid-event.secondary.fc-h-event {
-  border-color: #ff69a5;
+  border-color: #1c467b;
 }
 .fc-daygrid-day .fc-daygrid-event.success.fc-h-event {
   border-color: #20c997;

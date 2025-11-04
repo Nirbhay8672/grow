@@ -16,7 +16,7 @@ withDefaults(defineProps<Props>(), {
             <div class="container-fluid">
                 <div class="row justify-content-center"  style="min-height: 100vh; background-image: linear-gradient(to bottom, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.50) 30%, rgba(255,255,255,0.15) 100%), url('https://www.itl.cat/pngfile/big/9-92452_original-resolution-popular-4k-dubai.jpg'); background-size: cover; background-position: center center; background-repeat: no-repeat; background-attachment: scroll;">
                     <div class="col-xl-4 col-lg-5 col-md-5 p-0">
-                        <div class="signUP-admin-left signIn-admin-left position-relative" style="background: linear-gradient(135deg, #f9eff8 0%, #f3e8f3 100%); overflow: hidden;">
+                        <div class="signUP-admin-left signIn-admin-left position-relative" style="background: linear-gradient(220deg, rgb(255 255 255) 0%, rgb(207 207 207) 100%); overflow: hidden; box-shadow: rgba(0, 0, 0, 0.2) 6px 8px 14px;">
                             <!-- Decorative Background Elements -->
                             <div class="position-absolute w-100 h-100" style="z-index: 1; opacity: 0.4;">
                                 <!-- Top Right Circle -->
@@ -115,15 +115,15 @@ withDefaults(defineProps<Props>(), {
                         </div>
                     </div>
                     <div class="col-xl-8 col-lg-7 col-md-7 col-sm-8" style="min-height: 100vh;">
-                        <div class="signUp-admin-right signIn-admin-right p-md-40 p-10 position-relative" >
+                        <div class="signUp-admin-right signIn-admin-right p-md-40 p-10 position-relative d-flex align-items-center" style="min-height: 100vh;">
                             
-                            <div class="row justify-content-center position-relative" style="z-index: 1;">
+                            <div class="row justify-content-center position-relative w-100" style="z-index: 1;">
                                 <div class="col-xl-7 col-lg-8 col-md-12">
                                     <div class="edit-profile mt-md-25 mt-0">
                                         <div class="card border-0">
                                             <div class="card-header border-0 pb-md-15 pb-10 pt-md-20 pt-10 ">
-                                                <div class="edit-profile__title">
-                                                    <h6 class="mb-0">Sign in to <span class="color-primary">Admin</span></h6>
+                                                <div class="text-center">
+                                                    <h6 class="mb-0">Sign In To <span class="color-primary">Admin</span></h6>
                                                 </div>
                                             </div>
                                             <div class="card-body">

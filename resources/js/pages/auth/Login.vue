@@ -48,9 +48,9 @@ const form = useForm({
                 <div v-if="errors.password" class="text-danger small mt-1">{{ errors.password }}</div>
             </div>
 
-            <div class="signUp-condition signIn-condition mb-3 d-flex justify-content-between align-items-center">
+            <div class="signUp-condition signIn-condition mb-3 d-flex justify-content-start align-items-center">
                 <input id="remember" type="checkbox" name="remember" v-model="form.remember" class="form-check-input" />
-                <label for="remember" class="form-check-label">Remember me</label>
+                <label for="remember" class="form-check-label ms-2 mt-1">Remember me</label>
             </div>
 
             <div class="button-group d-flex pt-1 justify-content-md-start justify-content-center">
