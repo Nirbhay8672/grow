@@ -1105,7 +1105,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="footer-copyright">
-                            <p>2025 @<a href="#">mr.web</a>
+                            <p>© 2025 Growedge Realty. Made By<a href="#">Mr.Web</a>
                             </p>
                         </div>
                     </div>
