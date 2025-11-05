@@ -15,7 +15,7 @@ class VisitorController extends Controller
 {
     public function index(Request $request): Response
     {
-        
+
         $visitors = Visitor::query()
             ->orderBy('created_at', 'desc')
             ->get();
@@ -26,7 +26,7 @@ class VisitorController extends Controller
     public function store(VisitorStoreRequest $request): Response
     {
         $validated = $request->validated();
-        
+
         // Generate unique barcode
         $barcode = $this->generateUniqueBarcode();
         $validated['barcode'] = $barcode;
@@ -58,13 +58,13 @@ class VisitorController extends Controller
     {
         $visitor->delete();
 
-        return response(null, 204);
+        return response(204);
     }
 
     public function showPage()
     {
         $visitors = Visitor::orderBy('created_at', 'desc')->get();
-        
+
         return Inertia::render('visitors/Visitors', [
             'visitors' => $visitors,
         ]);
@@ -98,23 +98,23 @@ class VisitorController extends Controller
         $size = 500; // Size of QR code
         $padding = 40; // Padding around QR code
         $totalSize = $size + ($padding * 2);
-        
+
         // Create image with white background
         $image = imagecreatetruecolor($totalSize, $totalSize);
-        
+
         // Colors - Google Pay style
         $white = imagecolorallocate($image, 255, 255, 255);
         $black = imagecolorallocate($image, 0, 0, 0);
         $lightGray = imagecolorallocate($image, 245, 245, 245);
-        
+
         // Fill background with white
         imagefilledrectangle($image, 0, 0, $totalSize, $totalSize, $white);
-        
+
         // Generate QR code pattern based on barcode string
         $qrData = $this->generateQRPattern($barcode);
         $qrSize = count($qrData);
         $cellSize = $size / $qrSize;
-        
+
         // Draw QR code pattern
         for ($y = 0; $y < $qrSize; $y++) {
             for ($x = 0; $x < $qrSize; $x++) {
@@ -122,30 +122,30 @@ class VisitorController extends Controller
                 $y1 = $padding + ($y * $cellSize);
                 $x2 = $x1 + $cellSize;
                 $y2 = $y1 + $cellSize;
-                
+
                 if ($qrData[$y][$x]) {
                     // Draw square with rounded corners effect
                     imagefilledrectangle($image, $x1, $y1, $x2, $y2, $black);
                 }
             }
         }
-        
+
         // Add barcode text at the bottom (Google Pay style)
         $textY = $totalSize - 25;
         $textX = ($totalSize - (strlen($barcode) * 7)) / 2;
-        
+
         // Use larger font for better readability
         imagestring($image, 5, $textX, $textY, $barcode, $black);
-        
+
         // Save image
         $filename = $barcode . '.jpg';
         $filepath = $directory . '/' . $filename;
-        
+
         // Save to public storage
         $fullPath = storage_path('app/public/' . $filepath);
         imagejpeg($image, $fullPath, 95);
         imagedestroy($image);
-        
+
         // Return relative path for storage
         return $filepath;
     }
@@ -158,43 +158,44 @@ class VisitorController extends Controller
     {
         $size = 25; // QR code grid size (25x25 = 625 cells)
         $pattern = [];
-        
+
         // Initialize pattern
         for ($i = 0; $i < $size; $i++) {
             $pattern[$i] = array_fill(0, $size, false);
         }
-        
+
         // Create position markers (corners) - Google Pay style
         $this->drawPositionMarker($pattern, 0, 0, $size);
         $this->drawPositionMarker($pattern, 0, $size - 7, $size);
         $this->drawPositionMarker($pattern, $size - 7, 0, $size);
-        
+
         // Generate data pattern from barcode string
         $hash = md5($barcode);
         $bitIndex = 0;
-        
+
         // Fill data area (avoiding position markers and timing patterns)
         for ($y = 0; $y < $size; $y++) {
             for ($x = 0; $x < $size; $x++) {
                 // Skip position markers
-                if (($y < 9 && $x < 9) || 
-                    ($y < 9 && $x >= $size - 8) || 
-                    ($y >= $size - 8 && $x < 9)) {
+                if (($y < 9 && $x < 9) ||
+                    ($y < 9 && $x >= $size - 8) ||
+                    ($y >= $size - 8 && $x < 9)
+                ) {
                     continue;
                 }
-                
+
                 // Skip timing patterns
                 if ($y == 6 || $x == 6) {
                     continue;
                 }
-                
+
                 // Use hash bits to determine pattern
                 $bit = (hexdec($hash[$bitIndex % 32]) >> ($bitIndex % 4)) & 1;
                 $pattern[$y][$x] = (bool)$bit;
                 $bitIndex++;
             }
         }
-        
+
         return $pattern;
     }
 
@@ -211,7 +212,7 @@ class VisitorController extends Controller
                 }
             }
         }
-        
+
         // Inner white square (3x3)
         for ($y = 2; $y < 5; $y++) {
             for ($x = 2; $x < 5; $x++) {
@@ -220,7 +221,7 @@ class VisitorController extends Controller
                 }
             }
         }
-        
+
         // Center dot
         if ($startY + 3 < $size && $startX + 3 < $size) {
             $pattern[$startY + 3][$startX + 3] = true;
@@ -247,29 +248,14 @@ class VisitorController extends Controller
             }
         }
 
-        // Use Storage::response() for proper file serving
-        try {
-            return Storage::disk('public')->response($visitor->barcode_image, null, [
+        // Use response()->file() for serving the file with headers
+        $filePath = Storage::disk('public')->path($visitor->barcode_image);
+        if (file_exists($filePath)) {
+            return response()->file($filePath, [
                 'Content-Type' => 'image/jpeg',
                 'Content-Disposition' => 'inline; filename="' . basename($visitor->barcode_image) . '"',
                 'Cache-Control' => 'public, max-age=3600',
             ]);
-        } catch (\Exception $e) {
-            // Fallback to direct file response
-            $filePath = Storage::disk('public')->path($visitor->barcode_image);
-            if (file_exists($filePath)) {
-                return response()->file($filePath, [
-                    'Content-Type' => 'image/jpeg',
-                ]);
-            }
-            abort(404, 'Barcode image not found: ' . $e->getMessage());
         }
     }
-
-
-
-
-
-
 }
-
