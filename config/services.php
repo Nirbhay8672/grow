@@ -35,4 +35,25 @@ return [
         ],
     ],
 
+    'whatsapp' => [
+        'enabled' => env('WHATSAPP_ENABLED', false),
+        'api_url' => env('WHATSAPP_API_URL', 'https://graph.facebook.com'),
+        'api_token' => env('WHATSAPP_API_TOKEN'),
+        'phone_number_id' => env('WHATSAPP_PHONE_NUMBER_ID'),
+        'default_country_code' => env('WHATSAPP_DEFAULT_COUNTRY_CODE', '91'),
+    ],
+
+    'twilio' => [
+        'account_sid' => env('TWILIO_ACCOUNT_SID'),
+        'auth_token' => env('TWILIO_AUTH_TOKEN'),
+        'whatsapp_from' => env('TWILIO_WHATSAPP_FROM'),
+        'whatsapp_enabled' => env('TWILIO_WHATSAPP_ENABLED', false),
+    ],
+
+    'chatapi' => [
+        'enabled' => env('CHATAPI_ENABLED', false),
+        'api_url' => env('CHATAPI_URL', 'https://api.chat-api.com/instance'),
+        'api_token' => env('CHATAPI_TOKEN'),
+    ],
+
 ];

@@ -47,3 +47,4 @@ class ConstructionTypeSeeder extends Seeder
 }
 
 
+

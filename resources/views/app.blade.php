@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
@@ -1062,6 +1062,12 @@
                             <a href="/dashboard" data-inertia-link data-icon-color="#3b82f6" class="{{ request()->is('dashboard') ? 'active' : '' }}" style="{{ request()->is('dashboard') ? 'background-color: #3b82f6; color: #ffffff; border-radius: 6px; margin-left: 8px; margin-right: 8px; padding: 8px 12px;' : '' }}">
                                 <span data-feather="home" class="nav-icon" style="color: {{ request()->is('dashboard') ? '#ffffff' : '#3b82f6' }};"></span>
                                 <span class="menu-text" style="{{ request()->is('dashboard') ? 'font-weight: 500; color: #ffffff;' : '' }}">Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/visitors" data-inertia-link data-icon-color="#ec4899" class="{{ request()->is('visitors*') ? 'active' : '' }}" style="{{ request()->is('visitors*') ? 'background-color: #ec4899; color: #ffffff; border-radius: 6px; margin-left: 8px; margin-right: 8px; padding: 8px 12px;' : '' }}">
+                                <span data-feather="user-check" class="nav-icon" style="color: {{ request()->is('visitors*') ? '#ffffff' : '#ec4899' }};"></span>
+                                <span class="menu-text" style="{{ request()->is('visitors*') ? 'font-weight: 500; color: #ffffff;' : '' }}">Visitors</span>
                             </a>
                         </li>
                         <li>

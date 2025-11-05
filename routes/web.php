@@ -23,6 +23,7 @@ use App\Http\Controllers\FurnitureTypeController;
 use App\Http\Controllers\PropertyZoneController;
 use App\Http\Controllers\AmenityController;
 use App\Http\Controllers\PropertyConstructionDocumentController;
+use App\Http\Controllers\VisitorController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -57,6 +58,8 @@ Route::get('furniture-types', [FurnitureTypeController::class, 'showPage'])->mid
 Route::get('property-zones', [PropertyZoneController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('property-zones.index');
 Route::get('amenities', [AmenityController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('amenities.index');
 Route::get('property-construction-documents', [PropertyConstructionDocumentController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('property-construction-documents.index');
+Route::get('visitors', [VisitorController::class, 'showPage'])->middleware(['auth', 'verified'])->name('visitors.index');
+Route::get('visitors/{visitor}/barcode', [VisitorController::class, 'showBarcode'])->name('visitors.barcode');
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/roles', [RoleController::class, 'store'])->name('roles.store')->middleware('permission:role.create');
@@ -165,6 +168,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/property-construction-documents/{propertyConstructionDocument}', [PropertyConstructionDocumentController::class, 'show'])->name('property-construction-documents.show')->middleware('permission:role.read');
     Route::put('/property-construction-documents/{propertyConstructionDocument}', [PropertyConstructionDocumentController::class, 'update'])->name('property-construction-documents.update')->middleware('permission:role.update');
     Route::delete('/property-construction-documents/{propertyConstructionDocument}', [PropertyConstructionDocumentController::class, 'destroy'])->name('property-construction-documents.destroy')->middleware('permission:role.delete');
+    
+    Route::post('/visitors', [VisitorController::class, 'store'])->name('visitors.store');
+    Route::get('/visitors/{visitor}', [VisitorController::class, 'show'])->name('visitors.show');
+    Route::put('/visitors/{visitor}', [VisitorController::class, 'update'])->name('visitors.update');
+    Route::delete('/visitors/{visitor}', [VisitorController::class, 'destroy'])->name('visitors.destroy');
     
     // Profile routes (users can update their own profile)
     Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update.simple');

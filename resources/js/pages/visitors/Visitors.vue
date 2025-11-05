@@ -4,22 +4,23 @@ import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import AppLayout from '@/layouts/AppLayout.vue';
 import Modal from '@/components/custom/modal/Modal.vue';
-import ConstructionTypeForm from '@/pages/construction-types/components/ConstructionTypeForm.vue';
-import ConstructionTypeTable from '@/pages/construction-types/components/ConstructionTypeTable.vue';
+import VisitorForm from '@/pages/visitors/components/VisitorForm.vue';
+import VisitorTable from '@/pages/visitors/components/VisitorTable.vue';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 
-interface ConstructionType {
+interface Visitor {
     id: number;
     name: string;
-    is_active: boolean;
-    user_id: number;
+    mobile: string;
+    barcode: string;
+    barcode_image: string | null;
     created_at: string;
     updated_at: string;
 }
 
 interface Props {
-    constructionTypes: ConstructionType[];
+    visitors: Visitor[];
 }
 
 const props = defineProps<Props>();
@@ -30,13 +31,13 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: dashboard().url,
     },
     {
-        title: 'Construction Types',
-        href: '/construction-types',
+        title: 'Visitors',
+        href: '/visitors',
     },
 ];
 
 const showForm = ref(false);
-const editingConstructionType = ref<ConstructionType | null>(null);
+const editingVisitor = ref<Visitor | null>(null);
 const loading = ref(false);
 const errors = ref<Record<string, string[]>>({});
 const toast = ref<{ show: boolean; message: string; type: 'success' | 'error' }>({
@@ -47,14 +48,14 @@ const toast = ref<{ show: boolean; message: string; type: 'success' | 'error' }>
 
 const form = reactive({
     name: '',
-    is_active: true,
+    mobile: '',
 });
 
 const resetForm = () => {
     form.name = '';
-    form.is_active = true;
+    form.mobile = '';
     errors.value = {};
-    editingConstructionType.value = null;
+    editingVisitor.value = null;
     showForm.value = false;
 };
 
@@ -69,15 +70,15 @@ const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     }, 3000);
 };
 
-const editConstructionType = (constructionType: ConstructionType) => {
-    editingConstructionType.value = constructionType;
-    form.name = constructionType.name;
-    form.is_active = constructionType.is_active;
+const editVisitor = (visitor: Visitor) => {
+    editingVisitor.value = visitor;
+    form.name = visitor.name;
+    form.mobile = visitor.mobile;
     errors.value = {};
     showForm.value = true;
 };
 
-const createConstructionType = () => {
+const createVisitor = () => {
     resetForm();
     showForm.value = true;
 };
@@ -87,12 +88,12 @@ const handleSubmit = async () => {
     errors.value = {};
 
     try {
-        if (editingConstructionType.value) {
-            await axios.put(`/construction-types/${editingConstructionType.value.id}`, form);
-            showToast('Construction Type updated successfully!');
+        if (editingVisitor.value) {
+            await axios.put(`/visitors/${editingVisitor.value.id}`, form);
+            showToast('Visitor updated successfully!');
         } else {
-            await axios.post('/construction-types', form);
-            showToast('Construction Type created successfully!');
+            await axios.post('/visitors', form);
+            showToast('Visitor created successfully! Barcode has been sent via WhatsApp.');
         }
         
         resetForm();
@@ -102,20 +103,20 @@ const handleSubmit = async () => {
             errors.value = error.response.data.errors;
             showToast('Please fix the validation errors.', 'error');
         } else {
-            console.error('Error saving construction type:', error);
-            showToast('An error occurred while saving the construction type.', 'error');
+            console.error('Error saving visitor:', error);
+            showToast('An error occurred while saving the visitor.', 'error');
         }
     } finally {
         loading.value = false;
     }
 };
 
-const deleteConstructionType = async (constructionType: ConstructionType) => {
+const deleteVisitor = async (visitor: Visitor) => {
     const Swal = (window as any).Swal;
     
     const result = await Swal.fire({
         title: 'Are you sure?',
-        text: `You are about to delete the construction type "${constructionType.name}". This action cannot be undone!`,
+        text: `You are about to delete visitor "${visitor.name}". This action cannot be undone!`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#dc3545',
@@ -127,53 +128,53 @@ const deleteConstructionType = async (constructionType: ConstructionType) => {
 
     if (result.isConfirmed) {
         try {
-            await axios.delete(`/construction-types/${constructionType.id}`);
-            showToast('Construction Type deleted successfully!');
+            await axios.delete(`/visitors/${visitor.id}`);
+            showToast('Visitor deleted successfully!');
             router.reload();
         } catch (error) {
-            console.error('Error deleting construction type:', error);
-            showToast('An error occurred while deleting the construction type.', 'error');
+            console.error('Error deleting visitor:', error);
+            showToast('An error occurred while deleting the visitor.', 'error');
         }
     }
 };
 </script>
 
 <template>
-    <Head title="Construction Types Management" />
+    <Head title="Visitors Management" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="row">
             <div class="col-12">
-                <!-- Construction Type Table -->
-                <ConstructionTypeTable
-                    :construction-types="constructionTypes"
-                    @edit="editConstructionType"
-                    @delete="deleteConstructionType"
+                <!-- Visitors Table -->
+                <VisitorTable
+                    :visitors="visitors"
+                    @edit="editVisitor"
+                    @delete="deleteVisitor"
                 >
                     <template #header-action>
                         <button
-                            @click="createConstructionType"
+                            @click="createVisitor"
                             class="btn btn-primary btn-sm btn-default btn-squared text-capitalize lh-normal px-3 py-2"
                         >
                             <span data-feather="plus" class="me-1"></span>
-                            Add Construction Type
+                            Add Visitor
                         </button>
                     </template>
-                </ConstructionTypeTable>
+                </VisitorTable>
 
-                <!-- Construction Type Form Modal -->
+                <!-- Visitor Form Modal -->
                 <Modal
                     :show="showForm"
-                    :title="editingConstructionType ? 'Edit Construction Type' : 'Create Construction Type'"
+                    :title="editingVisitor ? 'Edit Visitor' : 'Create Visitor'"
                     :loading="loading"
-                    :submit-label="editingConstructionType ? 'Update Construction Type' : 'Create Construction Type'"
+                    :submit-label="editingVisitor ? 'Update Visitor' : 'Create Visitor'"
                     size="sm"
                     @close="resetForm"
                     @submit="handleSubmit"
                 >
-                    <ConstructionTypeForm
+                    <VisitorForm
                         :form="form"
-                        :editing-construction-type="editingConstructionType"
+                        :editing-visitor="editingVisitor"
                         :errors="errors"
                         @submit="handleSubmit"
                         @cancel="resetForm"
@@ -223,6 +224,4 @@ const deleteConstructionType = async (constructionType: ConstructionType) => {
     }
 }
 </style>
-
-
 
