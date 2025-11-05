@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\VisitorStoreRequest;
 use App\Http\Requests\VisitorUpdateRequest;
 use App\Models\Visitor;
+use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
@@ -15,7 +16,6 @@ class VisitorController extends Controller
 {
     public function index(Request $request): Response
     {
-
         $visitors = Visitor::query()
             ->orderBy('created_at', 'desc')
             ->get();
@@ -36,6 +36,9 @@ class VisitorController extends Controller
         $validated['barcode_image'] = $barcodeImagePath;
 
         $visitor = Visitor::create($validated);
+
+        // Send WhatsApp message
+        $this->sendWelcomeMessage($visitor);
 
         return response($visitor, 201);
     }
@@ -226,6 +229,24 @@ class VisitorController extends Controller
         if ($startY + 3 < $size && $startX + 3 < $size) {
             $pattern[$startY + 3][$startX + 3] = true;
         }
+    }
+
+    /**
+     * Send welcome message via WhatsApp
+     * Note: Free-form messages only work within 24-hour window after user's last message
+     */
+    private function sendWelcomeMessage(Visitor $visitor): void
+    {
+        if (empty($visitor->mobile)) {
+            return;
+        }
+
+        $whatsappService = new WhatsAppService();
+        $message = "Hello {$visitor->name},\n\n";
+        $message .= "Welcome! Your visitor barcode is: {$visitor->barcode}\n\n";
+        $message .= "Please keep this barcode safe for your visit.";
+
+        $whatsappService->sendMessage($visitor->mobile, $message);
     }
 
     /**

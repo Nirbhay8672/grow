@@ -41,6 +41,7 @@ return [
         'api_token' => env('WHATSAPP_API_TOKEN'),
         'phone_number_id' => env('WHATSAPP_PHONE_NUMBER_ID'),
         'default_country_code' => env('WHATSAPP_DEFAULT_COUNTRY_CODE', '91'),
+        'template_name' => env('WHATSAPP_TEMPLATE_NAME', 'visitor_welcome'),
     ],
 
     'twilio' => [
