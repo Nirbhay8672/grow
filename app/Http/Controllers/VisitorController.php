@@ -9,9 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
-use Twilio\Rest\Client;
 
 class VisitorController extends Controller
 {
@@ -27,20 +25,6 @@ class VisitorController extends Controller
 
     public function store(VisitorStoreRequest $request): Response
     {
-        $sid    = "ACbb792b7811fc7584ecd0fe83bf68245c";
-        $token  = "1976005b7b2f024084bf78f818b6fd99";
-        $twilio = new Client($sid, $token);
-    
-        $message = $twilio->messages
-          ->create("whatsapp:+918200186326", // to
-            array(
-              "from" => "whatsapp:+14155238886",
-              "contentSid" => "HXb5b62575e6e4ff6129ad7c8efe1f983e",
-              "body" => "Your Message"
-            )
-          );
-    
-    print($message->sid);
         $validated = $request->validated();
         
         // Generate unique barcode
@@ -52,17 +36,6 @@ class VisitorController extends Controller
         $validated['barcode_image'] = $barcodeImagePath;
 
         $visitor = Visitor::create($validated);
-        
-        // Send barcode via WhatsApp (non-blocking - errors are logged but don't fail the request)
-        try {
-            $this->sendBarcodeViaWhatsApp($visitor);
-        } catch (\Exception $e) {
-            Log::error('WhatsApp sending failed for visitor', [
-                'visitor_id' => $visitor->id,
-                'error' => $e->getMessage()
-            ]);
-            // Continue even if WhatsApp fails
-        }
 
         return response($visitor, 201);
     }
@@ -293,167 +266,10 @@ class VisitorController extends Controller
         }
     }
 
-    /**
-     * Send barcode to visitor's mobile number via WhatsApp
-     */
-    private function sendBarcodeViaWhatsApp(Visitor $visitor): void
-    {
-        try {
-            $mobile = $this->formatMobileNumber($visitor->mobile);
-            $barcodeUrl = url('/visitors/' . $visitor->id . '/barcode');
-            $barcodeImageUrl = url('/storage/' . $visitor->barcode_image);
-            
-            $message = "Hello {$visitor->name},\n\nYour visitor registration is successful!\n\nYour unique barcode is: {$visitor->barcode}\n\nPlease keep this barcode for your records.\n\nThank you!";
 
-            // Priority: Twilio WhatsApp API (if configured)
-            if (config('services.twilio.whatsapp_enabled', false)) {
-                $this->sendViaTwilio($mobile, $message, $barcodeImageUrl);
-            }
-            // Option 2: Using WhatsApp Business API
-            elseif (config('services.whatsapp.enabled', false)) {
-                $this->sendViaWhatsAppAPI($mobile, $message);
-            }
-            // Option 3: Using WhatsApp Web API (like ChatAPI)
-            elseif (config('services.chatapi.enabled', false)) {
-                $this->sendViaChatAPI($mobile, $message);
-            }
-            // Option 4: Log for manual sending or use queue
-            else {
-                Log::info('WhatsApp message queued', [
-                    'mobile' => $mobile,
-                    'message' => $message,
-                    'barcode_url' => $barcodeUrl,
-                    'visitor_id' => $visitor->id
-                ]);
-            }
-        } catch (\Exception $e) {
-            Log::error('Failed to send WhatsApp message', [
-                'visitor_id' => $visitor->id,
-                'error' => $e->getMessage()
-            ]);
-            // Don't throw exception - visitor is already created
-        }
-    }
 
-    /**
-     * Format mobile number for WhatsApp (remove leading zeros, add country code)
-     */
-    private function formatMobileNumber(string $mobile): string
-    {
-        // Remove any non-numeric characters
-        $mobile = preg_replace('/[^0-9]/', '', $mobile);
-        
-        // Get country code from Twilio config or default
-        $defaultCountryCode = config('services.twilio.default_country_code', config('services.whatsapp.default_country_code', '91'));
-        
-        // If mobile doesn't start with country code, add it
-        if (!str_starts_with($mobile, $defaultCountryCode)) {
-            // Remove leading zero if present
-            $mobile = ltrim($mobile, '0');
-            $mobile = $defaultCountryCode . $mobile;
-        }
-        
-        return $mobile;
-    }
 
-    /**
-     * Send via WhatsApp Business API
-     */
-    private function sendViaWhatsAppAPI(string $mobile, string $message): void
-    {
-        if (!class_exists(\GuzzleHttp\Client::class)) {
-            throw new \Exception('GuzzleHttp is required for WhatsApp API. Install it via: composer require guzzlehttp/guzzle');
-        }
 
-        $apiUrl = config('services.whatsapp.api_url');
-        $apiToken = config('services.whatsapp.api_token');
-        $phoneNumberId = config('services.whatsapp.phone_number_id');
 
-        $client = new \GuzzleHttp\Client();
-        $client->post("{$apiUrl}/v1/{$phoneNumberId}/messages", [
-            'headers' => [
-                'Authorization' => "Bearer {$apiToken}",
-                'Content-Type' => 'application/json',
-            ],
-            'json' => [
-                'messaging_product' => 'whatsapp',
-                'to' => $mobile,
-                'type' => 'text',
-                'text' => ['body' => $message],
-            ],
-        ]);
-    }
-
-    /**
-     * Send via Twilio WhatsApp
-     */
-    private function sendViaTwilio(string $mobile, string $message, ?string $imageUrl = null): void
-    {
-        if (!class_exists(\Twilio\Rest\Client::class)) {
-            throw new \Exception('Twilio SDK is required. Install it via: composer require twilio/sdk');
-        }
-
-        $accountSid = config('services.twilio.account_sid');
-        $authToken = config('services.twilio.auth_token');
-        $from = config('services.twilio.whatsapp_from');
-
-        // Validate Twilio configuration
-        if (empty($accountSid) || empty($authToken) || empty($from)) {
-            throw new \Exception('Twilio configuration is incomplete. Please check your .env file for TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_WHATSAPP_FROM');
-        }
-
-        // Ensure 'from' is in whatsapp: format
-        if (!str_starts_with($from, 'whatsapp:')) {
-            $from = 'whatsapp:' . $from;
-        }
-
-        $client = new \Twilio\Rest\Client($accountSid, $authToken);
-        
-        // Send image with message if image URL is provided
-        if ($imageUrl) {
-            $client->messages->create(
-                "whatsapp:{$mobile}",
-                [
-                    'from' => $from,
-                    'mediaUrl' => [$imageUrl],
-                    'body' => $message,
-                ]
-            );
-        } else {
-            // Send text message only
-            $client->messages->create(
-                "whatsapp:{$mobile}",
-                [
-                    'from' => $from,
-                    'body' => $message,
-                ]
-            );
-        }
-    }
-
-    /**
-     * Send via ChatAPI
-     */
-    private function sendViaChatAPI(string $mobile, string $message): void
-    {
-        if (!class_exists(\GuzzleHttp\Client::class)) {
-            throw new \Exception('GuzzleHttp is required for ChatAPI. Install it via: composer require guzzlehttp/guzzle');
-        }
-
-        $apiUrl = config('services.chatapi.api_url');
-        $apiToken = config('services.chatapi.api_token');
-
-        $client = new \GuzzleHttp\Client();
-        $client->post("{$apiUrl}/sendMessage", [
-            'headers' => [
-                'Content-Type' => 'application/json',
-            ],
-            'json' => [
-                'phone' => $mobile,
-                'body' => $message,
-                'token' => $apiToken,
-            ],
-        ]);
-    }
 }
 
