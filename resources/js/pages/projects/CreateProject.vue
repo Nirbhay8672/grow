@@ -8,6 +8,7 @@ import StepIndicator from './components/StepIndicator.vue';
 import BuilderInformation from './components/BuilderInformation.vue';
 import ProjectInformation from './components/ProjectInformation.vue';
 import ContactDetails from './components/ContactDetails.vue';
+import ChoiseSelection from './components/ChoiseSelection.vue';
 
 declare global {
     interface Window {
@@ -91,8 +92,6 @@ const errors = ref<Record<string, string[]>>({});
 
 const cities = ref<City[]>([]);
 const localities = ref<Locality[]>([]);
-const categories = ref<Category[]>([]);
-const subCategories = ref<SubCategory[]>([]);
 
 interface Contact {
     id: number;
@@ -139,6 +138,18 @@ const form = reactive({
     construction_type_id: '',
     category_id: '',
     sub_category_id: '',
+    
+    // Tower Details
+    no_of_towers: '',
+    no_of_floors: '',
+    total_units: '',
+    no_of_unit_each_tower: '',
+    no_of_lift: '',
+    front_road_width: '',
+    front_road_width_measurement_unit_id: '',
+    
+    // Washroom
+    washroom: 'Private',
 });
 
 const addContact = () => {
@@ -215,45 +226,6 @@ watch(() => form.locality_id, (newLocalityId) => {
     }
 });
 
-// Watch construction type changes to load categories from relationship
-watch(() => form.construction_type_id, (newConstructionTypeId) => {
-    if (newConstructionTypeId) {
-        const selectedConstructionType = props.constructionTypes.find(
-            (ct) => ct.id === Number(newConstructionTypeId)
-        );
-        if (selectedConstructionType && selectedConstructionType.categories) {
-            categories.value = selectedConstructionType.categories;
-        } else {
-            categories.value = [];
-        }
-        form.category_id = '';
-        form.sub_category_id = '';
-        subCategories.value = [];
-    } else {
-        categories.value = [];
-        form.category_id = '';
-        form.sub_category_id = '';
-        subCategories.value = [];
-    }
-}, { immediate: false });
-
-// Watch category changes to load sub-categories from relationship
-watch(() => form.category_id, (newCategoryId) => {
-    if (newCategoryId) {
-        const selectedCategory = categories.value.find(
-            (cat) => cat.id === Number(newCategoryId)
-        );
-        if (selectedCategory && selectedCategory.sub_categories) {
-            subCategories.value = selectedCategory.sub_categories;
-        } else {
-            subCategories.value = [];
-        }
-        form.sub_category_id = '';
-    } else {
-        subCategories.value = [];
-        form.sub_category_id = '';
-    }
-}, { immediate: false });
 
 const validateForm = (): boolean => {
     errors.value = {};
@@ -405,10 +377,20 @@ const handleNext = () => {
             errors.value.category_id = ['Please select a category'];
             return;
         }
-        // Validate sub-category if sub-categories are available
-        if (subCategories.value.length > 0 && !form.sub_category_id) {
-            errors.value.sub_category_id = ['Please select a sub-category'];
-            return;
+        // Validate sub-category - check if selected category has sub-categories
+        if (form.category_id) {
+            const selectedConstructionType = props.constructionTypes.find(
+                (ct) => ct.id === Number(form.construction_type_id)
+            );
+            if (selectedConstructionType) {
+                const selectedCategory = selectedConstructionType.categories?.find(
+                    (cat) => cat.id === Number(form.category_id)
+                );
+                if (selectedCategory && selectedCategory.sub_categories && selectedCategory.sub_categories.length > 0 && !form.sub_category_id) {
+                    errors.value.sub_category_id = ['Please select a sub-category'];
+                    return;
+                }
+            }
         }
         
         // TODO: Submit form or proceed to next step
@@ -501,104 +483,174 @@ onMounted(() => {
 
                             <!-- Step 2: Construction Type & Category -->
                             <div v-if="currentStep === 2">
-                                <!-- Construction Type Selection -->
-                                <div class="mb-4">
-                                    <h5 class="mb-3 section-title">Property Type</h5>
-                                    <div class="form-group">
-                                        <div class="d-flex flex-wrap gap-3">
-                                            <div 
-                                                v-for="constructionType in constructionTypes" 
-                                                :key="constructionType.id"
-                                                class="form-check form-check-inline construction-type-radio"
-                                            >
-                                                <input
-                                                    :id="`construction_type_${constructionType.id}`"
-                                                    v-model="form.construction_type_id"
-                                                    type="radio"
-                                                    :value="String(constructionType.id)"
-                                                    class="form-check-input"
-                                                    :class="{ 'is-invalid': errors.construction_type_id }"
-                                                />
-                                                <label 
-                                                    :for="`construction_type_${constructionType.id}`"
-                                                    class="form-check-label construction-type-label"
-                                                >
-                                                    {{ constructionType.name }}
-                                                </label>
+                                <ChoiseSelection
+                                    :construction-types="constructionTypes"
+                                    :model-value="{
+                                        construction_type_id: form.construction_type_id,
+                                        category_id: form.category_id,
+                                        sub_category_id: form.sub_category_id,
+                                    }"
+                                    :errors="errors"
+                                    :show-ids="true"
+                                    @update:modelValue="(value) => {
+                                        form.construction_type_id = value.construction_type_id;
+                                        form.category_id = value.category_id;
+                                        form.sub_category_id = value.sub_category_id;
+                                    }"
+                                />
+
+                                <!-- Tower Details (shown when construction_type_id=1, category_id=1, sub_category_id=1) -->
+                                <div v-if="form.construction_type_id === '1' && form.category_id === '1' && form.sub_category_id === '1'" class="mb-4">
+                                    <h5 class="mb-3 section-title">Tower Details</h5>
+                                    <div class="row">
+                                        <div class="col-md-3 mb-3">
+                                            <label for="no_of_towers" class="form-label">No. Of Towers</label>
+                                            <input
+                                                id="no_of_towers"
+                                                v-model="form.no_of_towers"
+                                                type="number"
+                                                class="form-control form-control-sm"
+                                                :class="{ 'is-invalid': errors.no_of_towers }"
+                                                placeholder="Enter number of towers"
+                                            />
+                                            <div v-if="errors.no_of_towers" class="invalid-feedback d-block">
+                                                {{ errors.no_of_towers[0] }}
                                             </div>
                                         </div>
-                                        <div v-if="errors.construction_type_id" class="invalid-feedback d-block">
-                                            {{ errors.construction_type_id[0] }}
+                                        <div class="col-md-3 mb-3">
+                                            <label for="no_of_floors" class="form-label">No. Of Floors</label>
+                                            <input
+                                                id="no_of_floors"
+                                                v-model="form.no_of_floors"
+                                                type="number"
+                                                class="form-control form-control-sm"
+                                                :class="{ 'is-invalid': errors.no_of_floors }"
+                                                placeholder="Enter number of floors"
+                                            />
+                                            <div v-if="errors.no_of_floors" class="invalid-feedback d-block">
+                                                {{ errors.no_of_floors[0] }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label for="total_units" class="form-label">Total Units</label>
+                                            <input
+                                                id="total_units"
+                                                v-model="form.total_units"
+                                                type="number"
+                                                class="form-control form-control-sm"
+                                                :class="{ 'is-invalid': errors.total_units }"
+                                                placeholder="Enter total units"
+                                            />
+                                            <div v-if="errors.total_units" class="invalid-feedback d-block">
+                                                {{ errors.total_units[0] }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label for="no_of_unit_each_tower" class="form-label">No. Of Unit Each Tower</label>
+                                            <input
+                                                id="no_of_unit_each_tower"
+                                                v-model="form.no_of_unit_each_tower"
+                                                type="number"
+                                                class="form-control form-control-sm"
+                                                :class="{ 'is-invalid': errors.no_of_unit_each_tower }"
+                                                placeholder="Enter units per tower"
+                                            />
+                                            <div v-if="errors.no_of_unit_each_tower" class="invalid-feedback d-block">
+                                                {{ errors.no_of_unit_each_tower[0] }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="no_of_lift" class="form-label">No. Of Lift</label>
+                                            <input
+                                                id="no_of_lift"
+                                                v-model="form.no_of_lift"
+                                                type="number"
+                                                class="form-control form-control-sm"
+                                                :class="{ 'is-invalid': errors.no_of_lift }"
+                                                placeholder="Enter number of lifts"
+                                            />
+                                            <div v-if="errors.no_of_lift" class="invalid-feedback d-block">
+                                                {{ errors.no_of_lift[0] }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="front_road_width" class="form-label">Front Road Width <span class="text-danger">*</span></label>
+                                            <div class="input-group input-group-sm">
+                                                <input
+                                                    id="front_road_width"
+                                                    v-model="form.front_road_width"
+                                                    type="number"
+                                                    class="form-control form-control-sm"
+                                                    :class="{ 'is-invalid': errors.front_road_width }"
+                                                    placeholder="Enter road width"
+                                                    required
+                                                />
+                                                <select
+                                                    id="front_road_width_measurement_unit_id"
+                                                    v-model="form.front_road_width_measurement_unit_id"
+                                                    class="form-select form-select-sm"
+                                                    :class="{ 'is-invalid': errors.front_road_width_measurement_unit_id }"
+                                                >
+                                                    <option value="">Select Unit</option>
+                                                    <option 
+                                                        v-for="unit in props.measurementUnits" 
+                                                        :key="unit.id" 
+                                                        :value="String(unit.id)"
+                                                    >
+                                                        {{ unit.name }}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <div v-if="errors.front_road_width" class="invalid-feedback d-block">
+                                                {{ errors.front_road_width[0] }}
+                                            </div>
+                                            <div v-if="errors.front_road_width_measurement_unit_id" class="invalid-feedback d-block">
+                                                {{ errors.front_road_width_measurement_unit_id[0] }}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Category Selection (shown after construction type is selected) -->
-                                <div v-if="form.construction_type_id" class="mb-4">
-                                    <h5 class="mb-3 section-title">Category</h5>
-                                    <div v-if="categories.length === 0" class="text-muted mb-3">
-                                        Loading categories...
-                                    </div>
-                                    <div v-else-if="categories.length > 0" class="form-group">
-                                        <div class="d-flex flex-wrap gap-3">
-                                            <div 
-                                                v-for="category in categories" 
-                                                :key="category.id"
-                                                class="form-check form-check-inline construction-type-radio"
-                                            >
-                                                <input
-                                                    :id="`category_${category.id}`"
-                                                    v-model="form.category_id"
-                                                    type="radio"
-                                                    :value="String(category.id)"
-                                                    class="form-check-input"
-                                                    :class="{ 'is-invalid': errors.category_id }"
-                                                />
-                                                <label 
-                                                    :for="`category_${category.id}`"
-                                                    class="form-check-label construction-type-label"
-                                                >
-                                                    {{ category.name }}
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div v-if="errors.category_id" class="invalid-feedback d-block">
-                                            {{ errors.category_id[0] }}
-                                        </div>
-                                    </div>
-                                    <div v-else class="text-muted mb-3">
-                                        No categories found for this construction type.
-                                    </div>
-                                </div>
-
-                                <!-- Sub-Category Selection (shown after category is selected, only if sub-categories exist) -->
-                                <div v-if="form.category_id && subCategories.length > 0" class="mb-4">
-                                    <h5 class="mb-3 section-title">Sub Category</h5>
+                                <!-- Washroom (shown when construction_type_id=1, category_id=1, sub_category_id=1) -->
+                                <div v-if="form.construction_type_id === '1' && form.category_id === '1' && form.sub_category_id === '1'" class="mb-4">
+                                    <h5 class="mb-3 section-title">Washroom</h5>
                                     <div class="form-group">
                                         <div class="d-flex flex-wrap gap-3">
-                                            <div 
-                                                v-for="subCategory in subCategories" 
-                                                :key="subCategory.id"
-                                                class="form-check form-check-inline construction-type-radio"
-                                            >
+                                            <div class="form-check form-check-inline construction-type-radio">
                                                 <input
-                                                    :id="`sub_category_${subCategory.id}`"
-                                                    v-model="form.sub_category_id"
+                                                    id="washroom_private"
+                                                    v-model="form.washroom"
                                                     type="radio"
-                                                    :value="String(subCategory.id)"
+                                                    value="Private"
                                                     class="form-check-input"
-                                                    :class="{ 'is-invalid': errors.sub_category_id }"
+                                                    :class="{ 'is-invalid': errors.washroom }"
                                                 />
                                                 <label 
-                                                    :for="`sub_category_${subCategory.id}`"
+                                                    for="washroom_private"
                                                     class="form-check-label construction-type-label"
                                                 >
-                                                    {{ subCategory.name }}
+                                                    Private
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-check-inline construction-type-radio">
+                                                <input
+                                                    id="washroom_public"
+                                                    v-model="form.washroom"
+                                                    type="radio"
+                                                    value="Public"
+                                                    class="form-check-input"
+                                                    :class="{ 'is-invalid': errors.washroom }"
+                                                />
+                                                <label 
+                                                    for="washroom_public"
+                                                    class="form-check-label construction-type-label"
+                                                >
+                                                    Public
                                                 </label>
                                             </div>
                                         </div>
-                                        <div v-if="errors.sub_category_id" class="invalid-feedback d-block">
-                                            {{ errors.sub_category_id[0] }}
+                                        <div v-if="errors.washroom" class="invalid-feedback d-block">
+                                            {{ errors.washroom[0] }}
                                         </div>
                                     </div>
                                 </div>
@@ -632,3 +684,4 @@ onMounted(() => {
         </div>
     </AppLayout>
 </template>
+

@@ -25753,6 +25753,12 @@ body:after {
     background-color: #e5e7eb;
 }
 
+/* ChoiseSelection Component */
+.choise-selection-container {
+    border-bottom: 1px solid #1c467b;
+    margin-bottom: 1.5rem;
+}
+
 .form-label {
     font-size: 14px;
     font-weight: 500;
