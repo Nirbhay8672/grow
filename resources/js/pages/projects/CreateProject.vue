@@ -682,14 +682,16 @@ const handleCancel = () => {
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="project_status" class="form-label">Project Status</label>
-                                            <input
+                                            <select
                                                 id="project_status"
                                                 v-model="form.project_status"
-                                                type="text"
                                                 class="form-control form-control-sm"
                                                 :class="{ 'is-invalid': errors.project_status }"
-                                                placeholder="Enter project status"
-                                            />
+                                            >
+                                                <option value="">Select Project Status</option>
+                                                <option value="Ready possession">Ready possession</option>
+                                                <option value="Under construction">Under construction</option>
+                                            </select>
                                             <div v-if="errors.project_status" class="invalid-feedback">
                                                 {{ errors.project_status[0] }}
                                             </div>
@@ -895,4 +897,5 @@ const handleCancel = () => {
     color: #dc3545;
 }
 </style>
+
 
