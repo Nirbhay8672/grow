@@ -73,7 +73,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const currentStep = ref(1);
+const currentStep = ref(2); // Set to 2 for testing - change back to 1 for production
 const loading = ref(false);
 const errors = ref<Record<string, string[]>>({});
 
@@ -433,7 +433,7 @@ onMounted(() => {
                             <!-- Step 2: Construction Type -->
                             <div v-if="currentStep === 2">
                                 <div class="mb-4">
-                                    <h5 class="mb-3 section-title">Select Construction Type</h5>
+                                    <h5 class="mb-3 section-title">Property Type</h5>
                                     <div class="form-group">
                                         <div class="d-flex flex-wrap gap-3">
                                             <div 
