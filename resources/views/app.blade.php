@@ -1065,6 +1065,12 @@
                             </a>
                         </li>
                         <li>
+                            <a href="/projects/create" data-inertia-link data-icon-color="#dc3545" class="{{ request()->is('projects*') ? 'active' : '' }}" style="{{ request()->is('projects*') ? 'background-color: #dc3545; color: #ffffff; border-radius: 6px; margin-left: 8px; margin-right: 8px; padding: 8px 12px;' : '' }}">
+                                <span data-feather="folder" class="nav-icon" style="color: {{ request()->is('projects*') ? '#ffffff' : '#dc3545' }};"></span>
+                                <span class="menu-text" style="{{ request()->is('projects*') ? 'font-weight: 500; color: #ffffff;' : '' }}">Projects</span>
+                            </a>
+                        </li>
+                        <li>
                             <a href="/management/locations" data-inertia-link data-icon-color="#0ea5e9" class="{{ request()->is('management/locations') ? 'active' : '' }}" style="{{ request()->is('management/locations') ? 'background-color: #0ea5e9; color: #ffffff; border-radius: 6px; margin-left: 8px; margin-right: 8px; padding: 8px 12px;' : '' }}">
                                 <span data-feather="map" class="nav-icon" style="color: {{ request()->is('management/locations') ? '#ffffff' : '#0ea5e9' }};"></span>
                                 <span class="menu-text" style="{{ request()->is('management/locations') ? 'font-weight: 500; color: #ffffff;' : '' }}">Location Management</span>
@@ -1256,6 +1262,7 @@
                 // Define which routes should activate each menu item
                 const routePatterns = {
                     '/dashboard': ['/dashboard'],
+                    '/projects/create': ['/projects'],
                     '/management/locations': ['/management/locations', '/states', '/cities', '/districts', '/localities', '/talukas', '/villages'],
                     '/management/users': ['/management/users', '/users'],
                     '/management/configuration': ['/management/configuration', '/measurement-units', '/builders'],
