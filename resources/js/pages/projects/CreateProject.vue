@@ -4,7 +4,10 @@ import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Plus, X } from 'lucide-vue-next';
+import StepIndicator from './components/StepIndicator.vue';
+import BuilderInformation from './components/BuilderInformation.vue';
+import ProjectInformation from './components/ProjectInformation.vue';
+import ContactDetails from './components/ContactDetails.vue';
 
 declare global {
     interface Window {
@@ -359,525 +362,53 @@ onMounted(() => {
                     </div>
                     <div class="card-body">
                         <!-- Step Indicator -->
-                        <div class="d-flex justify-content-center mb-4">
-                            <div class="d-flex align-items-center" style="gap: 20px;">
-                                <div class="d-flex flex-column align-items-center">
-                                    <div 
-                                        class="rounded-circle d-flex align-items-center justify-content-center"
-                                        :style="{
-                                            width: '40px',
-                                            height: '40px',
-                                            backgroundColor: currentStep >= 1 ? '#1c467b' : '#e5e7eb',
-                                            color: currentStep >= 1 ? '#ffffff' : '#9ca3af',
-                                            fontWeight: 'bold',
-                                            fontSize: '16px'
-                                        }"
-                                    >
-                                        1
-                                    </div>
-                                    <span 
-                                        class="mt-2"
-                                        :style="{
-                                            fontSize: '14px',
-                                            color: currentStep >= 1 ? '#1c467b' : '#9ca3af',
-                                            fontWeight: currentStep >= 1 ? '500' : 'normal'
-                                        }"
-                                    >
-                                        Project & Builder Information
-                                    </span>
-                                </div>
-                                <div style="width: 100px; height: 2px; background-color: #e5e7eb;"></div>
-                                <div class="d-flex flex-column align-items-center">
-                                    <div 
-                                        class="rounded-circle d-flex align-items-center justify-content-center"
-                                        :style="{
-                                            width: '40px',
-                                            height: '40px',
-                                            backgroundColor: currentStep >= 2 ? '#1c467b' : '#e5e7eb',
-                                            color: currentStep >= 2 ? '#ffffff' : '#9ca3af',
-                                            fontWeight: 'bold',
-                                            fontSize: '16px'
-                                        }"
-                                    >
-                                        2
-                                    </div>
-                                    <span 
-                                        class="mt-2"
-                                        :style="{
-                                            fontSize: '14px',
-                                            color: currentStep >= 2 ? '#1c467b' : '#9ca3af',
-                                            fontWeight: currentStep >= 2 ? '500' : 'normal'
-                                        }"
-                                    >
-                                        Project Type & Basic Info
-                                    </span>
-                                </div>
-                                <div style="width: 100px; height: 2px; background-color: #e5e7eb;"></div>
-                                <div class="d-flex flex-column align-items-center">
-                                    <div 
-                                        class="rounded-circle d-flex align-items-center justify-content-center"
-                                        :style="{
-                                            width: '40px',
-                                            height: '40px',
-                                            backgroundColor: currentStep >= 3 ? '#1c467b' : '#e5e7eb',
-                                            color: currentStep >= 3 ? '#ffffff' : '#9ca3af',
-                                            fontWeight: 'bold',
-                                            fontSize: '16px'
-                                        }"
-                                    >
-                                        3
-                                    </div>
-                                    <span 
-                                        class="mt-2"
-                                        :style="{
-                                            fontSize: '14px',
-                                            color: currentStep >= 3 ? '#1c467b' : '#9ca3af',
-                                            fontWeight: currentStep >= 3 ? '500' : 'normal'
-                                        }"
-                                    >
-                                        Parking & Amenities
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                        <StepIndicator :current-step="currentStep" />
 
                         <!-- Form -->
                         <form @submit.prevent="handleSubmit">
                             <!-- Builder Information Section -->
-                            <div class="mb-4">
-                                <h5 class="mb-3" style="color: #1c467b; font-weight: 600;">Builder Information</h5>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="builder_id" class="form-label">
-                                                Builder Name <span class="text-danger">*</span>
-                                            </label>
-                                            <select
-                                                id="builder_id"
-                                                v-model="form.builder_id"
-                                                class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors.builder_id }"
-                                                @blur="validateForm"
-                                                required
-                                            >
-                                                <option value="">Select Builder</option>
-                                                <option 
-                                                    v-for="builder in builders" 
-                                                    :key="builder.id" 
-                                                    :value="builder.id"
-                                                >
-                                                    {{ builder.name }}
-                                                </option>
-                                            </select>
-                                            <div v-if="errors.builder_id" class="invalid-feedback">
-                                                {{ errors.builder_id[0] }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="builder_website" class="form-label">Website</label>
-                                            <input
-                                                id="builder_website"
-                                                v-model="form.builder_website"
-                                                type="url"
-                                                class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors.builder_website }"
-                                                placeholder="https://example.com"
-                                                @blur="validateForm"
-                                            />
-                                            <div v-if="errors.builder_website" class="invalid-feedback">
-                                                {{ errors.builder_website[0] }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <BuilderInformation
+                                :builders="builders"
+                                :form="form"
+                                :errors="errors"
+                                :validate-form="validateForm"
+                            />
 
                             <!-- Project Information Section -->
-                            <div class="mb-4">
-                                <h5 class="mb-3" style="color: #1c467b; font-weight: 600;">Project Information</h5>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="project_name" class="form-label">
-                                                Project Name <span class="text-danger">*</span>
-                                            </label>
-                                            <input
-                                                id="project_name"
-                                                v-model="form.project_name"
-                                                type="text"
-                                                class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors.project_name }"
-                                                placeholder="Enter project name"
-                                                @blur="validateForm"
-                                                required
-                                            />
-                                            <div v-if="errors.project_name" class="invalid-feedback">
-                                                {{ errors.project_name[0] }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="address" class="form-label">Address</label>
-                                            <textarea
-                                                id="address"
-                                                v-model="form.address"
-                                                class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors.address }"
-                                                placeholder="Enter address"
-                                                rows="2"
-                                            ></textarea>
-                                            <div v-if="errors.address" class="invalid-feedback">
-                                                {{ errors.address[0] }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="state_id" class="form-label">State</label>
-                                            <select
-                                                id="state_id"
-                                                v-model="form.state_id"
-                                                class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors.state_id }"
-                                            >
-                                                <option value="">Select State</option>
-                                                <option 
-                                                    v-for="state in states" 
-                                                    :key="state.id" 
-                                                    :value="state.id"
-                                                >
-                                                    {{ state.name }}
-                                                </option>
-                                            </select>
-                                            <div v-if="errors.state_id" class="invalid-feedback">
-                                                {{ errors.state_id[0] }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="city_id" class="form-label">City</label>
-                                            <select
-                                                id="city_id"
-                                                v-model="form.city_id"
-                                                class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors.city_id }"
-                                                :disabled="!form.state_id"
-                                            >
-                                                <option value="">Select City</option>
-                                                <option 
-                                                    v-for="city in cities" 
-                                                    :key="city.id" 
-                                                    :value="city.id"
-                                                >
-                                                    {{ city.name }}
-                                                </option>
-                                            </select>
-                                            <div v-if="errors.city_id" class="invalid-feedback">
-                                                {{ errors.city_id[0] }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="locality_id" class="form-label">
-                                                Locality <span class="text-danger">*</span>
-                                            </label>
-                                            <select
-                                                id="locality_id"
-                                                v-model="form.locality_id"
-                                                class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors.locality_id }"
-                                                :disabled="!form.city_id"
-                                                @blur="validateForm"
-                                                @change="validateForm"
-                                                required
-                                            >
-                                                <option value="">Select Locality</option>
-                                                <option 
-                                                    v-for="locality in localities" 
-                                                    :key="locality.id" 
-                                                    :value="locality.id"
-                                                >
-                                                    {{ locality.name }}
-                                                </option>
-                                            </select>
-                                            <div v-if="errors.locality_id" class="invalid-feedback">
-                                                {{ errors.locality_id[0] }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="pincode" class="form-label">Pincode</label>
-                                            <input
-                                                id="pincode"
-                                                v-model="form.pincode"
-                                                type="text"
-                                                class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors.pincode }"
-                                                placeholder="Enter pincode"
-                                            />
-                                            <div v-if="errors.pincode" class="invalid-feedback">
-                                                {{ errors.pincode[0] }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="location_link" class="form-label">Location Link</label>
-                                            <input
-                                                id="location_link"
-                                                v-model="form.location_link"
-                                                type="url"
-                                                class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors.location_link }"
-                                                placeholder="https://maps.google.com/..."
-                                                @blur="validateForm"
-                                            />
-                                            <div v-if="errors.location_link" class="invalid-feedback">
-                                                {{ errors.location_link[0] }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="land_size" class="form-label">Land Size</label>
-                                            <div class="input-group input-group-sm">
-                                                <input
-                                                    id="land_size"
-                                                    v-model="form.land_size"
-                                                    type="text"
-                                                    class="form-control form-control-sm"
-                                                    :class="{ 'is-invalid': errors.land_size }"
-                                                    placeholder="Enter land size"
-                                                />
-                                                <select
-                                                    id="measurement_unit_id"
-                                                    v-model="form.measurement_unit_id"
-                                                    class="form-control form-control-sm"
-                                                    :class="{ 'is-invalid': errors.measurement_unit_id }"
-                                                    style="max-width: 150px;"
-                                                >
-                                                    <option value="">Select Unit</option>
-                                                    <option 
-                                                        v-for="unit in measurementUnits" 
-                                                        :key="unit.id" 
-                                                        :value="unit.id"
-                                                    >
-                                                        {{ unit.name }}
-                                                    </option>
-                                                </select>
-                                                <div v-if="errors.land_size || errors.measurement_unit_id" class="invalid-feedback d-block w-100">
-                                                    <span v-if="errors.land_size">{{ errors.land_size[0] }}</span>
-                                                    <span v-if="errors.measurement_unit_id">{{ errors.measurement_unit_id[0] }}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="rera_no" class="form-label">Rera No</label>
-                                            <input
-                                                id="rera_no"
-                                                v-model="form.rera_no"
-                                                type="text"
-                                                class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors.rera_no }"
-                                                placeholder="Enter RERA number"
-                                            />
-                                            <div v-if="errors.rera_no" class="invalid-feedback">
-                                                {{ errors.rera_no[0] }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="project_status" class="form-label">Project Status</label>
-                                            <select
-                                                id="project_status"
-                                                v-model="form.project_status"
-                                                class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors.project_status }"
-                                            >
-                                                <option value="">Select Project Status</option>
-                                                <option value="Ready Possession">Ready Possession</option>
-                                                <option value="Under Construction">Under Construction</option>
-                                            </select>
-                                            <div v-if="errors.project_status" class="invalid-feedback">
-                                                {{ errors.project_status[0] }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <ProjectInformation
+                                :states="states"
+                                :cities="cities"
+                                :localities="localities"
+                                :measurement-units="measurementUnits"
+                                :form="form"
+                                :errors="errors"
+                                :validate-form="validateForm"
+                            />
 
                             <!-- Contact Details Section -->
-                            <div class="mb-4">
-                                <h5 class="mb-3" style="color: #1c467b; font-weight: 600;">Contact Details</h5>
-                                
-                                <!-- Dynamic Contact Fields -->
-                                <div 
-                                    v-for="(contact, index) in contacts" 
-                                    :key="contact.id" 
-                                    class="row mb-3"
-                                >
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label :for="`contact_name_${contact.id}`" class="form-label">
-                                                Name <span class="text-danger">*</span>
-                                            </label>
-                                            <input
-                                                :id="`contact_name_${contact.id}`"
-                                                v-model="contact.name"
-                                                type="text"
-                                                class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors[`contacts.${index}.name`] }"
-                                                placeholder="Enter name"
-                                                @blur="validateForm"
-                                                required
-                                            />
-                                            <div v-if="errors[`contacts.${index}.name`]" class="invalid-feedback">
-                                                {{ errors[`contacts.${index}.name`][0] }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label :for="`contact_mobile_${contact.id}`" class="form-label">
-                                                Mobile <span class="text-danger">*</span>
-                                            </label>
-                                            <input
-                                                :id="`contact_mobile_${contact.id}`"
-                                                v-model="contact.mobile"
-                                                type="tel"
-                                                class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors[`contacts.${index}.mobile`] }"
-                                                placeholder="Enter mobile number"
-                                                @blur="validateForm"
-                                                @input="validateForm"
-                                                maxlength="10"
-                                                required
-                                            />
-                                            <div v-if="errors[`contacts.${index}.mobile`]" class="invalid-feedback">
-                                                {{ errors[`contacts.${index}.mobile`][0] }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label :for="`contact_email_${contact.id}`" class="form-label">Email</label>
-                                            <input
-                                                :id="`contact_email_${contact.id}`"
-                                                v-model="contact.email"
-                                                type="email"
-                                                class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors[`contacts.${index}.email`] }"
-                                                placeholder="Enter email address"
-                                                @blur="validateForm"
-                                            />
-                                            <div v-if="errors[`contacts.${index}.email`]" class="invalid-feedback">
-                                                {{ errors[`contacts.${index}.email`][0] }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label :for="`contact_designation_${contact.id}`" class="form-label">Designation</label>
-                                            <input
-                                                :id="`contact_designation_${contact.id}`"
-                                                v-model="contact.designation"
-                                                type="text"
-                                                class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors[`contacts.${index}.designation`] }"
-                                                placeholder="Enter designation"
-                                            />
-                                            <div v-if="errors[`contacts.${index}.designation`]" class="invalid-feedback">
-                                                {{ errors[`contacts.${index}.designation`][0] }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-1">
-                                        <div class="form-group mb-0">
-                                            <label class="form-label" style="visibility: hidden;">Action</label>
-                                            <div class="d-flex gap-1">
-                                                <button
-                                                    v-if="index === 0"
-                                                    type="button"
-                                                    @click="addContact"
-                                                    class="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
-                                                    style="width: 40px; height: 38px; padding: 0; background-color: #1c467b; border: none; flex-shrink: 0; margin: 0;"
-                                                    title="Add Contact"
-                                                >
-                                                    <Plus :size="18" color="white" style="display: block; margin: 0;" />
-                                                </button>
-                                                <button
-                                                    v-if="index > 0"
-                                                    type="button"
-                                                    @click="removeContact(contact.id)"
-                                                    class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
-                                                    style="width: 40px; height: 38px; padding: 0; border: none; flex-shrink: 0; margin: 0;"
-                                                    title="Remove Contact"
-                                                >
-                                                    <X :size="18" color="white" style="display: block; margin: 0;" />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Restricted User Field -->
-                                <div class="row mt-3">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="restricted_user_ids" class="form-label">Restricted Users</label>
-                                            <select
-                                                id="restricted_user_ids"
-                                                v-model="form.restricted_user_ids"
-                                                class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors.restricted_user_ids }"
-                                                :multiple="true"
-                                            >
-                                                <option 
-                                                    v-for="user in users" 
-                                                    :key="user.id" 
-                                                    :value="user.id"
-                                                >
-                                                    {{ user.name }} ({{ user.email }})
-                                                </option>
-                                            </select>
-                                            <div v-if="errors.restricted_user_ids" class="invalid-feedback">
-                                                {{ errors.restricted_user_ids[0] }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <ContactDetails
+                                :users="users"
+                                :contacts="contacts"
+                                :form="form"
+                                :errors="errors"
+                                :validate-form="validateForm"
+                                :add-contact="addContact"
+                                :remove-contact="removeContact"
+                            />
 
                             <!-- Action Buttons -->
                             <div class="d-flex justify-content-end gap-2 mt-4">
                                 <button
                                     type="button"
                                     @click="handleCancel"
-                                    class="btn btn-warning btn-sm"
-                                    style="background-color: #ff9800; color: white; border: none;"
+                                    class="btn btn-warning btn-sm btn-cancel"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    class="btn btn-primary btn-sm"
+                                    class="btn btn-primary btn-sm btn-primary-custom"
                                     :disabled="loading"
-                                    style="background-color: #1c467b; color: white; border: none;"
                                 >
                                     {{ loading ? 'Creating...' : 'Create Project' }}
                                 </button>
@@ -889,32 +420,3 @@ onMounted(() => {
         </div>
     </AppLayout>
 </template>
-
-<style scoped>
-.form-label {
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 4px;
-    color: #374151;
-}
-
-.form-control-sm {
-    font-size: 14px;
-    padding: 8px 12px;
-}
-
-.is-invalid {
-    border-color: #dc3545;
-}
-
-.invalid-feedback {
-    display: block;
-    font-size: 12px;
-    color: #dc3545;
-    margin-top: 4px;
-}
-
-.text-danger {
-    color: #dc3545;
-}
-</style>

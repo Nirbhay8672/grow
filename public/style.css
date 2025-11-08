@@ -25671,4 +25671,137 @@ body:after {
     padding: 19px 0;
   }
 }
+/* Project Form Styles */
+.section-title {
+    color: #1c467b;
+    font-weight: 600;
+}
+
+.step-indicator-container {
+    gap: 20px;
+}
+
+.step-circle {
+    width: 40px;
+    height: 40px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.step-circle.active {
+    background-color: #1c467b;
+    color: #ffffff;
+}
+
+.step-circle.inactive {
+    background-color: #e5e7eb;
+    color: #9ca3af;
+}
+
+.step-label {
+    font-size: 14px;
+}
+
+.step-label.active {
+    color: #1c467b;
+    font-weight: 500;
+}
+
+.step-label.inactive {
+    color: #9ca3af;
+    font-weight: normal;
+}
+
+.step-connector {
+    width: 100px;
+    height: 2px;
+    background-color: #e5e7eb;
+}
+
+.form-label {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: #374151;
+}
+
+.form-control-sm {
+    font-size: 14px;
+    padding: 8px 12px;
+}
+
+.is-invalid {
+    border-color: #dc3545;
+}
+
+.invalid-feedback {
+    display: block;
+    font-size: 12px;
+    color: #dc3545;
+    margin-top: 4px;
+}
+
+.text-danger {
+    color: #dc3545;
+}
+
+.btn-cancel {
+    background-color: #ff9800;
+    color: white;
+    border: none;
+}
+
+.btn-primary-custom {
+    background-color: #1c467b;
+    color: white;
+    border: none;
+}
+
+.contact-action-btn {
+    width: 40px;
+    height: 38px;
+    padding: 0;
+    flex-shrink: 0;
+    margin: 0;
+}
+
+.contact-add-btn {
+    background-color: #1c467b;
+    border: none;
+}
+
+.contact-icon {
+    display: block;
+    margin: 0;
+}
+
+.hidden-label {
+    visibility: hidden;
+}
+
+.measurement-unit-select {
+    max-width: 150px;
+}
+
+/* Input Group Height Fix */
+.input-group-sm {
+    display: flex;
+    align-items: stretch;
+}
+
+.input-group-sm > .form-control,
+.input-group-sm > .form-select,
+.input-group-sm .form-control-sm {
+    padding: 8px 12px;
+    font-size: 14px;
+    height: 39px;
+    min-height: calc(1.5em + 0.5rem + 2px);
+    line-height: 1.5;
+}
+
+.input-group-sm .form-control:not(:first-child),
+.input-group-sm .form-select:not(:first-child) {
+    border-left: 0;
+    margin-left: -1px;
+}
 /*# sourceMappingURL=maps/style.css.map */
