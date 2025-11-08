@@ -47,11 +47,17 @@ interface User {
     email: string;
 }
 
+interface ConstructionType {
+    id: number;
+    name: string;
+}
+
 interface Props {
     builders: Builder[];
     states: State[];
     measurementUnits: MeasurementUnit[];
     users: User[];
+    constructionTypes: ConstructionType[];
 }
 
 const props = defineProps<Props>();
@@ -114,6 +120,9 @@ const form = reactive({
     
     // Contact Details
     restricted_user_ids: [] as number[],
+    
+    // Construction Type
+    construction_type_id: '',
 });
 
 const addContact = () => {
@@ -323,8 +332,30 @@ const handleSubmit = async () => {
     }
 };
 
-const handleCancel = () => {
-    router.visit('/dashboard');
+const handleNext = () => {
+    if (currentStep.value === 1) {
+        // Validate step 1 before proceeding
+        if (!validateForm()) {
+            return;
+        }
+        currentStep.value = 2;
+    } else if (currentStep.value === 2) {
+        // Validate step 2 and submit
+        if (!form.construction_type_id) {
+            errors.value.construction_type_id = ['Please select a construction type'];
+            return;
+        }
+        
+        // TODO: Submit form or proceed to next step
+        console.log('Form validated, submitting...');
+        // router.post('/projects', formData, { ... });
+    }
+};
+
+const handlePrevious = () => {
+    if (currentStep.value > 1) {
+        currentStep.value--;
+    }
 };
 
 // Initialize Select2 only for restricted users multiple select
@@ -366,51 +397,90 @@ onMounted(() => {
 
                         <!-- Form -->
                         <form @submit.prevent="handleSubmit">
-                            <!-- Builder Information Section -->
-                            <BuilderInformation
-                                :builders="builders"
-                                :form="form"
-                                :errors="errors"
-                                :validate-form="validateForm"
-                            />
+                            <!-- Step 1: Project & Builder Information -->
+                            <div v-if="currentStep === 1">
+                                <!-- Builder Information Section -->
+                                <BuilderInformation
+                                    :builders="builders"
+                                    :form="form"
+                                    :errors="errors"
+                                    :validate-form="validateForm"
+                                />
 
-                            <!-- Project Information Section -->
-                            <ProjectInformation
-                                :states="states"
-                                :cities="cities"
-                                :localities="localities"
-                                :measurement-units="measurementUnits"
-                                :form="form"
-                                :errors="errors"
-                                :validate-form="validateForm"
-                            />
+                                <!-- Project Information Section -->
+                                <ProjectInformation
+                                    :states="states"
+                                    :cities="cities"
+                                    :localities="localities"
+                                    :measurement-units="measurementUnits"
+                                    :form="form"
+                                    :errors="errors"
+                                    :validate-form="validateForm"
+                                />
 
-                            <!-- Contact Details Section -->
-                            <ContactDetails
-                                :users="users"
-                                :contacts="contacts"
-                                :form="form"
-                                :errors="errors"
-                                :validate-form="validateForm"
-                                :add-contact="addContact"
-                                :remove-contact="removeContact"
-                            />
+                                <!-- Contact Details Section -->
+                                <ContactDetails
+                                    :users="users"
+                                    :contacts="contacts"
+                                    :form="form"
+                                    :errors="errors"
+                                    :validate-form="validateForm"
+                                    :add-contact="addContact"
+                                    :remove-contact="removeContact"
+                                />
+                            </div>
+
+                            <!-- Step 2: Construction Type -->
+                            <div v-if="currentStep === 2">
+                                <div class="mb-4">
+                                    <h5 class="mb-3 section-title">Select Construction Type</h5>
+                                    <div class="form-group">
+                                        <div class="d-flex flex-wrap gap-3">
+                                            <div 
+                                                v-for="constructionType in constructionTypes" 
+                                                :key="constructionType.id"
+                                                class="form-check form-check-inline construction-type-radio"
+                                            >
+                                                <input
+                                                    :id="`construction_type_${constructionType.id}`"
+                                                    v-model="form.construction_type_id"
+                                                    type="radio"
+                                                    :value="String(constructionType.id)"
+                                                    class="form-check-input"
+                                                    :class="{ 'is-invalid': errors.construction_type_id }"
+                                                />
+                                                <label 
+                                                    :for="`construction_type_${constructionType.id}`"
+                                                    class="form-check-label construction-type-label"
+                                                >
+                                                    {{ constructionType.name }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div v-if="errors.construction_type_id" class="invalid-feedback d-block">
+                                            {{ errors.construction_type_id[0] }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             <!-- Action Buttons -->
                             <div class="d-flex justify-content-end gap-2 mt-4">
                                 <button
+                                    v-if="currentStep === 2"
                                     type="button"
-                                    @click="handleCancel"
-                                    class="btn btn-warning btn-sm btn-cancel"
+                                    @click="handlePrevious"
+                                    class="btn btn-secondary btn-sm btn-previous"
                                 >
-                                    Cancel
+                                    Previous
                                 </button>
                                 <button
-                                    type="submit"
+                                    type="button"
+                                    @click="handleNext"
                                     class="btn btn-primary btn-sm btn-primary-custom"
                                     :disabled="loading"
                                 >
-                                    {{ loading ? 'Creating...' : 'Create Project' }}
+                                    {{ loading ? 'Processing...' : currentStep === 2 ? 'Create Project' : 'Next' }}
                                 </button>
                             </div>
                         </form>

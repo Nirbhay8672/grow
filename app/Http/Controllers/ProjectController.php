@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Builder;
 use App\Models\City;
+use App\Models\ConstructionType;
 use App\Models\Locality;
 use App\Models\MeasurementUnit;
 use App\Models\Project;
@@ -44,11 +45,16 @@ class ProjectController extends Controller
         $users = User::orderBy('name')
             ->get(['id', 'name', 'email']);
 
+        $constructionTypes = ConstructionType::where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
         return Inertia::render('projects/CreateProject', [
             'builders' => $builders,
             'states' => $states,
             'measurementUnits' => $measurementUnits,
             'users' => $users,
+            'constructionTypes' => $constructionTypes,
         ]);
     }
 

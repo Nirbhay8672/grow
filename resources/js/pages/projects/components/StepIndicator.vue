@@ -35,7 +35,7 @@ defineProps<Props>();
                     class="mt-2 step-label"
                     :class="currentStep >= 2 ? 'active' : 'inactive'"
                 >
-                    Project Type & Basic Info
+                    Construction Type
                 </span>
             </div>
             <div class="step-connector"></div>

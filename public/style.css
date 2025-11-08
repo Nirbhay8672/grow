@@ -25863,4 +25863,21 @@ textarea.form-control-sm:focus {
     border-color: #fa8b0c;
     box-shadow: 0 0 0 0.2rem rgba(250, 139, 12, 0.25);
 }
+
+/* Construction Type Radio Buttons */
+.construction-type-radio {
+    margin-right: 0;
+}
+
+.construction-type-label {
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Previous Button */
+.btn-previous {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+}
 /*# sourceMappingURL=maps/style.css.map */
