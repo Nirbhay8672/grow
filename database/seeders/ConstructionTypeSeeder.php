@@ -14,22 +14,17 @@ class ConstructionTypeSeeder extends Seeder
     {
         $constructionTypes = [
             [
-                'name' => 'Industrial',
-                'is_active' => true,
-                'user_id' => 1,
-            ],
-            [
                 'name' => 'Commercial',
                 'is_active' => true,
                 'user_id' => 1,
             ],
             [
-                'name' => 'Office & Retail',
+                'name' => 'Residential',
                 'is_active' => true,
                 'user_id' => 1,
             ],
             [
-                'name' => 'Residential',
+                'name' => 'Office & Retail',
                 'is_active' => true,
                 'user_id' => 1,
             ],

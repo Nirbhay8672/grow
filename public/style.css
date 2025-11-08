@@ -25681,11 +25681,27 @@ body:after {
     gap: 20px;
 }
 
+/* Vertical Step Indicator (Left Side) */
+.step-indicator-vertical {
+    position: sticky;
+    top: 20px;
+}
+
+.step-item {
+    margin-bottom: 20px;
+}
+
+.step-content {
+    margin-right: 15px;
+    position: relative;
+}
+
 .step-circle {
     width: 40px;
     height: 40px;
     font-weight: bold;
     font-size: 16px;
+    flex-shrink: 0;
 }
 
 .step-circle.active {
@@ -25698,8 +25714,26 @@ body:after {
     color: #9ca3af;
 }
 
+.step-connector-vertical {
+    width: 2px;
+    height: 40px;
+    background-color: #e5e7eb;
+    margin: 5px 0;
+}
+
+.step-connector-vertical.active {
+    background-color: #1c467b;
+}
+
+.step-label-wrapper {
+    flex: 1;
+    padding-top: 8px;
+}
+
 .step-label {
     font-size: 14px;
+    display: block;
+    line-height: 1.4;
 }
 
 .step-label.active {
@@ -25712,6 +25746,7 @@ body:after {
     font-weight: normal;
 }
 
+/* Horizontal Step Indicator (for backward compatibility) */
 .step-connector {
     width: 100px;
     height: 2px;

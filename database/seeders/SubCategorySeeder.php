@@ -14,154 +14,200 @@ class SubCategorySeeder extends Seeder
     public function run(): void
     {
         // Get categories to assign sub categories
-        $apartmentCategory = Category::where('name', 'Apartment')->first();
-        $villaCategory = Category::where('name', 'Villa')->first();
+        $officeCategory = Category::where('name', 'Office')->first();
+        $retailCategory = Category::where('name', 'Retail')->first();
+        $storageCategory = Category::where('name', 'Storage/Industrial')->first();
+        $flatCategory = Category::where('name', 'Flat')->first();
+        $villaCategory = Category::where('name', 'Villa/Bungalow')->first();
         $plotCategory = Category::where('name', 'Plot')->first();
-        $shopCategory = Category::where('name', 'Shop')->first();
-        $officeCategory = Category::where('name', 'Office Space')->first();
-        $warehouseCategory = Category::where('name', 'Warehouse')->first();
+        $penthouseCategory = Category::where('name', 'Penthouse')->first();
 
         $subCategories = [];
 
-        // Apartment sub categories
-        if ($apartmentCategory) {
-            $subCategories[] = [
-                'name' => '1 BHK',
-                'category_id' => $apartmentCategory->id,
-                'is_active' => true,
-                'user_id' => 1,
-            ];
-            $subCategories[] = [
-                'name' => '2 BHK',
-                'category_id' => $apartmentCategory->id,
-                'is_active' => true,
-                'user_id' => 1,
-            ];
-            $subCategories[] = [
-                'name' => '3 BHK',
-                'category_id' => $apartmentCategory->id,
-                'is_active' => true,
-                'user_id' => 1,
-            ];
-            $subCategories[] = [
-                'name' => '4 BHK',
-                'category_id' => $apartmentCategory->id,
-                'is_active' => true,
-                'user_id' => 1,
-            ];
-        }
-
-        // Villa sub categories
-        if ($villaCategory) {
-            $subCategories[] = [
-                'name' => '2 BHK Villa',
-                'category_id' => $villaCategory->id,
-                'is_active' => true,
-                'user_id' => 1,
-            ];
-            $subCategories[] = [
-                'name' => '3 BHK Villa',
-                'category_id' => $villaCategory->id,
-                'is_active' => true,
-                'user_id' => 1,
-            ];
-            $subCategories[] = [
-                'name' => '4 BHK Villa',
-                'category_id' => $villaCategory->id,
-                'is_active' => true,
-                'user_id' => 1,
-            ];
-            $subCategories[] = [
-                'name' => '5+ BHK Villa',
-                'category_id' => $villaCategory->id,
-                'is_active' => true,
-                'user_id' => 1,
-            ];
-        }
-
-        // Plot sub categories
-        if ($plotCategory) {
-            $subCategories[] = [
-                'name' => 'Residential Plot',
-                'category_id' => $plotCategory->id,
-                'is_active' => true,
-                'user_id' => 1,
-            ];
-            $subCategories[] = [
-                'name' => 'Commercial Plot',
-                'category_id' => $plotCategory->id,
-                'is_active' => true,
-                'user_id' => 1,
-            ];
-            $subCategories[] = [
-                'name' => 'Agricultural Plot',
-                'category_id' => $plotCategory->id,
-                'is_active' => true,
-                'user_id' => 1,
-            ];
-        }
-
-        // Shop sub categories
-        if ($shopCategory) {
-            $subCategories[] = [
-                'name' => 'Ground Floor Shop',
-                'category_id' => $shopCategory->id,
-                'is_active' => true,
-                'user_id' => 1,
-            ];
-            $subCategories[] = [
-                'name' => 'First Floor Shop',
-                'category_id' => $shopCategory->id,
-                'is_active' => true,
-                'user_id' => 1,
-            ];
-            $subCategories[] = [
-                'name' => 'Showroom',
-                'category_id' => $shopCategory->id,
-                'is_active' => true,
-                'user_id' => 1,
-            ];
-        }
-
-        // Office Space sub categories
+        // Commercial - Office sub categories
         if ($officeCategory) {
             $subCategories[] = [
-                'name' => 'Small Office (Up to 500 sq ft)',
-                'category_id' => $officeCategory->id,
-                'is_active' => true,
-                'user_id' => 1,
-            ];
-            $subCategories[] = [
-                'name' => 'Medium Office (500-2000 sq ft)',
-                'category_id' => $officeCategory->id,
-                'is_active' => true,
-                'user_id' => 1,
-            ];
-            $subCategories[] = [
-                'name' => 'Large Office (2000+ sq ft)',
+                'name' => 'Office Space',
                 'category_id' => $officeCategory->id,
                 'is_active' => true,
                 'user_id' => 1,
             ];
         }
 
-        // Warehouse sub categories
-        if ($warehouseCategory) {
+        // Commercial - Retail sub categories
+        if ($retailCategory) {
             $subCategories[] = [
-                'name' => 'Small Warehouse',
-                'category_id' => $warehouseCategory->id,
+                'name' => 'Ground Floor',
+                'category_id' => $retailCategory->id,
                 'is_active' => true,
                 'user_id' => 1,
             ];
             $subCategories[] = [
-                'name' => 'Medium Warehouse',
-                'category_id' => $warehouseCategory->id,
+                'name' => '1st Floor',
+                'category_id' => $retailCategory->id,
                 'is_active' => true,
                 'user_id' => 1,
             ];
             $subCategories[] = [
-                'name' => 'Large Warehouse',
-                'category_id' => $warehouseCategory->id,
+                'name' => '2nd Floor',
+                'category_id' => $retailCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => '3rd Floor',
+                'category_id' => $retailCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+        }
+
+        // Commercial - Storage/Industrial sub categories
+        if ($storageCategory) {
+            $subCategories[] = [
+                'name' => 'Warehouse',
+                'category_id' => $storageCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => 'Cold Storage',
+                'category_id' => $storageCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => 'IND. Shed',
+                'category_id' => $storageCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => 'Plotting',
+                'category_id' => $storageCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+        }
+
+        // Residential - Flat sub categories
+        if ($flatCategory) {
+            $subCategories[] = [
+                'name' => '1RK',
+                'category_id' => $flatCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => '1BHK',
+                'category_id' => $flatCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => '2BHK',
+                'category_id' => $flatCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => '3BHK',
+                'category_id' => $flatCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => '4BHK',
+                'category_id' => $flatCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => '5BHK',
+                'category_id' => $flatCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => '5+ BHK',
+                'category_id' => $flatCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+        }
+
+        // Residential - Villa/Bungalow sub categories
+        if ($villaCategory) {
+            $subCategories[] = [
+                'name' => '1BHK',
+                'category_id' => $villaCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => '2BHK',
+                'category_id' => $villaCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => '3BHK',
+                'category_id' => $villaCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => '4BHK',
+                'category_id' => $villaCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => '4+ BHK',
+                'category_id' => $villaCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+        }
+
+        // Residential - Plot (no sub-categories, Plot itself is the item)
+        // Note: Plot doesn't have sub-categories according to the image
+
+        // Residential - Penthouse sub categories
+        if ($penthouseCategory) {
+            $subCategories[] = [
+                'name' => '1BHK',
+                'category_id' => $penthouseCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => '2BHK',
+                'category_id' => $penthouseCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => '3BHK',
+                'category_id' => $penthouseCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => '4BHK',
+                'category_id' => $penthouseCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => '5BHK',
+                'category_id' => $penthouseCategory->id,
+                'is_active' => true,
+                'user_id' => 1,
+            ];
+            $subCategories[] = [
+                'name' => '5+ BHK',
+                'category_id' => $penthouseCategory->id,
                 'is_active' => true,
                 'user_id' => 1,
             ];

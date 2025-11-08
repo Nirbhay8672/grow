@@ -50,6 +50,18 @@ interface User {
 interface ConstructionType {
     id: number;
     name: string;
+    categories?: Category[];
+}
+
+interface Category {
+    id: number;
+    name: string;
+    sub_categories?: SubCategory[];
+}
+
+interface SubCategory {
+    id: number;
+    name: string;
 }
 
 interface Props {
@@ -79,6 +91,8 @@ const errors = ref<Record<string, string[]>>({});
 
 const cities = ref<City[]>([]);
 const localities = ref<Locality[]>([]);
+const categories = ref<Category[]>([]);
+const subCategories = ref<SubCategory[]>([]);
 
 interface Contact {
     id: number;
@@ -123,6 +137,8 @@ const form = reactive({
     
     // Construction Type
     construction_type_id: '',
+    category_id: '',
+    sub_category_id: '',
 });
 
 const addContact = () => {
@@ -198,6 +214,46 @@ watch(() => form.locality_id, (newLocalityId) => {
         form.pincode = '';
     }
 });
+
+// Watch construction type changes to load categories from relationship
+watch(() => form.construction_type_id, (newConstructionTypeId) => {
+    if (newConstructionTypeId) {
+        const selectedConstructionType = props.constructionTypes.find(
+            (ct) => ct.id === Number(newConstructionTypeId)
+        );
+        if (selectedConstructionType && selectedConstructionType.categories) {
+            categories.value = selectedConstructionType.categories;
+        } else {
+            categories.value = [];
+        }
+        form.category_id = '';
+        form.sub_category_id = '';
+        subCategories.value = [];
+    } else {
+        categories.value = [];
+        form.category_id = '';
+        form.sub_category_id = '';
+        subCategories.value = [];
+    }
+}, { immediate: false });
+
+// Watch category changes to load sub-categories from relationship
+watch(() => form.category_id, (newCategoryId) => {
+    if (newCategoryId) {
+        const selectedCategory = categories.value.find(
+            (cat) => cat.id === Number(newCategoryId)
+        );
+        if (selectedCategory && selectedCategory.sub_categories) {
+            subCategories.value = selectedCategory.sub_categories;
+        } else {
+            subCategories.value = [];
+        }
+        form.sub_category_id = '';
+    } else {
+        subCategories.value = [];
+        form.sub_category_id = '';
+    }
+}, { immediate: false });
 
 const validateForm = (): boolean => {
     errors.value = {};
@@ -345,6 +401,15 @@ const handleNext = () => {
             errors.value.construction_type_id = ['Please select a construction type'];
             return;
         }
+        if (!form.category_id) {
+            errors.value.category_id = ['Please select a category'];
+            return;
+        }
+        // Validate sub-category if sub-categories are available
+        if (subCategories.value.length > 0 && !form.sub_category_id) {
+            errors.value.sub_category_id = ['Please select a sub-category'];
+            return;
+        }
         
         // TODO: Submit form or proceed to next step
         console.log('Form validated, submitting...');
@@ -392,11 +457,15 @@ onMounted(() => {
                         <h4 class="mb-0">Create Project</h4>
                     </div>
                     <div class="card-body">
-                        <!-- Step Indicator -->
-                        <StepIndicator :current-step="currentStep" />
-
-                        <!-- Form -->
-                        <form @submit.prevent="handleSubmit">
+                        <div class="row">
+                            <!-- Step Indicator (Left Side) -->
+                            <div class="col-md-3 col-lg-2">
+                                <StepIndicator :current-step="currentStep" />
+                            </div>
+                            
+                            <!-- Form Content (Right Side) -->
+                            <div class="col-md-9 col-lg-10">
+                                <form @submit.prevent="handleSubmit">
                             <!-- Step 1: Project & Builder Information -->
                             <div v-if="currentStep === 1">
                                 <!-- Builder Information Section -->
@@ -430,8 +499,9 @@ onMounted(() => {
                                 />
                             </div>
 
-                            <!-- Step 2: Construction Type -->
+                            <!-- Step 2: Construction Type & Category -->
                             <div v-if="currentStep === 2">
+                                <!-- Construction Type Selection -->
                                 <div class="mb-4">
                                     <h5 class="mb-3 section-title">Property Type</h5>
                                     <div class="form-group">
@@ -462,6 +532,76 @@ onMounted(() => {
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Category Selection (shown after construction type is selected) -->
+                                <div v-if="form.construction_type_id" class="mb-4">
+                                    <h5 class="mb-3 section-title">Category</h5>
+                                    <div v-if="categories.length === 0" class="text-muted mb-3">
+                                        Loading categories...
+                                    </div>
+                                    <div v-else-if="categories.length > 0" class="form-group">
+                                        <div class="d-flex flex-wrap gap-3">
+                                            <div 
+                                                v-for="category in categories" 
+                                                :key="category.id"
+                                                class="form-check form-check-inline construction-type-radio"
+                                            >
+                                                <input
+                                                    :id="`category_${category.id}`"
+                                                    v-model="form.category_id"
+                                                    type="radio"
+                                                    :value="String(category.id)"
+                                                    class="form-check-input"
+                                                    :class="{ 'is-invalid': errors.category_id }"
+                                                />
+                                                <label 
+                                                    :for="`category_${category.id}`"
+                                                    class="form-check-label construction-type-label"
+                                                >
+                                                    {{ category.name }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div v-if="errors.category_id" class="invalid-feedback d-block">
+                                            {{ errors.category_id[0] }}
+                                        </div>
+                                    </div>
+                                    <div v-else class="text-muted mb-3">
+                                        No categories found for this construction type.
+                                    </div>
+                                </div>
+
+                                <!-- Sub-Category Selection (shown after category is selected, only if sub-categories exist) -->
+                                <div v-if="form.category_id && subCategories.length > 0" class="mb-4">
+                                    <h5 class="mb-3 section-title">Sub Category</h5>
+                                    <div class="form-group">
+                                        <div class="d-flex flex-wrap gap-3">
+                                            <div 
+                                                v-for="subCategory in subCategories" 
+                                                :key="subCategory.id"
+                                                class="form-check form-check-inline construction-type-radio"
+                                            >
+                                                <input
+                                                    :id="`sub_category_${subCategory.id}`"
+                                                    v-model="form.sub_category_id"
+                                                    type="radio"
+                                                    :value="String(subCategory.id)"
+                                                    class="form-check-input"
+                                                    :class="{ 'is-invalid': errors.sub_category_id }"
+                                                />
+                                                <label 
+                                                    :for="`sub_category_${subCategory.id}`"
+                                                    class="form-check-label construction-type-label"
+                                                >
+                                                    {{ subCategory.name }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div v-if="errors.sub_category_id" class="invalid-feedback d-block">
+                                            {{ errors.sub_category_id[0] }}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Action Buttons -->
@@ -483,7 +623,9 @@ onMounted(() => {
                                     {{ loading ? 'Processing...' : currentStep === 2 ? 'Create Project' : 'Next' }}
                                 </button>
                             </div>
-                        </form>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Builder;
+use App\Models\Category;
 use App\Models\City;
 use App\Models\ConstructionType;
 use App\Models\Locality;
@@ -46,7 +47,12 @@ class ProjectController extends Controller
             ->get(['id', 'name', 'email']);
 
         $constructionTypes = ConstructionType::where('is_active', true)
-            ->orderBy('name')
+            ->with(['categories' => function ($query) {
+                $query->where('is_active', true)
+                    ->with(['subCategories' => function ($subQuery) {
+                        $subQuery->where('is_active', true);
+                    }]);
+            }])
             ->get(['id', 'name']);
 
         return Inertia::render('projects/CreateProject', [
@@ -77,5 +83,6 @@ class ProjectController extends Controller
 
         return response()->json($localities);
     }
+
 }
 

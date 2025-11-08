@@ -13,53 +13,61 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        // Get construction types to assign to categories
-        $constructionTypes = ConstructionType::pluck('id')->toArray();
+        // Get construction types
+        $commercial = ConstructionType::where('name', 'Commercial')->first();
+        $residential = ConstructionType::where('name', 'Residential')->first();
         
-        $categories = [
-            [
-                'name' => 'Apartment',
+        $categories = [];
+        
+        // Commercial Categories
+        if ($commercial) {
+            $categories[] = [
+                'name' => 'Office',
                 'is_active' => true,
                 'user_id' => 1,
-                'construction_type_id' => $constructionTypes[3] ?? null, // Residential
-            ],
-            [
-                'name' => 'Villa',
+                'construction_type_id' => $commercial->id,
+            ];
+            $categories[] = [
+                'name' => 'Retail',
                 'is_active' => true,
                 'user_id' => 1,
-                'construction_type_id' => $constructionTypes[3] ?? null, // Residential
-            ],
-            [
+                'construction_type_id' => $commercial->id,
+            ];
+            $categories[] = [
+                'name' => 'Storage/Industrial',
+                'is_active' => true,
+                'user_id' => 1,
+                'construction_type_id' => $commercial->id,
+            ];
+        }
+        
+        // Residential Categories
+        if ($residential) {
+            $categories[] = [
+                'name' => 'Flat',
+                'is_active' => true,
+                'user_id' => 1,
+                'construction_type_id' => $residential->id,
+            ];
+            $categories[] = [
+                'name' => 'Villa/Bungalow',
+                'is_active' => true,
+                'user_id' => 1,
+                'construction_type_id' => $residential->id,
+            ];
+            $categories[] = [
                 'name' => 'Plot',
                 'is_active' => true,
                 'user_id' => 1,
-                'construction_type_id' => $constructionTypes[4] ?? null, // Residential & Commercial
-            ],
-            [
-                'name' => 'Shop',
+                'construction_type_id' => $residential->id,
+            ];
+            $categories[] = [
+                'name' => 'Penthouse',
                 'is_active' => true,
                 'user_id' => 1,
-                'construction_type_id' => $constructionTypes[1] ?? null, // Commercial
-            ],
-            [
-                'name' => 'Office Space',
-                'is_active' => true,
-                'user_id' => 1,
-                'construction_type_id' => $constructionTypes[2] ?? null, // Office & Retail
-            ],
-            [
-                'name' => 'Warehouse',
-                'is_active' => true,
-                'user_id' => 1,
-                'construction_type_id' => $constructionTypes[0] ?? null, // Industrial
-            ],
-            [
-                'name' => 'Farm House',
-                'is_active' => true,
-                'user_id' => 1,
-                'construction_type_id' => $constructionTypes[3] ?? null, // Residential
-            ],
-        ];
+                'construction_type_id' => $residential->id,
+            ];
+        }
 
         foreach ($categories as $category) {
             Category::create($category);
