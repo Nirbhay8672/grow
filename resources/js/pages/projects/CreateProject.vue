@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue';
+import { ref, reactive, watch, onMounted, nextTick } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -324,6 +324,27 @@ const handleCancel = () => {
     router.visit('/dashboard');
 };
 
+// Initialize Select2 only for restricted users multiple select
+onMounted(() => {
+    nextTick(() => {
+        if (typeof window.$ !== 'undefined' && window.$.fn.select2) {
+            // Initialize Select2 for restricted users multiple select
+            window.$('#restricted_user_ids').select2({
+                placeholder: 'Select Restricted Users',
+                allowClear: true,
+                width: '100%',
+            });
+            
+            // Sync Select2 with Vue model for restricted users
+            window.$('#restricted_user_ids').on('change', function(this: HTMLSelectElement) {
+                const selectedValues = window.$(this).val() || [];
+                form.restricted_user_ids = Array.isArray(selectedValues) 
+                    ? selectedValues.map((val: string | number) => Number(val))
+                    : [];
+            });
+        }
+    });
+});
 </script>
 
 <template>
@@ -682,16 +703,14 @@ const handleCancel = () => {
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="project_status" class="form-label">Project Status</label>
-                                            <select
+                                            <input
                                                 id="project_status"
                                                 v-model="form.project_status"
+                                                type="text"
                                                 class="form-control form-control-sm"
                                                 :class="{ 'is-invalid': errors.project_status }"
-                                            >
-                                                <option value="">Select Project Status</option>
-                                                <option value="Ready possession">Ready possession</option>
-                                                <option value="Under construction">Under construction</option>
-                                            </select>
+                                                placeholder="Enter project status"
+                                            />
                                             <div v-if="errors.project_status" class="invalid-feedback">
                                                 {{ errors.project_status[0] }}
                                             </div>
@@ -897,5 +916,3 @@ const handleCancel = () => {
     color: #dc3545;
 }
 </style>
-
-
