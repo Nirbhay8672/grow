@@ -25746,7 +25746,7 @@ body:after {
 }
 
 .btn-cancel {
-    background-color: #ff9800;
+    background-color: #fa8b0c;
     color: white;
     border: none;
 }
@@ -25803,5 +25803,64 @@ body:after {
 .input-group-sm .form-select:not(:first-child) {
     border-left: 0;
     margin-left: -1px;
+}
+
+/* Form Control Border Styles - Blue like logo, Orange on hover */
+.form-control,
+.form-control-sm,
+.form-select,
+select.form-control,
+select.form-control-sm {
+    border-color: #1c467b;
+    border-width: 1px;
+    transition: border-color 0.15s ease-in-out;
+}
+
+.form-control:hover:not(:disabled):not([readonly]),
+.form-control-sm:hover:not(:disabled):not([readonly]),
+.form-select:hover:not(:disabled),
+select.form-control:hover:not(:disabled):not([readonly]),
+select.form-control-sm:hover:not(:disabled):not([readonly]) {
+    border-color: #fa8b0c;
+    outline: none;
+}
+
+.form-control:focus,
+.form-control-sm:focus,
+.form-select:focus,
+select.form-control:focus,
+select.form-control-sm:focus {
+    border-color: #fa8b0c;
+    box-shadow: 0 0 0 0.2rem rgba(250, 139, 12, 0.25);
+    outline: none;
+}
+
+/* Input Group - maintain border colors */
+.input-group-sm .form-control:hover,
+.input-group-sm .form-select:hover {
+    border-color: #fa8b0c;
+}
+
+.input-group-sm .form-control:focus,
+.input-group-sm .form-select:focus {
+    border-color: #fa8b0c;
+    box-shadow: 0 0 0 0.2rem rgba(250, 139, 12, 0.25);
+}
+
+/* Textarea */
+textarea.form-control,
+textarea.form-control-sm {
+    border-color: #1c467b;
+}
+
+textarea.form-control:hover:not(:disabled):not([readonly]),
+textarea.form-control-sm:hover:not(:disabled):not([readonly]) {
+    border-color: #fa8b0c;
+}
+
+textarea.form-control:focus,
+textarea.form-control-sm:focus {
+    border-color: #fa8b0c;
+    box-shadow: 0 0 0 0.2rem rgba(250, 139, 12, 0.25);
 }
 /*# sourceMappingURL=maps/style.css.map */
