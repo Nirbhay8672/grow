@@ -58,6 +58,7 @@ Route::get('furniture-types', [FurnitureTypeController::class, 'showPage'])->mid
 Route::get('property-zones', [PropertyZoneController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('property-zones.index');
 Route::get('amenities', [AmenityController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('amenities.index');
 Route::get('property-construction-documents', [PropertyConstructionDocumentController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('property-construction-documents.index');
+Route::get('projects', [ProjectController::class, 'index'])->middleware(['auth', 'verified'])->name('projects.index');
 Route::get('projects/create', [ProjectController::class, 'create'])->middleware(['auth', 'verified'])->name('projects.create');
 
 Route::middleware(['auth'])->group(function () {

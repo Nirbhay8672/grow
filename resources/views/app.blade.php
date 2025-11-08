@@ -1065,7 +1065,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/projects/create" data-inertia-link data-icon-color="#dc3545" class="{{ request()->is('projects*') ? 'active' : '' }}" style="{{ request()->is('projects*') ? 'background-color: #dc3545; color: #ffffff; border-radius: 6px; margin-left: 8px; margin-right: 8px; padding: 8px 12px;' : '' }}">
+                            <a href="/projects" data-inertia-link data-icon-color="#dc3545" class="{{ request()->is('projects*') ? 'active' : '' }}" style="{{ request()->is('projects*') ? 'background-color: #dc3545; color: #ffffff; border-radius: 6px; margin-left: 8px; margin-right: 8px; padding: 8px 12px;' : '' }}">
                                 <span data-feather="folder" class="nav-icon" style="color: {{ request()->is('projects*') ? '#ffffff' : '#dc3545' }};"></span>
                                 <span class="menu-text" style="{{ request()->is('projects*') ? 'font-weight: 500; color: #ffffff;' : '' }}">Projects</span>
                             </a>
@@ -1132,78 +1132,6 @@
         </span>
     </div>
     <div class="overlay-dark-sidebar"></div>
-    <div class="customizer-overlay"></div>
-
-    <a href="#" class="customizer-trigger">
-        <span data-feather="settings"></span></a>
-    <div class="customizer-wrapper">
-        <div class="customizer">
-            <div class="customizer__head">
-                <h4 class="customizer__title">Customizer</h4>
-                <span class="customizer__sub-title">Customize your overview page layout</span>
-                <a href="#" class="customizer-close">
-                    <span data-feather="x"></span></a>
-            </div>
-            <div class="customizer__body">
-                <div class="customizer__single">
-                    <h4>Layout Type</h4>
-                    <ul class="customizer-list d-flex layout">
-                        <li class="customizer-list__item">
-                            <a href="https://demo.dashboardmarket.com/ltr" class="active">
-                                <img src="/img/ltr.png" alt="">
-                                <i class="fa fa-check-circle"></i>
-                            </a>
-                        </li>
-                        <li class="customizer-list__item">
-                            <a href="https://demo.dashboardmarket.com/rtl">
-                                <img src="/img/rtl.png" alt="">
-                                <i class="fa fa-check-circle"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <!-- ends: .customizer__single -->
-
-                <div class="customizer__single">
-                    <h4>Sidebar Type</h4>
-                    <ul class="customizer-list d-flex l_sidebar">
-                        <li class="customizer-list__item">
-                            <a href="#" data-layout="light" class="active">
-                                <img src="/img/light.png" alt="">
-                                <i class="fa fa-check-circle"></i>
-                            </a>
-                        </li>
-                        <li class="customizer-list__item">
-                            <a href="#" data-layout="dark">
-                                <img src="/img/dark.png" alt="">
-                                <i class="fa fa-check-circle"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <!-- ends: .customizer__single -->
-
-                <div class="customizer__single">
-                    <h4>Navbar Type</h4>
-                    <ul class="customizer-list d-flex l_navbar">
-                        <li class="customizer-list__item">
-                            <a href="#" data-layout="side" class="active">
-                                <img src="/img/side.png" alt="">
-                                <i class="fa fa-check-circle"></i>
-                            </a>
-                        </li>
-                        <li class="customizer-list__item top">
-                            <a href="#" data-layout="top">
-                                <img src="/img/top.png" alt="">
-                                <i class="fa fa-check-circle"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <!-- ends: .customizer__single -->
-            </div>
-        </div>
-    </div>
 
     @endif
 
@@ -1262,7 +1190,7 @@
                 // Define which routes should activate each menu item
                 const routePatterns = {
                     '/dashboard': ['/dashboard'],
-                    '/projects/create': ['/projects'],
+                    '/projects': ['/projects'],
                     '/management/locations': ['/management/locations', '/states', '/cities', '/districts', '/localities', '/talukas', '/villages'],
                     '/management/users': ['/management/users', '/users'],
                     '/management/configuration': ['/management/configuration', '/measurement-units', '/builders'],

@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue';
+import { ref, reactive, watch, onMounted, nextTick } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Plus, X } from 'lucide-vue-next';
+
+declare global {
+    interface Window {
+        $: any;
+    }
+}
 
 interface Builder {
     id: number;
@@ -51,7 +56,7 @@ const props = defineProps<Props>();
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: dashboard().url,
+        href: '/dashboard',
     },
     {
         title: 'Create Project',
@@ -105,7 +110,7 @@ const form = reactive({
     project_status: '',
     
     // Contact Details
-    restricted_user_id: '',
+    restricted_user_ids: [] as number[],
 });
 
 const addContact = () => {
@@ -134,6 +139,13 @@ watch(() => form.state_id, async (newStateId) => {
             form.locality_id = '';
             form.pincode = '';
             localities.value = [];
+            
+            // Update Select2 for city with new options
+            nextTick(() => {
+                if (typeof window.$ !== 'undefined' && window.$.fn.select2) {
+                    window.$('#city_id').val(null).trigger('change.select2');
+                }
+            });
         } catch (error) {
             console.error('Error loading cities:', error);
             cities.value = [];
@@ -144,6 +156,14 @@ watch(() => form.state_id, async (newStateId) => {
         form.locality_id = '';
         form.pincode = '';
         localities.value = [];
+        
+            // Update Select2
+            nextTick(() => {
+                if (typeof window.$ !== 'undefined' && window.$.fn.select2) {
+                    window.$('#city_id').val(null).trigger('change.select2');
+                    window.$('#locality_id').val(null).trigger('change.select2');
+                }
+            });
     }
 });
 
@@ -155,6 +175,13 @@ watch(() => form.city_id, async (newCityId) => {
             localities.value = response.data;
             form.locality_id = '';
             form.pincode = '';
+            
+            // Update Select2 for locality with new options
+            nextTick(() => {
+                if (typeof window.$ !== 'undefined' && window.$.fn.select2) {
+                    window.$('#locality_id').val(null).trigger('change.select2');
+                }
+            });
         } catch (error) {
             console.error('Error loading localities:', error);
             localities.value = [];
@@ -163,6 +190,13 @@ watch(() => form.city_id, async (newCityId) => {
         localities.value = [];
         form.locality_id = '';
         form.pincode = '';
+        
+            // Update Select2
+            nextTick(() => {
+                if (typeof window.$ !== 'undefined' && window.$.fn.select2) {
+                    window.$('#locality_id').val(null).trigger('change.select2');
+                }
+            });
     }
 });
 
@@ -312,8 +346,98 @@ const handleSubmit = async () => {
 };
 
 const handleCancel = () => {
-    router.visit(dashboard().url);
+    router.visit('/dashboard');
 };
+
+// Initialize Select2 for all select inputs after component mounts
+onMounted(() => {
+    nextTick(() => {
+        if (typeof window.$ !== 'undefined' && window.$.fn.select2) {
+            // Initialize Select2 for single select inputs with search
+            const singleSelects = [
+                { id: 'builder_id', placeholder: 'Select Builder' },
+                { id: 'state_id', placeholder: 'Select State' },
+                { id: 'city_id', placeholder: 'Select City' },
+                { id: 'locality_id', placeholder: 'Select Locality' },
+                { id: 'measurement_unit_id', placeholder: 'Select Unit' },
+            ];
+
+            singleSelects.forEach(({ id, placeholder }) => {
+                window.$(`#${id}`).select2({
+                    placeholder: placeholder,
+                    allowClear: true,
+                    width: '100%',
+                });
+
+                // Sync Select2 with Vue model
+                window.$(`#${id}`).on('change', function(this: HTMLSelectElement) {
+                    const value = window.$(this).val();
+                    if (id === 'builder_id') form.builder_id = value ? String(value) : '';
+                    else if (id === 'state_id') form.state_id = value ? String(value) : '';
+                    else if (id === 'city_id') form.city_id = value ? String(value) : '';
+                    else if (id === 'locality_id') form.locality_id = value ? String(value) : '';
+                    else if (id === 'measurement_unit_id') form.measurement_unit_id = value ? String(value) : '';
+                });
+            });
+
+            // Watch Vue model changes and update Select2
+            watch(() => form.builder_id, (newVal) => {
+                nextTick(() => {
+                    if (typeof window.$ !== 'undefined') {
+                        window.$('#builder_id').val(newVal || null).trigger('change');
+                    }
+                });
+            });
+
+            watch(() => form.state_id, (newVal) => {
+                nextTick(() => {
+                    if (typeof window.$ !== 'undefined') {
+                        window.$('#state_id').val(newVal || null).trigger('change');
+                    }
+                });
+            });
+
+            watch(() => form.city_id, (newVal) => {
+                nextTick(() => {
+                    if (typeof window.$ !== 'undefined') {
+                        window.$('#city_id').val(newVal || null).trigger('change');
+                    }
+                });
+            });
+
+            watch(() => form.locality_id, (newVal) => {
+                nextTick(() => {
+                    if (typeof window.$ !== 'undefined') {
+                        window.$('#locality_id').val(newVal || null).trigger('change');
+                    }
+                });
+            });
+
+            watch(() => form.measurement_unit_id, (newVal) => {
+                nextTick(() => {
+                    if (typeof window.$ !== 'undefined') {
+                        window.$('#measurement_unit_id').val(newVal || null).trigger('change');
+                    }
+                });
+            });
+
+            // Initialize Select2 for restricted users multiple select
+            window.$('#restricted_user_ids').select2({
+                placeholder: 'Select Restricted Users',
+                allowClear: true,
+                width: '100%',
+            });
+            
+            // Sync Select2 with Vue model for restricted users
+            window.$('#restricted_user_ids').on('change', function(this: HTMLSelectElement) {
+                const selectedValues = window.$(this).val() || [];
+                form.restricted_user_ids = Array.isArray(selectedValues) 
+                    ? selectedValues.map((val: string | number) => Number(val))
+                    : [];
+            });
+        }
+    });
+});
 </script>
 
 <template>
@@ -616,42 +740,38 @@ const handleCancel = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-2">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="land_size" class="form-label">Land Size</label>
-                                            <input
-                                                id="land_size"
-                                                v-model="form.land_size"
-                                                type="text"
-                                                class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors.land_size }"
-                                                placeholder="Enter land size"
-                                            />
-                                            <div v-if="errors.land_size" class="invalid-feedback">
-                                                {{ errors.land_size[0] }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label for="measurement_unit_id" class="form-label">Unit</label>
-                                            <select
-                                                id="measurement_unit_id"
-                                                v-model="form.measurement_unit_id"
-                                                class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors.measurement_unit_id }"
-                                            >
-                                                <option value="">Select Unit</option>
-                                                <option 
-                                                    v-for="unit in measurementUnits" 
-                                                    :key="unit.id" 
-                                                    :value="unit.id"
+                                            <div class="input-group input-group-sm">
+                                                <input
+                                                    id="land_size"
+                                                    v-model="form.land_size"
+                                                    type="text"
+                                                    class="form-control form-control-sm"
+                                                    :class="{ 'is-invalid': errors.land_size }"
+                                                    placeholder="Enter land size"
+                                                />
+                                                <select
+                                                    id="measurement_unit_id"
+                                                    v-model="form.measurement_unit_id"
+                                                    class="form-control form-control-sm"
+                                                    :class="{ 'is-invalid': errors.measurement_unit_id }"
+                                                    style="max-width: 150px;"
                                                 >
-                                                    {{ unit.name }}
-                                                </option>
-                                            </select>
-                                            <div v-if="errors.measurement_unit_id" class="invalid-feedback">
-                                                {{ errors.measurement_unit_id[0] }}
+                                                    <option value="">Select Unit</option>
+                                                    <option 
+                                                        v-for="unit in measurementUnits" 
+                                                        :key="unit.id" 
+                                                        :value="unit.id"
+                                                    >
+                                                        {{ unit.name }}
+                                                    </option>
+                                                </select>
+                                                <div v-if="errors.land_size || errors.measurement_unit_id" class="invalid-feedback d-block w-100">
+                                                    <span v-if="errors.land_size">{{ errors.land_size[0] }}</span>
+                                                    <span v-if="errors.measurement_unit_id">{{ errors.measurement_unit_id[0] }}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -810,14 +930,14 @@ const handleCancel = () => {
                                 <div class="row mt-3">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="restricted_user_id" class="form-label">Restricted User</label>
+                                            <label for="restricted_user_ids" class="form-label">Restricted Users</label>
                                             <select
-                                                id="restricted_user_id"
-                                                v-model="form.restricted_user_id"
+                                                id="restricted_user_ids"
+                                                v-model="form.restricted_user_ids"
                                                 class="form-control form-control-sm"
-                                                :class="{ 'is-invalid': errors.restricted_user_id }"
+                                                :class="{ 'is-invalid': errors.restricted_user_ids }"
+                                                :multiple="true"
                                             >
-                                                <option value="">Select Restricted User</option>
                                                 <option 
                                                     v-for="user in users" 
                                                     :key="user.id" 
@@ -826,8 +946,8 @@ const handleCancel = () => {
                                                     {{ user.name }} ({{ user.email }})
                                                 </option>
                                             </select>
-                                            <div v-if="errors.restricted_user_id" class="invalid-feedback">
-                                                {{ errors.restricted_user_id[0] }}
+                                            <div v-if="errors.restricted_user_ids" class="invalid-feedback">
+                                                {{ errors.restricted_user_ids[0] }}
                                             </div>
                                         </div>
                                     </div>

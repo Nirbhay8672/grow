@@ -6,6 +6,8 @@ use App\Models\Builder;
 use App\Models\City;
 use App\Models\Locality;
 use App\Models\MeasurementUnit;
+use App\Models\Project;
+use App\Models\ProjectContact;
 use App\Models\State;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -14,6 +16,17 @@ use Inertia\Response;
 
 class ProjectController extends Controller
 {
+    public function index(): Response
+    {
+        $projects = Project::with(['builder', 'state', 'city', 'locality', 'contacts'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        return Inertia::render('projects/Projects', [
+            'projects' => $projects,
+        ]);
+    }
+
     public function create(): Response
     {
         $builders = Builder::where('is_active', true)
