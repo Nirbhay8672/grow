@@ -131,14 +131,29 @@ class ProjectController extends Controller
                 'front_road_width',
                 'front_road_width_measurement_unit_id',
                 'washroom',
-                'towers_different_specification',
-                'free_allotted_parking_four_wheeler',
-                'free_allotted_parking_two_wheeler',
-                'available_for_purchase',
-                'no_of_parking',
                 'total_floor_for_parking',
                 'remark',
             ]);
+
+            // Handle checkbox fields - explicitly set to false if not present or '0'
+            $projectData['towers_different_specification'] = $request->has('towers_different_specification') 
+                && ($request->towers_different_specification === '1' || $request->towers_different_specification === true || $request->towers_different_specification === 1);
+            
+            $projectData['free_allotted_parking_four_wheeler'] = $request->has('free_allotted_parking_four_wheeler') 
+                && ($request->free_allotted_parking_four_wheeler === '1' || $request->free_allotted_parking_four_wheeler === true || $request->free_allotted_parking_four_wheeler === 1);
+            
+            $projectData['free_allotted_parking_two_wheeler'] = $request->has('free_allotted_parking_two_wheeler') 
+                && ($request->free_allotted_parking_two_wheeler === '1' || $request->free_allotted_parking_two_wheeler === true || $request->free_allotted_parking_two_wheeler === 1);
+            
+            $projectData['available_for_purchase'] = $request->has('available_for_purchase') 
+                && ($request->available_for_purchase === '1' || $request->available_for_purchase === true || $request->available_for_purchase === 1);
+            
+            // Handle no_of_parking - set to null if available_for_purchase is false
+            if ($projectData['available_for_purchase']) {
+                $projectData['no_of_parking'] = $request->input('no_of_parking');
+            } else {
+                $projectData['no_of_parking'] = null;
+            }
 
             $projectData['user_id'] = auth()->id();
 
@@ -344,14 +359,29 @@ class ProjectController extends Controller
                 'front_road_width',
                 'front_road_width_measurement_unit_id',
                 'washroom',
-                'towers_different_specification',
-                'free_allotted_parking_four_wheeler',
-                'free_allotted_parking_two_wheeler',
-                'available_for_purchase',
-                'no_of_parking',
                 'total_floor_for_parking',
                 'remark',
             ]);
+
+            // Handle checkbox fields - explicitly set to false if not present or '0'
+            $projectData['towers_different_specification'] = $request->has('towers_different_specification') 
+                && ($request->towers_different_specification === '1' || $request->towers_different_specification === true || $request->towers_different_specification === 1);
+            
+            $projectData['free_allotted_parking_four_wheeler'] = $request->has('free_allotted_parking_four_wheeler') 
+                && ($request->free_allotted_parking_four_wheeler === '1' || $request->free_allotted_parking_four_wheeler === true || $request->free_allotted_parking_four_wheeler === 1);
+            
+            $projectData['free_allotted_parking_two_wheeler'] = $request->has('free_allotted_parking_two_wheeler') 
+                && ($request->free_allotted_parking_two_wheeler === '1' || $request->free_allotted_parking_two_wheeler === true || $request->free_allotted_parking_two_wheeler === 1);
+            
+            $projectData['available_for_purchase'] = $request->has('available_for_purchase') 
+                && ($request->available_for_purchase === '1' || $request->available_for_purchase === true || $request->available_for_purchase === 1);
+            
+            // Handle no_of_parking - set to null if available_for_purchase is false
+            if ($projectData['available_for_purchase']) {
+                $projectData['no_of_parking'] = $request->input('no_of_parking');
+            } else {
+                $projectData['no_of_parking'] = null;
+            }
 
             // Handle brochure file upload
             if ($request->hasFile('brochure_file')) {
