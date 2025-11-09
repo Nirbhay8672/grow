@@ -276,7 +276,6 @@ class ProjectController extends Controller
             ->get(['id', 'name']);
 
         $measurementUnits = MeasurementUnit::where('is_active', true)
-            ->orderBy('name')
             ->get(['id', 'name']);
 
         // Static restricted user options

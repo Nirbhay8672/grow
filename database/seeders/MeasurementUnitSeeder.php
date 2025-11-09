@@ -10,6 +10,9 @@ class MeasurementUnitSeeder extends Seeder
     public function run(): void
     {
         $measurementUnits = [
+            'SqFt',
+            'SqYd',
+            'SqM',
             'Acre',
             'Bigha',
             'Biswa',
@@ -18,8 +21,20 @@ class MeasurementUnitSeeder extends Seeder
             'Chatak',
             'Decimal',
             'Dhur',
-            'Ft.',
             'Gaj',
+            'Ground',
+            'Kanal',
+            'Katha',
+            'Killa',
+            'Lessa',
+            'Marla',
+            'Murabba',
+            'Pura',
+            'Sq. Km.',
+            'Sq. Karam',
+            'Sq. Mile',
+            'Ft.',
+            'Mt.',
         ];
 
         foreach ($measurementUnits as $unitName) {

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+
 interface Props {
     form: any;
     errors: any;
@@ -11,6 +13,13 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+// Filter measurement units for height/width fields (only Ft. and Mt.)
+const heightWidthUnits = computed(() => {
+    return props.measurementUnits.filter(unit => 
+        unit.name === 'Ft.' || unit.name === 'Mt.'
+    );
+});
 
 const toggleCarpetArea = (index: number) => {
     props.form.tower_details[index].show_carpet_area = !props.form.tower_details[index].show_carpet_area;
@@ -181,7 +190,7 @@ const getDisplayedTowers = () => {
                         >
                             <option value="">Select Unit</option>
                             <option 
-                                v-for="unit in measurementUnits" 
+                                v-for="unit in heightWidthUnits" 
                                 :key="unit.id" 
                                 :value="String(unit.id)"
                             >
@@ -336,7 +345,7 @@ const getDisplayedTowers = () => {
                                 >
                                     <option value="">Select Unit</option>
                                     <option 
-                                        v-for="unit in measurementUnits" 
+                                        v-for="unit in heightWidthUnits" 
                                         :key="unit.id" 
                                         :value="String(unit.id)"
                                     >

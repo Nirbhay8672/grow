@@ -843,14 +843,6 @@ const handlePrevious = () => {
     }
 };
 
-const handleStepClick = (step: number) => {
-    // Only allow navigation to steps that have been visited or are the next step
-    // For now, allow navigation to any step (you can add validation if needed)
-    if (step >= 1 && step <= 3) {
-        currentStep.value = step;
-    }
-};
-
 // Initialize form data from project if editing
 const initializeFormFromProject = async () => {
     if (!props.project) return;
@@ -1135,10 +1127,9 @@ onMounted(async () => {
                             <div class="row">
                                 <!-- Step Indicator (Left Side) -->
                                 <div class="col-md-3 col-lg-2">
-                                    <StepIndicator 
-                                        :current-step="currentStep" 
-                                        @step-click="handleStepClick"
-                                    />
+                                <StepIndicator 
+                                    :current-step="currentStep"
+                                />
                                 </div>
                                 
                                 <!-- Form Content (Right Side) -->

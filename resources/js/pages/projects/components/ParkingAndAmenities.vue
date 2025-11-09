@@ -55,6 +55,13 @@ interface Props {
 
 const props = defineProps<Props>();
 
+// Filter measurement units for height/width fields (only Ft. and Mt.)
+const heightWidthUnits = computed(() => {
+    return props.measurementUnits.filter(unit => 
+        unit.name === 'Ft.' || unit.name === 'Mt.'
+    );
+});
+
 // Create local reactive errors
 const localErrors = ref<Record<string, string[]>>({});
 
@@ -605,7 +612,7 @@ const handleIntegerInput = (event: Event, field: string) => {
                         >
                             <option value="">Select Unit</option>
                             <option 
-                                v-for="unit in measurementUnits" 
+                                v-for="unit in heightWidthUnits" 
                                 :key="unit.id" 
                                 :value="String(unit.id)"
                             >
