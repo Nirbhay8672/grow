@@ -151,7 +151,7 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     },
 ]);
 
-const currentStep = ref(2);
+const currentStep = ref(1);
 const loading = ref(false);
 const errors = ref<Record<string, string[]>>({});
 
