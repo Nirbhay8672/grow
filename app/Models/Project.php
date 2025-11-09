@@ -4,13 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Project extends Model
 {
     protected $fillable = [
+        // Step 1: Builder Information
         'builder_id',
         'builder_website',
+        
+        // Step 1: Project Information
         'project_name',
         'address',
         'state_id',
@@ -23,6 +27,35 @@ class Project extends Model
         'rera_no',
         'project_status',
         'restricted_user_ids',
+        
+        // Step 2: Construction Type & Category
+        'construction_type_id',
+        'category_id',
+        'sub_category_id',
+        
+        // Step 2: Tower Details
+        'no_of_towers',
+        'no_of_floors',
+        'total_units',
+        'no_of_unit_each_tower',
+        'no_of_lift',
+        'front_road_width',
+        'front_road_width_measurement_unit_id',
+        'washroom',
+        'towers_different_specification',
+        
+        // Step 3: Parking Details
+        'free_allotted_parking_four_wheeler',
+        'free_allotted_parking_two_wheeler',
+        'available_for_purchase',
+        'no_of_parking',
+        'total_floor_for_parking',
+        
+        // Step 3: Other
+        'remark',
+        'brochure_file',
+        
+        // Common
         'user_id',
         'is_active',
     ];
@@ -32,6 +65,10 @@ class Project extends Model
         return [
             'is_active' => 'boolean',
             'restricted_user_ids' => 'array',
+            'towers_different_specification' => 'boolean',
+            'free_allotted_parking_four_wheeler' => 'boolean',
+            'free_allotted_parking_two_wheeler' => 'boolean',
+            'available_for_purchase' => 'boolean',
         ];
     }
 
@@ -76,6 +113,52 @@ class Project extends Model
     public function contacts(): HasMany
     {
         return $this->hasMany(ProjectContact::class);
+    }
+
+    // Step 2: Construction Type & Category relationships
+    public function constructionType(): BelongsTo
+    {
+        return $this->belongsTo(ConstructionType::class);
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function subCategory(): BelongsTo
+    {
+        return $this->belongsTo(SubCategory::class);
+    }
+
+    // Step 2: Tower Details relationship
+    public function towerDetails(): HasMany
+    {
+        return $this->hasMany(ProjectTowerDetail::class);
+    }
+
+    // Step 2: Front Road Width Measurement Unit
+    public function frontRoadWidthMeasurementUnit(): BelongsTo
+    {
+        return $this->belongsTo(MeasurementUnit::class, 'front_road_width_measurement_unit_id');
+    }
+
+    // Step 3: Basement Parking relationship
+    public function basementParking(): HasMany
+    {
+        return $this->hasMany(ProjectBasementParking::class);
+    }
+
+    // Step 3: Amenities relationship (many-to-many)
+    public function amenities(): BelongsToMany
+    {
+        return $this->belongsToMany(Amenity::class, 'project_amenities');
+    }
+
+    // Step 3: Documents relationship
+    public function documents(): HasMany
+    {
+        return $this->hasMany(ProjectDocument::class);
     }
 }
 

@@ -15,11 +15,17 @@ interface Contact {
     designation: string;
 }
 
+interface RestrictedUserOption {
+    id: string;
+    name: string;
+    email: string;
+}
+
 interface Props {
-    users: User[];
+    restrictedUserOptions: RestrictedUserOption[];
     contacts: Contact[];
     form: {
-        restricted_user_ids: number[];
+        restricted_user_ids: (string | number)[];
     };
     errors: Record<string, string[]>;
     validateForm: () => void;
@@ -155,11 +161,11 @@ defineProps<Props>();
                         :multiple="true"
                     >
                         <option 
-                            v-for="user in users" 
-                            :key="user.id" 
-                            :value="user.id"
+                            v-for="option in restrictedUserOptions" 
+                            :key="option.id" 
+                            :value="option.id"
                         >
-                            {{ user.name }} ({{ user.email }})
+                            {{ option.name }}
                         </option>
                     </select>
                     <div v-if="errors.restricted_user_ids" class="invalid-feedback">

@@ -73,11 +73,17 @@ interface Amenity {
     is_active: boolean;
 }
 
+interface RestrictedUserOption {
+    id: string;
+    name: string;
+    email: string;
+}
+
 interface Props {
     builders: Builder[];
     states: State[];
     measurementUnits: MeasurementUnit[];
-    users: User[];
+    restrictedUserOptions: RestrictedUserOption[];
     constructionTypes: ConstructionType[];
     amenities: Amenity[];
 }
@@ -95,7 +101,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const currentStep = ref(2); // Set to 2 for testing - change back to 1 for production
+const currentStep = ref(1);
 const loading = ref(false);
 const errors = ref<Record<string, string[]>>({});
 
@@ -141,7 +147,7 @@ const form = reactive({
     project_status: '',
     
     // Contact Details
-    restricted_user_ids: [] as number[],
+    restricted_user_ids: [] as (string | number)[],
     
     // Construction Type
     construction_type_id: '',
@@ -540,30 +546,157 @@ const handleSubmit = async () => {
     }
     
     try {
-        // Prepare form data with contacts
-        const formData = {
-            ...form,
-            contacts: contacts.value,
-        };
+        // Create FormData for file uploads
+        const formData = new FormData();
         
-        // TODO: Implement project creation API call
-        console.log('Form data:', formData);
-        // router.post('/projects', formData, {
-        //     onSuccess: () => {
-        //         // Handle success
-        //     },
-        //     onError: (err) => {
-        //         if (err.errors) {
-        //             errors.value = err.errors;
-        //         }
-        //     },
-        //     onFinish: () => {
-        //         loading.value = false;
-        //     },
-        // });
-    } catch (error) {
+        // Step 1: Builder Information
+        formData.append('builder_id', form.builder_id);
+        if (form.builder_website) {
+            formData.append('builder_website', form.builder_website);
+        }
+        
+        // Step 1: Project Information
+        formData.append('project_name', form.project_name);
+        if (form.address) formData.append('address', form.address);
+        if (form.state_id) formData.append('state_id', form.state_id);
+        if (form.city_id) formData.append('city_id', form.city_id);
+        formData.append('locality_id', form.locality_id);
+        if (form.pincode) formData.append('pincode', form.pincode);
+        if (form.location_link) formData.append('location_link', form.location_link);
+        if (form.land_size) formData.append('land_size', form.land_size);
+        if (form.measurement_unit_id) formData.append('measurement_unit_id', form.measurement_unit_id);
+        if (form.rera_no) formData.append('rera_no', form.rera_no);
+        if (form.project_status) formData.append('project_status', form.project_status);
+        if (form.restricted_user_ids && form.restricted_user_ids.length > 0) {
+            form.restricted_user_ids.forEach((id: string | number) => {
+                formData.append('restricted_user_ids[]', String(id));
+            });
+        }
+        
+        // Step 1: Contacts
+        contacts.value.forEach((contact, index) => {
+            formData.append(`contacts[${index}][name]`, contact.name);
+            formData.append(`contacts[${index}][mobile]`, contact.mobile);
+            if (contact.email) formData.append(`contacts[${index}][email]`, contact.email);
+            if (contact.designation) formData.append(`contacts[${index}][designation]`, contact.designation);
+        });
+        
+        // Step 2: Construction Type & Category
+        formData.append('construction_type_id', form.construction_type_id);
+        formData.append('category_id', form.category_id);
+        if (form.sub_category_id) formData.append('sub_category_id', form.sub_category_id);
+        
+        // Step 2: Tower Details
+        if (form.no_of_towers) formData.append('no_of_towers', form.no_of_towers);
+        if (form.no_of_floors) formData.append('no_of_floors', form.no_of_floors);
+        if (form.total_units) formData.append('total_units', form.total_units);
+        if (form.no_of_unit_each_tower) formData.append('no_of_unit_each_tower', form.no_of_unit_each_tower);
+        if (form.no_of_lift) formData.append('no_of_lift', form.no_of_lift);
+        if (form.front_road_width) formData.append('front_road_width', form.front_road_width);
+        if (form.front_road_width_measurement_unit_id) formData.append('front_road_width_measurement_unit_id', form.front_road_width_measurement_unit_id);
+        if (form.washroom) formData.append('washroom', form.washroom);
+        formData.append('towers_different_specification', form.towers_different_specification ? '1' : '0');
+        
+        // Step 2: Tower Details Array
+        if (form.tower_details && form.tower_details.length > 0) {
+            form.tower_details.forEach((tower: any, index: number) => {
+                if (tower.tower_name) formData.append(`tower_details[${index}][tower_name]`, tower.tower_name);
+                if (tower.saleable_area_from) formData.append(`tower_details[${index}][saleable_area_from]`, tower.saleable_area_from);
+                if (tower.saleable_area_to) formData.append(`tower_details[${index}][saleable_area_to]`, tower.saleable_area_to);
+                if (tower.saleable_area_unit_id) formData.append(`tower_details[${index}][saleable_area_unit_id]`, tower.saleable_area_unit_id);
+                if (tower.ceiling_height) formData.append(`tower_details[${index}][ceiling_height]`, tower.ceiling_height);
+                if (tower.ceiling_height_unit_id) formData.append(`tower_details[${index}][ceiling_height_unit_id]`, tower.ceiling_height_unit_id);
+                formData.append(`tower_details[${index}][show_carpet_area]`, tower.show_carpet_area ? '1' : '0');
+                if (tower.carpet_area_from) formData.append(`tower_details[${index}][carpet_area_from]`, tower.carpet_area_from);
+                if (tower.carpet_area_to) formData.append(`tower_details[${index}][carpet_area_to]`, tower.carpet_area_to);
+                if (tower.carpet_area_unit_id) formData.append(`tower_details[${index}][carpet_area_unit_id]`, tower.carpet_area_unit_id);
+                formData.append(`tower_details[${index}][show_builtup_area]`, tower.show_builtup_area ? '1' : '0');
+                if (tower.builtup_area_from) formData.append(`tower_details[${index}][builtup_area_from]`, tower.builtup_area_from);
+                if (tower.builtup_area_to) formData.append(`tower_details[${index}][builtup_area_to]`, tower.builtup_area_to);
+                if (tower.builtup_area_unit_id) formData.append(`tower_details[${index}][builtup_area_unit_id]`, tower.builtup_area_unit_id);
+            });
+        }
+        
+        // Step 3: Parking Details
+        formData.append('free_allotted_parking_four_wheeler', form.free_allotted_parking_four_wheeler ? '1' : '0');
+        formData.append('free_allotted_parking_two_wheeler', form.free_allotted_parking_two_wheeler ? '1' : '0');
+        formData.append('available_for_purchase', form.available_for_purchase ? '1' : '0');
+        if (form.no_of_parking) formData.append('no_of_parking', form.no_of_parking);
+        if (form.total_floor_for_parking) formData.append('total_floor_for_parking', form.total_floor_for_parking);
+        
+        // Step 3: Basement Parking Array
+        if (form.basement_parking && form.basement_parking.length > 0) {
+            form.basement_parking.forEach((parking: any, index: number) => {
+                if (parking.floor_no) formData.append(`basement_parking[${index}][floor_no]`, parking.floor_no);
+                if (parking.ev_charging_point) formData.append(`basement_parking[${index}][ev_charging_point]`, parking.ev_charging_point);
+                if (parking.hydraulic_parking) formData.append(`basement_parking[${index}][hydraulic_parking]`, parking.hydraulic_parking);
+                if (parking.height_of_basement) formData.append(`basement_parking[${index}][height_of_basement]`, parking.height_of_basement);
+                if (parking.height_of_basement_unit_id) formData.append(`basement_parking[${index}][height_of_basement_unit_id]`, parking.height_of_basement_unit_id);
+            });
+        }
+        
+        // Step 3: Amenities
+        if (form.amenity_ids && form.amenity_ids.length > 0) {
+            form.amenity_ids.forEach((amenityId: string) => {
+                formData.append('amenity_ids[]', amenityId);
+            });
+        }
+        
+        // Step 3: Documents
+        if (form.document_uploads && form.document_uploads.length > 0) {
+            form.document_uploads.forEach((doc: any, docIndex: number) => {
+                if (doc.category) {
+                    formData.append(`document_uploads[${docIndex}][category]`, doc.category);
+                }
+                if (doc.files && doc.files.length > 0) {
+                    doc.files.forEach((file: File, fileIndex: number) => {
+                        formData.append(`document_uploads[${docIndex}][files][${fileIndex}]`, file);
+                    });
+                }
+            });
+        }
+        
+        // Step 3: Brochure File
+        if (form.brochure_file) {
+            formData.append('brochure_file', form.brochure_file);
+        }
+        
+        // Step 3: Remark
+        if (form.remark) formData.append('remark', form.remark);
+        
+        // Send request via axios
+        // Note: Laravel handles CSRF token automatically via cookies
+        const response = await axios.post('/projects', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        
+        if (response.data.success) {
+            // Success - redirect to projects list
+            router.visit('/projects', {
+                onSuccess: () => {
+                    // Show success message if you have a toast system
+                    console.log('Project created successfully!');
+                },
+            });
+        }
+    } catch (error: any) {
         console.error('Error creating project:', error);
         loading.value = false;
+        
+        // Handle validation errors
+        if (error.response?.status === 422 && error.response?.data?.errors) {
+            errors.value = error.response.data.errors;
+            // Scroll to first error
+            const firstErrorField = document.querySelector('.is-invalid');
+            if (firstErrorField) {
+                firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        } else {
+            // Show error message
+            alert(error.response?.data?.message || 'Failed to create project. Please try again.');
+        }
     }
 };
 
@@ -618,19 +751,28 @@ onMounted(() => {
     nextTick(() => {
         if (typeof window.$ !== 'undefined' && window.$.fn.select2) {
             // Initialize Select2 for restricted users multiple select
-            window.$('#restricted_user_ids').select2({
-                placeholder: 'Select Restricted Users',
-                allowClear: true,
-                width: '100%',
-            });
+            const selectElement = window.$('#restricted_user_ids');
             
-            // Sync Select2 with Vue model for restricted users
-            window.$('#restricted_user_ids').on('change', function(this: HTMLSelectElement) {
-                const selectedValues = window.$(this).val() || [];
-                form.restricted_user_ids = Array.isArray(selectedValues) 
-                    ? selectedValues.map((val: string | number) => Number(val))
-                    : [];
-            });
+            if (selectElement.length) {
+                selectElement.select2({
+                    placeholder: 'Select Restricted Users',
+                    allowClear: true,
+                    width: '100%',
+                });
+                
+                // Set initial values if form.restricted_user_ids has values
+                if (form.restricted_user_ids && form.restricted_user_ids.length > 0) {
+                    selectElement.val(form.restricted_user_ids.map(id => String(id))).trigger('change');
+                }
+                
+                // Sync Select2 with Vue model for restricted users
+                selectElement.on('change', function(this: HTMLSelectElement) {
+                    const selectedValues = window.$(this).val() || [];
+                    form.restricted_user_ids = Array.isArray(selectedValues) 
+                        ? selectedValues.map((val: string | number) => val)
+                        : selectedValues ? [selectedValues] : [];
+                });
+            }
         }
     });
 });
@@ -679,7 +821,7 @@ onMounted(() => {
 
                                 <!-- Contact Details Section -->
                                 <ContactDetails
-                                    :users="users"
+                                    :restricted-user-options="restrictedUserOptions"
                                     :contacts="contacts"
                                     :form="form"
                                     :errors="errors"

@@ -60,6 +60,7 @@ Route::get('amenities', [AmenityController::class, 'showPage'])->middleware(['au
 Route::get('property-construction-documents', [PropertyConstructionDocumentController::class, 'showPage'])->middleware(['auth', 'verified', 'permission:role.read'])->name('property-construction-documents.index');
 Route::get('projects', [ProjectController::class, 'index'])->middleware(['auth', 'verified'])->name('projects.index');
 Route::get('projects/create', [ProjectController::class, 'create'])->middleware(['auth', 'verified'])->name('projects.create');
+Route::post('projects', [ProjectController::class, 'store'])->middleware(['auth', 'verified'])->name('projects.store');
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/roles', [RoleController::class, 'store'])->name('roles.store')->middleware('permission:role.create');
