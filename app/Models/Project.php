@@ -32,6 +32,7 @@ class Project extends Model
         'construction_type_id',
         'category_id',
         'sub_category_id',
+        'sub_category_ids',
         
         // Step 2: Tower Details
         'no_of_towers',
@@ -42,7 +43,9 @@ class Project extends Model
         'front_road_width',
         'front_road_width_measurement_unit_id',
         'washroom',
+        'two_road_corner',
         'towers_different_specification',
+        'retail_unit_details',
         
         // Step 3: Parking Details
         'free_allotted_parking_four_wheeler',
@@ -65,7 +68,10 @@ class Project extends Model
         return [
             'is_active' => 'boolean',
             'restricted_user_ids' => 'array',
+            'sub_category_ids' => 'array',
             'towers_different_specification' => 'boolean',
+            'two_road_corner' => 'boolean',
+            'retail_unit_details' => 'array',
             'free_allotted_parking_four_wheeler' => 'boolean',
             'free_allotted_parking_two_wheeler' => 'boolean',
             'available_for_purchase' => 'boolean',

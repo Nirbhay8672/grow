@@ -93,6 +93,7 @@ interface Project {
     construction_type_id?: string;
     category_id?: string;
     sub_category_id?: string;
+    sub_category_ids?: string | string[];
     no_of_towers?: string;
     no_of_floors?: string;
     total_units?: string;
@@ -101,7 +102,9 @@ interface Project {
     front_road_width?: string;
     front_road_width_measurement_unit_id?: string;
     washroom?: string;
+    two_road_corner?: boolean;
     towers_different_specification?: boolean;
+    retail_unit_details?: string | Array<any>;
     free_allotted_parking_four_wheeler?: boolean;
     free_allotted_parking_two_wheeler?: boolean;
     available_for_purchase?: boolean;
@@ -626,6 +629,67 @@ const validateForm = (): boolean => {
     return isValid;
 };
 
+// Function to determine which step contains the first error
+const getStepForFirstError = (): number => {
+    const errorKeys = Object.keys(errors.value);
+    if (errorKeys.length === 0) return 1;
+    
+    // Step 1 fields
+    const step1Fields = [
+        'builder_id', 'builder_website', 'project_name', 'address', 
+        'state_id', 'city_id', 'locality_id', 'pincode', 'location_link',
+        'land_size', 'measurement_unit_id', 'rera_no', 'project_status',
+        'restricted_user_ids'
+    ];
+    
+    // Step 2 fields
+    const step2Fields = [
+        'construction_type_id', 'category_id', 'sub_category_id', 'sub_category_ids',
+        'no_of_towers', 'no_of_floors', 'total_units', 'no_of_unit_each_tower',
+        'no_of_lift', 'front_road_width', 'front_road_width_measurement_unit_id',
+        'washroom', 'two_road_corner', 'retail_unit_details', 'tower_details'
+    ];
+    
+    // Step 3 fields
+    const step3Fields = [
+        'free_allotted_parking_four_wheeler', 'free_allotted_parking_two_wheeler',
+        'available_for_purchase', 'no_of_parking', 'total_floor_for_parking',
+        'basement_parking', 'amenities', 'documents', 'remark', 'brochure_file'
+    ];
+    
+    // Check contacts (Step 1)
+    const hasContactErrors = errorKeys.some(key => key.startsWith('contacts.'));
+    
+    // Find first error field
+    const firstErrorKey = errorKeys[0];
+    
+    // Check which step the first error belongs to
+    if (step1Fields.includes(firstErrorKey) || hasContactErrors) {
+        return 1;
+    } else if (step2Fields.includes(firstErrorKey) || errorKeys.some(key => key.startsWith('tower_details.') || key.startsWith('retail_unit_details.'))) {
+        return 2;
+    } else if (step3Fields.includes(firstErrorKey) || errorKeys.some(key => key.startsWith('basement_parking.') || key.startsWith('documents.'))) {
+        return 3;
+    }
+    
+    // Default to step 1
+    return 1;
+};
+
+// Function to navigate to step with first error and scroll to it
+const navigateToFirstError = () => {
+    const stepWithError = getStepForFirstError();
+    currentStep.value = stepWithError;
+    
+    // Wait for DOM to update, then scroll to first error
+    setTimeout(() => {
+        const firstErrorField = document.querySelector('.is-invalid');
+        if (firstErrorField) {
+            firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, 100);
+};
+
 const handleSubmit = async () => {
     loading.value = true;
     errors.value = {};
@@ -633,11 +697,10 @@ const handleSubmit = async () => {
     // Frontend validation
     if (!validateForm()) {
         loading.value = false;
-        // Scroll to first error
-        const firstErrorField = document.querySelector('.is-invalid');
-        if (firstErrorField) {
-            firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        // Show common error message
+        showToast('Please fix the validation errors before submitting.', 'error');
+        // Navigate to step with first error
+        navigateToFirstError();
         return;
     }
     
@@ -701,7 +764,24 @@ const handleSubmit = async () => {
         if (form.front_road_width) formData.append('front_road_width', form.front_road_width);
         if (form.front_road_width_measurement_unit_id) formData.append('front_road_width_measurement_unit_id', form.front_road_width_measurement_unit_id);
         if (form.washroom) formData.append('washroom', form.washroom);
+        formData.append('two_road_corner', form.two_road_corner ? '1' : '0');
         formData.append('towers_different_specification', form.towers_different_specification ? '1' : '0');
+        
+        // Step 2: Retail Unit Details (for Retail category)
+        if (form.category_id === '2' && form.retail_unit_details && form.retail_unit_details.length > 0) {
+            form.retail_unit_details.forEach((unit: any, index: number) => {
+                if (unit.tower_name) formData.append(`retail_unit_details[${index}][tower_name]`, unit.tower_name);
+                if (unit.sub_category_id) formData.append(`retail_unit_details[${index}][sub_category_id]`, unit.sub_category_id);
+                if (unit.size_from) formData.append(`retail_unit_details[${index}][size_from]`, unit.size_from);
+                if (unit.size_to) formData.append(`retail_unit_details[${index}][size_to]`, unit.size_to);
+                if (unit.size_unit_id) formData.append(`retail_unit_details[${index}][size_unit_id]`, unit.size_unit_id);
+                if (unit.front_opening) formData.append(`retail_unit_details[${index}][front_opening]`, unit.front_opening);
+                if (unit.front_opening_unit_id) formData.append(`retail_unit_details[${index}][front_opening_unit_id]`, unit.front_opening_unit_id);
+                if (unit.no_of_unit_each_floor) formData.append(`retail_unit_details[${index}][no_of_unit_each_floor]`, unit.no_of_unit_each_floor);
+                if (unit.ceiling_height) formData.append(`retail_unit_details[${index}][ceiling_height]`, unit.ceiling_height);
+                if (unit.ceiling_height_unit_id) formData.append(`retail_unit_details[${index}][ceiling_height_unit_id]`, unit.ceiling_height_unit_id);
+            });
+        }
         
         // Step 2: Tower Details Array
         if (form.tower_details && form.tower_details.length > 0) {
@@ -807,13 +887,10 @@ const handleSubmit = async () => {
         // Handle validation errors
         if (error.response?.status === 422 && error.response?.data?.errors) {
             errors.value = error.response.data.errors;
-            // Show validation error toast
-            showToast('Please fix the validation errors.', 'error');
-            // Scroll to first error
-            const firstErrorField = document.querySelector('.is-invalid');
-            if (firstErrorField) {
-                firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            // Show common validation error message
+            showToast('Please fix the validation errors before submitting.', 'error');
+            // Navigate to step with first error
+            navigateToFirstError();
         } else {
             // Show error toast
             showToast(
@@ -828,18 +905,30 @@ const handleNext = () => {
     if (currentStep.value === 1) {
         // Validate step 1 before proceeding
         if (!validateForm()) {
+            // Show common error message
+            showToast('Please fix the validation errors before proceeding.', 'error');
+            // Navigate to first error in current step
+            setTimeout(() => {
+                const firstErrorField = document.querySelector('.is-invalid');
+                if (firstErrorField) {
+                    firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
             return;
         }
         currentStep.value = 2;
     } else if (currentStep.value === 2) {
         // Validate step 2 before proceeding
+        errors.value = {};
+        let hasError = false;
+        
         if (!form.construction_type_id) {
             errors.value.construction_type_id = ['Please select a construction type'];
-            return;
+            hasError = true;
         }
         if (!form.category_id) {
             errors.value.category_id = ['Please select a category'];
-            return;
+            hasError = true;
         }
         // Validate sub-category - check if selected category has sub-categories
         if (form.category_id) {
@@ -855,17 +944,30 @@ const handleNext = () => {
                     if (form.category_id === '2') {
                         if (!Array.isArray(form.sub_category_id) || form.sub_category_id.length === 0) {
                             errors.value.sub_category_id = ['Please select at least one sub-category'];
-                            return;
+                            hasError = true;
                         }
                     } else {
                         // For other categories, single selection required
                         if (!form.sub_category_id) {
                             errors.value.sub_category_id = ['Please select a sub-category'];
-                            return;
+                            hasError = true;
                         }
                     }
                 }
             }
+        }
+        
+        if (hasError) {
+            // Show common error message
+            showToast('Please fix the validation errors before proceeding.', 'error');
+            // Scroll to first error
+            setTimeout(() => {
+                const firstErrorField = document.querySelector('.is-invalid');
+                if (firstErrorField) {
+                    firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
+            return;
         }
         currentStep.value = 3;
     } else if (currentStep.value === 3) {
@@ -936,14 +1038,20 @@ const initializeFormFromProject = async () => {
     form.restricted_user_ids = project.restricted_user_ids || [];
     form.construction_type_id = project.construction_type_id ? String(project.construction_type_id) : '';
     form.category_id = project.category_id ? String(project.category_id) : '';
-    // Handle sub_category_id - could be string or JSON array for Retail
-    if (project.sub_category_id) {
+    // Handle sub_category_id - check both single and multiple columns
+    if (project.sub_category_ids) {
+        // Retail category with multiple sub-categories
         try {
-            const parsed = JSON.parse(project.sub_category_id);
-            form.sub_category_id = Array.isArray(parsed) ? parsed.map(String) : String(project.sub_category_id);
+            const parsed = typeof project.sub_category_ids === 'string' 
+                ? JSON.parse(project.sub_category_ids) 
+                : project.sub_category_ids;
+            form.sub_category_id = Array.isArray(parsed) ? parsed.map(String) : [];
         } catch (e) {
-            form.sub_category_id = String(project.sub_category_id);
+            form.sub_category_id = [];
         }
+    } else if (project.sub_category_id) {
+        // Single sub-category for other categories
+        form.sub_category_id = String(project.sub_category_id);
     } else {
         form.sub_category_id = '';
     }
@@ -955,7 +1063,22 @@ const initializeFormFromProject = async () => {
     form.front_road_width = project.front_road_width || '';
     form.front_road_width_measurement_unit_id = project.front_road_width_measurement_unit_id ? String(project.front_road_width_measurement_unit_id) : '';
     form.washroom = project.washroom || 'Private';
+    form.two_road_corner = project.two_road_corner || false;
     form.towers_different_specification = project.towers_different_specification || false;
+    
+    // Handle retail_unit_details - parse JSON if exists
+    if (project.retail_unit_details) {
+        try {
+            const parsed = typeof project.retail_unit_details === 'string' 
+                ? JSON.parse(project.retail_unit_details) 
+                : project.retail_unit_details;
+            form.retail_unit_details = Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            form.retail_unit_details = [];
+        }
+    } else {
+        form.retail_unit_details = [];
+    }
     form.free_allotted_parking_four_wheeler = project.free_allotted_parking_four_wheeler || false;
     form.free_allotted_parking_two_wheeler = project.free_allotted_parking_two_wheeler || false;
     form.available_for_purchase = project.available_for_purchase || false;
@@ -1369,4 +1492,5 @@ onMounted(async () => {
     }
 }
 </style>
+
 

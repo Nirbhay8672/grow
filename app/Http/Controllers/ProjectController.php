@@ -135,17 +135,42 @@ class ProjectController extends Controller
             ]);
 
             // Handle sub_category_id - single value or array for Retail
-            if ($request->has('sub_category_ids') && is_array($request->sub_category_ids)) {
-                // For Retail category (ID 2), store as JSON array
-                $projectData['sub_category_id'] = json_encode($request->sub_category_ids);
-            } elseif ($request->has('sub_category_id')) {
+            if ($request->has('sub_category_ids') && is_array($request->sub_category_ids) && count($request->sub_category_ids) > 0) {
+                // For Retail category (ID 2), store multiple in sub_category_ids JSON column
+                $projectData['sub_category_ids'] = json_encode($request->sub_category_ids);
+                $projectData['sub_category_id'] = null; // Set single to null when using multiple
+            } elseif ($request->has('sub_category_id') && !empty($request->sub_category_id)) {
                 // For other categories, single value
                 $projectData['sub_category_id'] = $request->sub_category_id;
+                $projectData['sub_category_ids'] = null; // Set multiple to null when using single
+            } else {
+                // No sub-category selected
+                $projectData['sub_category_id'] = null;
+                $projectData['sub_category_ids'] = null;
             }
 
             // Handle checkbox fields - explicitly set to false if not present or '0'
             $projectData['towers_different_specification'] = $request->has('towers_different_specification') 
                 && ($request->towers_different_specification === '1' || $request->towers_different_specification === true || $request->towers_different_specification === 1);
+            
+            $projectData['two_road_corner'] = $request->has('two_road_corner') 
+                && ($request->two_road_corner === '1' || $request->two_road_corner === true || $request->two_road_corner === 1);
+            
+            // Handle retail_unit_details - store as JSON array
+            if ($request->has('retail_unit_details')) {
+                $retailUnitDetails = $request->input('retail_unit_details');
+                if (is_array($retailUnitDetails) && count($retailUnitDetails) > 0) {
+                    // Filter out empty entries
+                    $filteredDetails = array_filter($retailUnitDetails, function($unit) {
+                        return !empty($unit['tower_name']) || !empty($unit['sub_category_id']) || !empty($unit['size_from']);
+                    });
+                    $projectData['retail_unit_details'] = !empty($filteredDetails) ? json_encode(array_values($filteredDetails)) : null;
+                } else {
+                    $projectData['retail_unit_details'] = null;
+                }
+            } else {
+                $projectData['retail_unit_details'] = null;
+            }
             
             $projectData['free_allotted_parking_four_wheeler'] = $request->has('free_allotted_parking_four_wheeler') 
                 && ($request->free_allotted_parking_four_wheeler === '1' || $request->free_allotted_parking_four_wheeler === true || $request->free_allotted_parking_four_wheeler === 1);
@@ -370,17 +395,42 @@ class ProjectController extends Controller
             ]);
 
             // Handle sub_category_id - single value or array for Retail
-            if ($request->has('sub_category_ids') && is_array($request->sub_category_ids)) {
-                // For Retail category (ID 2), store as JSON array
-                $projectData['sub_category_id'] = json_encode($request->sub_category_ids);
-            } elseif ($request->has('sub_category_id')) {
+            if ($request->has('sub_category_ids') && is_array($request->sub_category_ids) && count($request->sub_category_ids) > 0) {
+                // For Retail category (ID 2), store multiple in sub_category_ids JSON column
+                $projectData['sub_category_ids'] = json_encode($request->sub_category_ids);
+                $projectData['sub_category_id'] = null; // Set single to null when using multiple
+            } elseif ($request->has('sub_category_id') && !empty($request->sub_category_id)) {
                 // For other categories, single value
                 $projectData['sub_category_id'] = $request->sub_category_id;
+                $projectData['sub_category_ids'] = null; // Set multiple to null when using single
+            } else {
+                // No sub-category selected
+                $projectData['sub_category_id'] = null;
+                $projectData['sub_category_ids'] = null;
             }
 
             // Handle checkbox fields - explicitly set to false if not present or '0'
             $projectData['towers_different_specification'] = $request->has('towers_different_specification') 
                 && ($request->towers_different_specification === '1' || $request->towers_different_specification === true || $request->towers_different_specification === 1);
+            
+            $projectData['two_road_corner'] = $request->has('two_road_corner') 
+                && ($request->two_road_corner === '1' || $request->two_road_corner === true || $request->two_road_corner === 1);
+            
+            // Handle retail_unit_details - store as JSON array
+            if ($request->has('retail_unit_details')) {
+                $retailUnitDetails = $request->input('retail_unit_details');
+                if (is_array($retailUnitDetails) && count($retailUnitDetails) > 0) {
+                    // Filter out empty entries
+                    $filteredDetails = array_filter($retailUnitDetails, function($unit) {
+                        return !empty($unit['tower_name']) || !empty($unit['sub_category_id']) || !empty($unit['size_from']);
+                    });
+                    $projectData['retail_unit_details'] = !empty($filteredDetails) ? json_encode(array_values($filteredDetails)) : null;
+                } else {
+                    $projectData['retail_unit_details'] = null;
+                }
+            } else {
+                $projectData['retail_unit_details'] = null;
+            }
             
             $projectData['free_allotted_parking_four_wheeler'] = $request->has('free_allotted_parking_four_wheeler') 
                 && ($request->free_allotted_parking_four_wheeler === '1' || $request->free_allotted_parking_four_wheeler === true || $request->free_allotted_parking_four_wheeler === 1);

@@ -87,9 +87,36 @@ const initializeFromForm = () => {
                     subCategories.value = selectedCategory.sub_categories;
                 }
             }
+        } else {
+            // If categories not found in relationship, try to load them
+            categories.value = [];
         }
     }
 };
+
+// Watch for changes to modelValue to ensure categories are loaded when editing
+// This ensures categories are loaded even if form values are set before component mounts
+watch(() => props.modelValue.construction_type_id, (newConstructionTypeId) => {
+    // Only run if we have a construction type and categories list is empty or needs refresh
+    if (newConstructionTypeId && (categories.value.length === 0 || !categories.value.some(cat => cat.id === Number(props.modelValue.category_id)))) {
+        const selectedConstructionType = props.constructionTypes.find(
+            (ct) => ct.id === Number(newConstructionTypeId)
+        );
+        if (selectedConstructionType && selectedConstructionType.categories) {
+            categories.value = selectedConstructionType.categories;
+            
+            // If category is already selected, load subcategories
+            if (props.modelValue.category_id) {
+                const selectedCategory = categories.value.find(
+                    (cat) => cat.id === Number(props.modelValue.category_id)
+                );
+                if (selectedCategory && selectedCategory.sub_categories) {
+                    subCategories.value = selectedCategory.sub_categories;
+                }
+            }
+        }
+    }
+}, { immediate: true });
 
 onMounted(async () => {
     // Set initializing flag to prevent watchers from interfering
