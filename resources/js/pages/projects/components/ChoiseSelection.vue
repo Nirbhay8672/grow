@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted, nextTick } from 'vue';
 
 interface ConstructionType {
     id: number;
@@ -45,8 +45,56 @@ const emit = defineEmits<{
 const categories = ref<Category[]>([]);
 const subCategories = ref<SubCategory[]>([]);
 
+// Track if this is the initial mount to prevent clearing values on remount
+const isInitialMount = ref(true);
+// Track if we're currently initializing to prevent watchers from interfering
+const isInitializing = ref(true);
+
+// Initialize categories and subcategories from existing form values on mount
+const initializeFromForm = () => {
+    if (props.modelValue.construction_type_id) {
+        const selectedConstructionType = props.constructionTypes.find(
+            (ct) => ct.id === Number(props.modelValue.construction_type_id)
+        );
+        if (selectedConstructionType && selectedConstructionType.categories) {
+            categories.value = selectedConstructionType.categories;
+            
+            // If category is already selected, load subcategories
+            if (props.modelValue.category_id) {
+                const selectedCategory = categories.value.find(
+                    (cat) => cat.id === Number(props.modelValue.category_id)
+                );
+                if (selectedCategory && selectedCategory.sub_categories) {
+                    subCategories.value = selectedCategory.sub_categories;
+                }
+            }
+        }
+    }
+};
+
+onMounted(async () => {
+    // Set initializing flag to prevent watchers from interfering
+    isInitializing.value = true;
+    
+    // Initialize categories and subcategories from form values
+    initializeFromForm();
+    
+    // Wait for next tick to ensure initialization is complete
+    await nextTick();
+    
+    // Mark that initialization is complete and watchers can now run
+    isInitializing.value = false;
+    // Mark that initial mount is complete after initialization
+    isInitialMount.value = false;
+});
+
 // Watch construction type changes to load categories from relationship
-watch(() => props.modelValue.construction_type_id, (newConstructionTypeId) => {
+watch(() => props.modelValue.construction_type_id, (newConstructionTypeId, oldConstructionTypeId) => {
+    // Skip watcher during initialization to prevent clearing values on remount
+    if (isInitializing.value) {
+        return;
+    }
+    
     if (newConstructionTypeId) {
         const selectedConstructionType = props.constructionTypes.find(
             (ct) => ct.id === Number(newConstructionTypeId)
@@ -56,25 +104,50 @@ watch(() => props.modelValue.construction_type_id, (newConstructionTypeId) => {
         } else {
             categories.value = [];
         }
-        emit('update:modelValue', {
-            ...props.modelValue,
-            category_id: '',
-            sub_category_id: '',
-        });
-        subCategories.value = [];
+        
+        // Only clear category/subcategory if construction type actually changed by user
+        // Don't clear on initial mount or when old value is undefined (remount)
+        if (!isInitialMount.value && oldConstructionTypeId !== undefined && newConstructionTypeId !== oldConstructionTypeId) {
+            emit('update:modelValue', {
+                ...props.modelValue,
+                category_id: '',
+                sub_category_id: '',
+            });
+            subCategories.value = [];
+        } else {
+            // Restore subcategories if category still exists
+            if (props.modelValue.category_id) {
+                const selectedCategory = categories.value.find(
+                    (cat) => cat.id === Number(props.modelValue.category_id)
+                );
+                if (selectedCategory && selectedCategory.sub_categories) {
+                    subCategories.value = selectedCategory.sub_categories;
+                } else {
+                    subCategories.value = [];
+                }
+            }
+        }
     } else {
         categories.value = [];
-        emit('update:modelValue', {
-            ...props.modelValue,
-            category_id: '',
-            sub_category_id: '',
-        });
+        // Only clear if not initial mount and value actually changed
+        if (!isInitialMount.value && oldConstructionTypeId !== undefined) {
+            emit('update:modelValue', {
+                ...props.modelValue,
+                category_id: '',
+                sub_category_id: '',
+            });
+        }
         subCategories.value = [];
     }
 }, { immediate: false });
 
 // Watch category changes to load sub-categories from relationship
-watch(() => props.modelValue.category_id, (newCategoryId) => {
+watch(() => props.modelValue.category_id, (newCategoryId, oldCategoryId) => {
+    // Skip watcher during initialization to prevent clearing values on remount
+    if (isInitializing.value) {
+        return;
+    }
+    
     if (newCategoryId) {
         const selectedCategory = categories.value.find(
             (cat) => cat.id === Number(newCategoryId)
@@ -84,16 +157,29 @@ watch(() => props.modelValue.category_id, (newCategoryId) => {
         } else {
             subCategories.value = [];
         }
-        emit('update:modelValue', {
-            ...props.modelValue,
-            sub_category_id: '',
-        });
+        
+        // Only clear subcategory if category actually changed by user
+        // Don't clear on initial mount or when old value is undefined (remount)
+        if (!isInitialMount.value && oldCategoryId !== undefined && newCategoryId !== oldCategoryId) {
+            emit('update:modelValue', {
+                ...props.modelValue,
+                sub_category_id: '',
+            });
+        }
     } else {
         subCategories.value = [];
-        emit('update:modelValue', {
-            ...props.modelValue,
-            sub_category_id: '',
-        });
+        // Only clear if not initial mount and value actually changed
+        if (!isInitialMount.value && oldCategoryId !== undefined) {
+            emit('update:modelValue', {
+                ...props.modelValue,
+                sub_category_id: '',
+            });
+        }
+    }
+    
+    // Mark that initial mount is complete after first watch execution
+    if (isInitialMount.value) {
+        isInitialMount.value = false;
     }
 }, { immediate: false });
 
