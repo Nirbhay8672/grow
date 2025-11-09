@@ -231,7 +231,6 @@ const updateSubCategory = (value: string) => {
                             class="form-check-label construction-type-label"
                         >
                             {{ constructionType.name }}
-                            <span v-if="showIds">(ID: {{ constructionType.id }})</span>
                         </label>
                     </div>
                 </div>
@@ -268,7 +267,6 @@ const updateSubCategory = (value: string) => {
                             class="form-check-label construction-type-label"
                         >
                             {{ category.name }}
-                            <span v-if="showIds">(ID: {{ category.id }})</span>
                         </label>
                     </div>
                 </div>
@@ -305,7 +303,6 @@ const updateSubCategory = (value: string) => {
                             class="form-check-label construction-type-label"
                         >
                             {{ subCategory.name }}
-                            <span v-if="showIds">(ID: {{ subCategory.id }})</span>
                         </label>
                     </div>
                 </div>
