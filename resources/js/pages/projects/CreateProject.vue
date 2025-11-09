@@ -10,6 +10,7 @@ import ProjectInformation from './components/ProjectInformation.vue';
 import ContactDetails from './components/ContactDetails.vue';
 import ChoiseSelection from './components/ChoiseSelection.vue';
 import TowerDetailsSection from './components/TowerDetailsSection.vue';
+import ParkingAndAmenities from './components/ParkingAndAmenities.vue';
 
 declare global {
     interface Window {
@@ -66,12 +67,19 @@ interface SubCategory {
     name: string;
 }
 
+interface Amenity {
+    id: number;
+    name: string;
+    is_active: boolean;
+}
+
 interface Props {
     builders: Builder[];
     states: State[];
     measurementUnits: MeasurementUnit[];
     users: User[];
     constructionTypes: ConstructionType[];
+    amenities: Amenity[];
 }
 
 const props = defineProps<Props>();
@@ -187,6 +195,39 @@ const form = reactive({
         show_carpet_area: boolean;
         show_builtup_area: boolean;
     }>,
+    
+    // Parking & Amenities
+    free_allotted_parking_four_wheeler: false,
+    free_allotted_parking_two_wheeler: false,
+    available_for_purchase: false,
+    no_of_parking: '',
+    total_floor_for_parking: '1',
+    basement_parking: [{
+        floor_no: '',
+        ev_charging_point: '',
+        hydraulic_parking: '',
+        height_of_basement: '',
+        height_of_basement_unit_id: '',
+    }] as Array<{
+        floor_no: string;
+        ev_charging_point: string;
+        hydraulic_parking: string;
+        height_of_basement: string;
+        height_of_basement_unit_id: string;
+    }>,
+    amenity_ids: [] as string[],
+    document_uploads: [] as Array<{
+        id: number;
+        category: string;
+        files: File[];
+        uploaded_files?: Array<{
+            id?: number;
+            name: string;
+            url?: string;
+        }>;
+    }>,
+    brochure_file: null as File | null,
+    remark: '',
 });
 
 const addContact = () => {
@@ -534,7 +575,7 @@ const handleNext = () => {
         }
         currentStep.value = 2;
     } else if (currentStep.value === 2) {
-        // Validate step 2 and submit
+        // Validate step 2 before proceeding
         if (!form.construction_type_id) {
             errors.value.construction_type_id = ['Please select a construction type'];
             return;
@@ -558,10 +599,11 @@ const handleNext = () => {
                 }
             }
         }
-        
-        // TODO: Submit form or proceed to next step
-        console.log('Form validated, submitting...');
-        // router.post('/projects', formData, { ... });
+        currentStep.value = 3;
+    } else if (currentStep.value === 3) {
+        // Validate step 3 and submit
+        // TODO: Add validation for step 3 if needed
+        handleSubmit();
     }
 };
 
@@ -678,10 +720,20 @@ onMounted(() => {
                                 />
                             </div>
 
+                            <!-- Step 3: Parking & Amenities -->
+                            <div v-if="currentStep === 3">
+                                <ParkingAndAmenities
+                                    :form="form"
+                                    :errors="errors"
+                                    :amenities="amenities"
+                                    :measurement-units="measurementUnits"
+                                />
+                            </div>
+
                             <!-- Action Buttons -->
                             <div class="d-flex justify-content-end gap-2 mt-4">
                                 <button
-                                    v-if="currentStep === 2"
+                                    v-if="currentStep > 1"
                                     type="button"
                                     @click="handlePrevious"
                                     class="btn btn-secondary btn-sm btn-previous"
@@ -694,7 +746,7 @@ onMounted(() => {
                                     class="btn btn-primary btn-sm btn-primary-custom"
                                     :disabled="loading"
                                 >
-                                    {{ loading ? 'Processing...' : currentStep === 2 ? 'Create Project' : 'Next' }}
+                                    {{ loading ? 'Processing...' : currentStep === 3 ? 'Create Project' : 'Next' }}
                                 </button>
                             </div>
                                 </form>

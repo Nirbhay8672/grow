@@ -25820,6 +25820,26 @@ body:after {
     visibility: hidden;
 }
 
+/* Square Remove Button - Orange */
+.btn-remove-square {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    padding: 0 !important;
+    background-color: #fa8b0c;
+    border: none;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-remove-square svg,
+.btn-remove-square .lucide {
+    display: block;
+    margin: 0;
+}
+
 .measurement-unit-select {
     max-width: 150px;
 }
@@ -25920,5 +25940,10 @@ textarea.form-control-sm:focus {
     background-color: #6c757d;
     color: white;
     border: none;
+}
+
+.btn-previous:hover {
+    background-color: #fa8b0c;
+    color: white;
 }
 /*# sourceMappingURL=maps/style.css.map */
