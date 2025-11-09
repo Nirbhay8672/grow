@@ -61,6 +61,9 @@ Route::get('property-construction-documents', [PropertyConstructionDocumentContr
 Route::get('projects', [ProjectController::class, 'index'])->middleware(['auth', 'verified'])->name('projects.index');
 Route::get('projects/create', [ProjectController::class, 'create'])->middleware(['auth', 'verified'])->name('projects.create');
 Route::post('projects', [ProjectController::class, 'store'])->middleware(['auth', 'verified'])->name('projects.store');
+Route::get('projects/{project}/edit', [ProjectController::class, 'edit'])->middleware(['auth', 'verified'])->name('projects.edit');
+Route::put('projects/{project}', [ProjectController::class, 'update'])->middleware(['auth', 'verified'])->name('projects.update');
+Route::delete('projects/documents/{document}', [ProjectController::class, 'deleteDocument'])->middleware(['auth', 'verified'])->name('projects.documents.delete');
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/roles', [RoleController::class, 'store'])->name('roles.store')->middleware('permission:role.create');

@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
-import { Plus, Eye, Edit, Trash2 } from 'lucide-vue-next';
 
 interface Project {
     id: number;
@@ -73,6 +72,13 @@ const deleteProject = (projectId: number) => {
         });
     }
 };
+
+// Initialize Feather icons
+onMounted(() => {
+    if (typeof window !== 'undefined' && (window as any).feather) {
+        (window as any).feather.replace();
+    }
+});
 </script>
 
 <template>
@@ -88,7 +94,7 @@ const deleteProject = (projectId: number) => {
                             href="/projects/create"
                             class="btn btn-primary btn-sm btn-default btn-squared text-capitalize lh-normal px-3 py-2"
                         >
-                            <Plus :size="16" class="me-1" />
+                            <span data-feather="plus" class="me-1"></span>
                             Create Project
                         </Link>
                     </div>
@@ -114,16 +120,13 @@ const deleteProject = (projectId: number) => {
                                                 <span class="userDatatable-title">Status</span>
                                             </th>
                                             <th>
-                                                <span class="userDatatable-title">Created</span>
-                                            </th>
-                                            <th>
                                                 <span class="userDatatable-title">Actions</span>
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-if="projects.data.length === 0">
-                                            <td colspan="7" class="text-center py-4">
+                                            <td colspan="6" class="text-center py-4">
                                                 <p class="text-muted mb-0">No projects found. <Link href="/projects/create" class="text-primary">Create your first project</Link></p>
                                             </td>
                                         </tr>
@@ -189,40 +192,24 @@ const deleteProject = (projectId: number) => {
                                             </td>
                                             <td>
                                                 <div class="userDatatable-content">
-                                                    {{ new Date(project.created_at).toLocaleDateString() }}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="userDatatable-content">
-                                                    <ul class="orderDatatable_actions mb-0 d-flex flex-wrap gap-2">
-                                                        <li>
-                                                            <Link
-                                                                :href="`/projects/${project.id}`"
-                                                                class="btn btn-sm btn-primary"
-                                                                title="View"
-                                                            >
-                                                                <Eye :size="14" />
-                                                            </Link>
-                                                        </li>
-                                                        <li>
-                                                            <Link
-                                                                :href="`/projects/${project.id}/edit`"
-                                                                class="btn btn-sm btn-warning"
-                                                                title="Edit"
-                                                            >
-                                                                <Edit :size="14" />
-                                                            </Link>
-                                                        </li>
-                                                        <li>
-                                                            <button
-                                                                @click="deleteProject(project.id)"
-                                                                class="btn btn-sm btn-danger"
-                                                                title="Delete"
-                                                            >
-                                                                <Trash2 :size="14" />
-                                                            </button>
-                                                        </li>
-                                                    </ul>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <Link
+                                                            :href="`/projects/${project.id}/edit`"
+                                                            class="btn btn-sm btn-outline-primary"
+                                                            title="Edit Project"
+                                                            style="padding: 4px 8px; min-width: 32px; height: 32px;"
+                                                        >
+                                                            ✏️
+                                                        </Link>
+                                                        <button
+                                                            @click="deleteProject(project.id)"
+                                                            class="btn btn-sm btn-outline-danger"
+                                                            title="Delete Project"
+                                                            style="padding: 4px 8px; min-width: 32px; height: 32px;"
+                                                        >
+                                                            🗑️
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -261,27 +248,4 @@ const deleteProject = (projectId: number) => {
         </div>
     </AppLayout>
 </template>
-
-<style scoped>
-.userDatatable-content {
-    font-size: 14px;
-}
-
-.orderDatatable_actions {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.orderDatatable_actions li {
-    display: inline-block;
-}
-
-.orderDatatable_actions .btn {
-    padding: 4px 8px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-</style>
 

@@ -1,6 +1,17 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
 import { Plus, X } from 'lucide-vue-next';
+import axios from 'axios';
+
+// Get CSRF token from meta tag
+const getCsrfToken = (): string => {
+    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    return token || '';
+};
+
+// Set default CSRF token for axios
+axios.defaults.headers.common['X-CSRF-TOKEN'] = getCsrfToken();
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 interface Amenity {
     id: number;
@@ -17,13 +28,21 @@ interface BasementParking {
 }
 
 interface DocumentUpload {
-    id: number;
+    id?: number;
     category: string;
     files: File[];
     uploaded_files?: Array<{
         id?: number;
         name: string;
         url?: string;
+    }>;
+    existing_file_path?: string;
+    existing_file_name?: string;
+    existing_document_id?: number;
+    existing_documents?: Array<{
+        id: number;
+        file_path: string;
+        file_name: string;
     }>;
 }
 
@@ -134,9 +153,82 @@ const addDocumentUpload = () => {
 };
 
 // Remove document upload field
-const removeDocumentUpload = (id: number) => {
-    if (props.form.document_uploads.length > 1) {
-        props.form.document_uploads = props.form.document_uploads.filter((doc: DocumentUpload) => doc.id !== id);
+const removeDocumentUpload = async (id: number) => {
+    // Find the document index
+    const docIndex = props.form.document_uploads.findIndex((doc: DocumentUpload) => doc.id === id);
+    if (docIndex === -1) return;
+    
+    const doc = props.form.document_uploads[docIndex];
+    
+    // If it has existing documents, delete them from database first
+    if (doc.existing_documents && doc.existing_documents.length > 0) {
+        if (!confirm('Are you sure you want to delete this document row and all its files? This action cannot be undone.')) {
+            return;
+        }
+        
+        // Delete all existing documents in this row
+        const deletePromises = doc.existing_documents.map((existingDoc: any) => 
+            axios.delete(`/projects/documents/${existingDoc.id}`)
+        );
+        
+        try {
+            await Promise.all(deletePromises);
+            // Remove the document from the array
+            props.form.document_uploads.splice(docIndex, 1);
+            
+            // If no documents left, ensure at least one empty entry
+            if (props.form.document_uploads.length === 0) {
+                props.form.document_uploads.push({
+                    id: documentUploadIdCounter++,
+                    category: '',
+                    files: [],
+                    uploaded_files: [],
+                });
+            }
+        } catch (error: any) {
+            console.error('Error deleting documents:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to delete some documents. Please try again.';
+            alert(errorMessage);
+        }
+    } else if (doc.existing_document_id) {
+        // Single existing document
+        if (!confirm('Are you sure you want to delete this document? This action cannot be undone.')) {
+            return;
+        }
+        
+        try {
+            await axios.delete(`/projects/documents/${doc.existing_document_id}`);
+            
+            // Remove the document from the array
+            props.form.document_uploads.splice(docIndex, 1);
+            
+            // If no documents left, ensure at least one empty entry
+            if (props.form.document_uploads.length === 0) {
+                props.form.document_uploads.push({
+                    id: documentUploadIdCounter++,
+                    category: '',
+                    files: [],
+                    uploaded_files: [],
+                });
+            }
+        } catch (error: any) {
+            console.error('Error deleting document:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to delete document. Please try again.';
+            alert(errorMessage);
+        }
+    } else {
+        // New document (not saved yet), just remove it from the array
+        if (props.form.document_uploads.length > 1) {
+            props.form.document_uploads.splice(docIndex, 1);
+        } else {
+            // If it's the last one, just clear it
+            props.form.document_uploads[docIndex] = {
+                id: documentUploadIdCounter++,
+                category: '',
+                files: [],
+                uploaded_files: [],
+            };
+        }
     }
 };
 
@@ -164,6 +256,115 @@ const removeUploadedFile = (docIndex: number, fileIndex: number) => {
     }
 };
 
+// Delete existing document from database and storage (single document display)
+const deleteExistingDocument = async (docIndex: number) => {
+    const doc = props.form.document_uploads[docIndex];
+    
+    if (!confirm('Are you sure you want to delete this document? This action cannot be undone.')) {
+        return;
+    }
+    
+    // If it's an existing document with an ID, delete it from the database
+    if (doc.existing_document_id) {
+        try {
+            await axios.delete(`/projects/documents/${doc.existing_document_id}`);
+            
+            // Clear the existing document data but keep the row
+            delete doc.existing_document_id;
+            delete doc.existing_file_path;
+            delete doc.existing_file_name;
+            
+            // If the row has no files and no new files, and there are other rows, remove it
+            if ((!doc.files || doc.files.length === 0) && 
+                (!doc.existing_documents || doc.existing_documents.length === 0) &&
+                props.form.document_uploads.length > 1) {
+                props.form.document_uploads.splice(docIndex, 1);
+            }
+            
+            // If no documents left, ensure at least one empty entry
+            if (props.form.document_uploads.length === 0) {
+                props.form.document_uploads.push({
+                    id: documentUploadIdCounter++,
+                    category: '',
+                    files: [],
+                    uploaded_files: [],
+                });
+            }
+        } catch (error: any) {
+            console.error('Error deleting document:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to delete document. Please try again.';
+            alert(errorMessage);
+        }
+    }
+};
+
+// Delete existing document by ID (for multiple documents in one entry)
+const deleteExistingDocumentById = async (documentId: number, docIndex: number, existingIndex: number) => {
+    if (!confirm('Are you sure you want to delete this document? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        await axios.delete(`/projects/documents/${documentId}`);
+        
+        // Remove from existing_documents array
+        const doc = props.form.document_uploads[docIndex];
+        if (doc.existing_documents) {
+            doc.existing_documents.splice(existingIndex, 1);
+            
+            // Update the main display if we deleted the first document
+            if (doc.existing_documents.length > 0) {
+                doc.existing_file_path = doc.existing_documents[0].file_path;
+                doc.existing_file_name = doc.existing_documents[0].file_name;
+                doc.existing_document_id = doc.existing_documents[0].id;
+            } else {
+                // No more documents in this group
+                delete doc.existing_file_path;
+                delete doc.existing_file_name;
+                delete doc.existing_document_id;
+                
+                // If the row has no files and no new files, and there are other rows, remove it
+                if ((!doc.files || doc.files.length === 0) && 
+                    props.form.document_uploads.length > 1) {
+                    props.form.document_uploads.splice(docIndex, 1);
+                }
+            }
+            
+            // If no documents left, ensure at least one empty entry
+            if (props.form.document_uploads.length === 0) {
+                props.form.document_uploads.push({
+                    id: documentUploadIdCounter++,
+                    category: '',
+                    files: [],
+                    uploaded_files: [],
+                });
+            }
+        }
+    } catch (error: any) {
+        console.error('Error deleting document:', error);
+        const errorMessage = error.response?.data?.message || error.message || 'Failed to delete document. Please try again.';
+        alert(errorMessage);
+    }
+};
+
+// Check if file is an image
+const isImageFile = (fileName: string): boolean => {
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
+    const lowerFileName = fileName.toLowerCase();
+    return imageExtensions.some(ext => lowerFileName.endsWith(ext));
+};
+
+// Get file URL for display
+const getFileUrl = (filePath: string): string => {
+    // Assuming files are stored in public storage
+    return `/storage/${filePath}`;
+};
+
+// Get preview URL for File objects
+const getFilePreviewUrl = (file: File): string => {
+    return window.URL.createObjectURL(file);
+};
+
 // Handle brochure file selection
 const handleBrochureFile = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -184,7 +385,38 @@ const handleBrochureFile = (event: Event) => {
         }
         
         props.form.brochure_file = file;
+        // Clear existing brochure when new one is selected
+        props.form.existing_brochure_file = null;
+        props.form.brochure_deleted = false;
     }
+};
+
+// Delete existing brochure file
+const deleteExistingBrochure = () => {
+    if (!confirm('Are you sure you want to delete the brochure file? This action cannot be undone.')) {
+        return;
+    }
+    
+    if (!props.form.existing_brochure_file) {
+        return;
+    }
+    
+    // Mark brochure as deleted and clear the existing file reference
+    props.form.brochure_deleted = true;
+    props.form.existing_brochure_file = null;
+    props.form.brochure_file = null;
+};
+
+// Get brochure file URL
+const getBrochureUrl = (filePath: string): string => {
+    return `/storage/${filePath}`;
+};
+
+// Get brochure file name from path
+const getBrochureFileName = (filePath: string): string => {
+    if (!filePath) return '';
+    const parts = filePath.split('/');
+    return parts[parts.length - 1] || filePath;
 };
 
 // Handle integer input
@@ -466,25 +698,116 @@ const handleIntegerInput = (event: Event, field: string) => {
                         <div v-if="allErrors[`document_uploads.${docIndex}.files`]" class="invalid-feedback d-block">
                             {{ allErrors[`document_uploads.${docIndex}.files`][0] }}
                         </div>
-                        <!-- Display selected files -->
+                        <!-- Display selected files (new files being uploaded) -->
                         <div v-if="doc.files && doc.files.length > 0" class="mt-2">
                             <div 
                                 v-for="(file, fileIndex) in doc.files" 
                                 :key="fileIndex"
-                                class="d-flex align-items-center justify-content-between mb-1 p-2 rounded"
-                                style="background-color: #1c467b; color: white;"
+                                class="d-flex align-items-center justify-content-between mb-2 p-2 rounded border" 
+                                style="background-color: #f8f9fa;"
                             >
-                                <span class="small text-white">{{ file.name }}</span>
+                                <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                    <!-- Image preview for image files -->
+                                    <div v-if="isImageFile(file.name)" class="flex-shrink-0">
+                                        <img 
+                                            :src="getFilePreviewUrl(file)" 
+                                            :alt="file.name"
+                                            style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
+                                            @error="(e: any) => { const target = e.target as HTMLImageElement; if (target) target.style.display='none' }"
+                                        />
+                                    </div>
+                                    <!-- File icon for non-image files -->
+                                    <div v-else class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background-color: #1c467b; border-radius: 4px;">
+                                        <span class="text-white" style="font-size: 20px;">📄</span>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="small fw-bold">{{ file.name }}</div>
+                                        <div class="small text-muted">{{ (file.size / 1024).toFixed(2) }} KB</div>
+                                    </div>
+                                </div>
                                 <button
                                     type="button"
                                     @click="removeDocumentFile(docIndex, fileIndex)"
-                                    class="btn btn-remove-square"
+                                    class="btn btn-danger btn-sm ms-2 btn-icon-square btn-icon-square-36"
+                                    title="Remove File"
                                 >
-                                    <X :size="14" color="white" />
+                                    <X :size="18" color="white" />
                                 </button>
                             </div>
                         </div>
-                        <!-- Display uploaded files -->
+                        <!-- Display existing documents from database -->
+                        <!-- Only show single document display if existing_documents array doesn't exist -->
+                        <div v-if="doc.existing_file_path && doc.existing_file_name && (!doc.existing_documents || doc.existing_documents.length === 0)" class="mt-2">
+                            <div class="d-flex align-items-center justify-content-between mb-2 p-2 rounded border" style="background-color: #f8f9fa;">
+                                <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                    <!-- Image preview for image files -->
+                                    <div v-if="isImageFile(doc.existing_file_name)" class="flex-shrink-0">
+                                        <img 
+                                            :src="getFileUrl(doc.existing_file_path)" 
+                                            :alt="doc.existing_file_name"
+                                            style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
+                                            @error="(e: any) => { const target = e.target as HTMLImageElement; if (target) target.style.display='none' }"
+                                        />
+                                    </div>
+                                    <!-- File icon for non-image files -->
+                                    <div v-else class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background-color: #1c467b; border-radius: 4px;">
+                                        <span class="text-white" style="font-size: 20px;">📄</span>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="small fw-bold">{{ doc.existing_file_name }}</div>
+                                        <div class="small text-muted">{{ doc.category || 'No category' }}</div>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    @click.stop="deleteExistingDocument(docIndex)"
+                                    class="btn btn-sm ms-2 btn-icon-square btn-icon-square-32"
+                                    style="background-color: #fa8b0c;"
+                                    title="Delete Document"
+                                >
+                                    <X :size="16" color="white" />
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Display multiple existing documents if they exist -->
+                        <div v-if="doc.existing_documents && doc.existing_documents.length > 0" class="mt-2">
+                            <div 
+                                v-for="(existingDoc, existingIndex) in doc.existing_documents" 
+                                :key="existingDoc.id"
+                                class="d-flex align-items-center justify-content-between mb-2 p-2 rounded border" 
+                                style="background-color: #f8f9fa;"
+                            >
+                                <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                    <!-- Image preview for image files -->
+                                    <div v-if="isImageFile(existingDoc.file_name)" class="flex-shrink-0">
+                                        <img 
+                                            :src="getFileUrl(existingDoc.file_path)" 
+                                            :alt="existingDoc.file_name"
+                                            style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
+                                            @error="(e: any) => { const target = e.target as HTMLImageElement; if (target) target.style.display='none' }"
+                                        />
+                                    </div>
+                                    <!-- File icon for non-image files -->
+                                    <div v-else class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background-color: #1c467b; border-radius: 4px;">
+                                        <span class="text-white" style="font-size: 20px;">📄</span>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="small fw-bold">{{ existingDoc.file_name }}</div>
+                                        <div class="small text-muted">{{ doc.category || 'No category' }}</div>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    @click.stop="deleteExistingDocumentById(existingDoc.id, docIndex, existingIndex)"
+                                    class="btn btn-sm ms-2 btn-icon-square btn-icon-square-32"
+                                    style="background-color: #fa8b0c;"
+                                    title="Delete Document"
+                                >
+                                    <X :size="16" color="white" />
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Display uploaded files (new files being added) -->
                         <div v-if="doc.uploaded_files && doc.uploaded_files.length > 0" class="mt-2">
                             <div 
                                 v-for="(uploadedFile, fileIndex) in doc.uploaded_files" 
@@ -496,9 +819,10 @@ const handleIntegerInput = (event: Event, field: string) => {
                                 <button
                                     type="button"
                                     @click="removeUploadedFile(docIndex, fileIndex)"
-                                    class="btn btn-remove-square"
+                                    class="btn btn-danger btn-sm btn-icon-square btn-icon-square-36"
+                                    title="Remove File"
                                 >
-                                    <X :size="14" color="white" />
+                                    <X :size="18" color="white" />
                                 </button>
                             </div>
                         </div>
@@ -506,23 +830,24 @@ const handleIntegerInput = (event: Event, field: string) => {
                     <div class="col-md-3 mb-3">
                         <label class="form-label hidden-label">Action</label>
                         <div class="d-flex gap-1">
+                            <!-- Show add button only for first row -->
                             <button
                                 v-if="docIndex === 0"
                                 type="button"
                                 @click="addDocumentUpload"
-                                class="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
-                                style="min-width: 40px; height: 38px; padding: 0 12px;"
+                                class="btn btn-primary btn-sm btn-icon-square btn-icon-square-38"
                                 title="Add Document Upload"
                             >
                                 <Plus :size="18" color="white" />
                             </button>
+                            <!-- Show remove button only for rows after first row -->
                             <button
                                 v-if="docIndex > 0"
                                 type="button"
-                                @click="removeDocumentUpload(doc.id)"
-                                class="btn btn-sm d-flex align-items-center justify-content-center"
-                                style="min-width: 40px; height: 38px; padding: 0 12px; background-color: #fa8b0c; border: none;"
-                                title="Remove Document Upload"
+                                @click.stop="removeDocumentUpload(doc.id)"
+                                class="btn btn-sm btn-icon-square btn-icon-square-38"
+                                style="background-color: #fa8b0c;"
+                                title="Remove Document Row"
                             >
                                 <X :size="18" color="white" />
                             </button>
@@ -549,8 +874,63 @@ const handleIntegerInput = (event: Event, field: string) => {
                     <div v-if="allErrors.brochure_file" class="invalid-feedback d-block">
                         {{ allErrors.brochure_file[0] }}
                     </div>
-                    <div v-if="form.brochure_file" class="mt-2 small text-muted">
-                        Selected: {{ form.brochure_file.name }}
+                    <!-- Display new selected file -->
+                    <div v-if="form.brochure_file && !form.existing_brochure_file" class="mt-2">
+                        <div class="d-flex align-items-center justify-content-between p-2 rounded border" style="background-color: #f8f9fa;">
+                            <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                <div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background-color: #1c467b; border-radius: 4px;">
+                                    <span class="text-white" style="font-size: 20px;">📄</span>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="small fw-bold">{{ form.brochure_file.name }}</div>
+                                    <div class="small text-muted">{{ (form.brochure_file.size / 1024).toFixed(2) }} KB</div>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                @click="form.brochure_file = null"
+                                class="btn btn-danger btn-sm ms-2 btn-icon-square btn-icon-square-36"
+                                title="Remove File"
+                            >
+                                <X :size="18" color="white" />
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Display existing brochure file -->
+                    <div v-if="form.existing_brochure_file" class="mt-2">
+                        <div class="d-flex align-items-center justify-content-between p-2 rounded border" style="background-color: #f8f9fa;">
+                            <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                <div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background-color: #1c467b; border-radius: 4px;">
+                                    <span class="text-white" style="font-size: 20px;">📄</span>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="small fw-bold">{{ getBrochureFileName(form.existing_brochure_file) }}</div>
+                                    <div class="small text-muted">Existing brochure file</div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 ms-2">
+                                <a
+                                    :href="getBrochureUrl(form.existing_brochure_file)"
+                                    target="_blank"
+                                    class="btn btn-primary btn-sm btn-icon-square btn-icon-square-36"
+                                    style="text-decoration: none;"
+                                    title="View/Download Brochure"
+                                >
+                                    <span style="font-size: 18px;">👁️</span>
+                                </a>
+                                <button
+                                    type="button"
+                                    @click="deleteExistingBrochure"
+                                    class="btn btn-danger btn-sm btn-icon-square btn-icon-square-36"
+                                    title="Delete Brochure"
+                                >
+                                    <X :size="18" color="white" />
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-2 small text-muted">
+                            <em>Select a new file to replace the existing brochure</em>
+                        </div>
                     </div>
                 </div>
             </div>

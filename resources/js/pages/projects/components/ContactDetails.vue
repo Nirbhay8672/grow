@@ -129,19 +129,20 @@ defineProps<Props>();
                             v-if="index === 0"
                             type="button"
                             @click="addContact"
-                            class="btn btn-primary btn-sm d-flex align-items-center justify-content-center contact-action-btn contact-add-btn"
+                            class="btn btn-primary btn-sm btn-icon-square btn-icon-square-38"
                             title="Add Contact"
                         >
-                            <Plus :size="18" color="white" class="contact-icon" />
+                            <Plus :size="18" color="white" />
                         </button>
                         <button
                             v-if="index > 0"
                             type="button"
                             @click="removeContact(contact.id)"
-                            class="btn btn-danger btn-sm d-flex align-items-center justify-content-center contact-action-btn"
+                            class="btn btn-sm btn-icon-square btn-icon-square-38"
+                            style="background-color: #fa8b0c;"
                             title="Remove Contact"
                         >
-                            <X :size="18" color="white" class="contact-icon" />
+                            <X :size="18" color="white" />
                         </button>
                     </div>
                 </div>

@@ -6207,6 +6207,148 @@ ul {
   background-color: #1c467b !important;
   border-color: #1c467b !important;
 }
+
+/* Global Icon Button Styles - Square buttons with centered icons */
+/* Target Bootstrap buttons specifically */
+button.btn-icon-square,
+a.btn-icon-square,
+.btn.btn-icon-square {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  border: none !important;
+  position: relative !important;
+  box-sizing: border-box !important;
+  /* Override Bootstrap defaults */
+  font-size: inherit !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  /* Force square shape */
+  flex-shrink: 0 !important;
+}
+
+/* Override Bootstrap button padding and spacing - more specific */
+button.btn-icon-square.btn-sm,
+a.btn-icon-square.btn-sm,
+.btn.btn-icon-square.btn-sm,
+button.btn-icon-square.btn-primary.btn-sm,
+button.btn-icon-square.btn-danger.btn-sm,
+button.btn-icon-square.btn-sm[style*="background-color"] {
+  padding: 0 !important;
+  font-size: inherit !important;
+  min-width: auto !important;
+}
+
+/* Reset all child elements */
+button.btn-icon-square > *,
+a.btn-icon-square > *,
+.btn.btn-icon-square > * {
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  transform: none !important;
+}
+
+/* Ensure SVG icons are perfectly centered */
+button.btn-icon-square svg,
+a.btn-icon-square svg,
+.btn.btn-icon-square svg {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  vertical-align: middle !important;
+  position: relative !important;
+  flex-shrink: 0 !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+/* Ensure span elements (like emoji icons) are centered */
+button.btn-icon-square span,
+a.btn-icon-square span,
+.btn.btn-icon-square span {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+}
+
+/* Specific sizes for icon buttons - ensure perfect square */
+/* High specificity to override Bootstrap */
+button.btn-icon-square-36,
+a.btn-icon-square-36,
+.btn.btn-icon-square-36,
+button.btn-icon-square.btn-icon-square-36,
+a.btn-icon-square.btn-icon-square-36,
+.btn.btn-icon-square.btn-icon-square-36,
+button.btn.btn-sm.btn-icon-square.btn-icon-square-36,
+a.btn.btn-sm.btn-icon-square.btn-icon-square-36,
+button.btn.btn-primary.btn-sm.btn-icon-square.btn-icon-square-36,
+button.btn.btn-danger.btn-sm.btn-icon-square.btn-icon-square-36 {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  max-width: 36px !important;
+  max-height: 36px !important;
+  aspect-ratio: 1 / 1 !important;
+  padding: 0 !important;
+  flex-basis: 36px !important;
+}
+
+button.btn-icon-square-38,
+a.btn-icon-square-38,
+.btn.btn-icon-square-38,
+button.btn-icon-square.btn-icon-square-38,
+a.btn-icon-square.btn-icon-square-38,
+.btn.btn-icon-square.btn-icon-square-38,
+button.btn.btn-sm.btn-icon-square.btn-icon-square-38,
+a.btn.btn-sm.btn-icon-square.btn-icon-square-38,
+button.btn.btn-primary.btn-sm.btn-icon-square.btn-icon-square-38,
+button.btn.btn-danger.btn-sm.btn-icon-square.btn-icon-square-38,
+button.btn.btn-sm.btn-icon-square.btn-icon-square-38[style*="background-color"] {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  max-width: 38px !important;
+  max-height: 38px !important;
+  aspect-ratio: 1 / 1 !important;
+  padding: 0 !important;
+  flex-basis: 38px !important;
+}
+
+/* Smaller size for single document remove buttons */
+button.btn-icon-square-32,
+a.btn-icon-square-32,
+.btn.btn-icon-square-32,
+button.btn-icon-square.btn-icon-square-32,
+a.btn-icon-square.btn-icon-square-32,
+.btn.btn-icon-square.btn-icon-square-32,
+button.btn.btn-sm.btn-icon-square.btn-icon-square-32,
+a.btn.btn-sm.btn-icon-square.btn-icon-square-32,
+button.btn.btn-primary.btn-sm.btn-icon-square.btn-icon-square-32,
+button.btn.btn-danger.btn-sm.btn-icon-square.btn-icon-square-32,
+button.btn.btn-sm.btn-icon-square.btn-icon-square-32[style*="background-color"] {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
+  aspect-ratio: 1 / 1 !important;
+  padding: 0 !important;
+  flex-basis: 32px !important;
+}
 .atbd-button-group .btn.btn-outline-light.active:hover {
   background-color: #1c467b !important;
   border-color: #1c467b !important;
@@ -25896,16 +26038,70 @@ select.form-control-sm:focus {
     outline: none;
 }
 
-/* Input Group - maintain border colors */
-.input-group-sm .form-control:hover,
-.input-group-sm .form-select:hover {
-    border-color: #fa8b0c;
+/* Input Group - ensure all inputs have borders */
+.input-group .form-control,
+.input-group .form-select,
+.input-group-sm .form-control,
+.input-group-sm .form-select,
+.input-group-lg .form-control,
+.input-group-lg .form-select {
+    border: 1px solid #1c467b !important;
+    border-width: 1px !important;
 }
 
+/* Input Group - maintain border colors on hover and focus */
+.input-group .form-control:hover,
+.input-group .form-select:hover,
+.input-group-sm .form-control:hover,
+.input-group-sm .form-select:hover,
+.input-group-lg .form-control:hover,
+.input-group-lg .form-select:hover {
+    border-color: #fa8b0c !important;
+}
+
+.input-group .form-control:focus,
+.input-group .form-select:focus,
 .input-group-sm .form-control:focus,
-.input-group-sm .form-select:focus {
-    border-color: #fa8b0c;
-    box-shadow: 0 0 0 0.2rem rgba(250, 139, 12, 0.25);
+.input-group-sm .form-select:focus,
+.input-group-lg .form-control:focus,
+.input-group-lg .form-select:focus {
+    border-color: #fa8b0c !important;
+    box-shadow: 0 0 0 0.2rem rgba(250, 139, 12, 0.25) !important;
+}
+
+/* Input Group Text - ensure borders */
+.input-group-text {
+    border: 1px solid #1c467b !important;
+    border-width: 1px !important;
+}
+
+/* Input Group - fix border connections between input and select */
+.input-group > .form-control:not(:first-child),
+.input-group > .form-select:not(:first-child),
+.input-group-sm > .form-control:not(:first-child),
+.input-group-sm > .form-select:not(:first-child),
+.input-group-lg > .form-control:not(:first-child),
+.input-group-lg > .form-select:not(:first-child) {
+    border-left: 1px solid #1c467b !important;
+    margin-left: 0 !important;
+}
+
+.input-group > .form-control:not(:first-child):hover,
+.input-group > .form-select:not(:first-child):hover,
+.input-group-sm > .form-control:not(:first-child):hover,
+.input-group-sm > .form-select:not(:first-child):hover,
+.input-group-lg > .form-control:not(:first-child):hover,
+.input-group-lg > .form-select:not(:first-child):hover {
+    border-left-color: #fa8b0c !important;
+}
+
+.input-group > .form-control:not(:first-child):focus,
+.input-group > .form-select:not(:first-child):focus,
+.input-group-sm > .form-control:not(:first-child):focus,
+.input-group-sm > .form-select:not(:first-child):focus,
+.input-group-lg > .form-control:not(:first-child):focus,
+.input-group-lg > .form-select:not(:first-child):focus {
+    border-left-color: #fa8b0c !important;
 }
 
 /* Textarea */

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, watch, onMounted, nextTick } from 'vue';
+import { ref, reactive, watch, onMounted, nextTick, computed } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -44,12 +44,6 @@ interface MeasurementUnit {
     name: string;
 }
 
-interface User {
-    id: number;
-    name: string;
-    email: string;
-}
-
 interface ConstructionType {
     id: number;
     name: string;
@@ -79,7 +73,57 @@ interface RestrictedUserOption {
     email: string;
 }
 
+interface Project {
+    id: number;
+    builder_id: string;
+    builder_website?: string;
+    project_name: string;
+    address?: string;
+    state_id?: string;
+    city_id?: string;
+    locality_id: string;
+    pincode?: string;
+    location_link?: string;
+    land_size?: string;
+    measurement_unit_id?: string;
+    rera_no?: string;
+    project_status?: string;
+    restricted_user_ids?: (string | number)[];
+    construction_type_id?: string;
+    category_id?: string;
+    sub_category_id?: string;
+    no_of_towers?: string;
+    no_of_floors?: string;
+    total_units?: string;
+    no_of_unit_each_tower?: string;
+    no_of_lift?: string;
+    front_road_width?: string;
+    front_road_width_measurement_unit_id?: string;
+    washroom?: string;
+    towers_different_specification?: boolean;
+    free_allotted_parking_four_wheeler?: boolean;
+    free_allotted_parking_two_wheeler?: boolean;
+    available_for_purchase?: boolean;
+    no_of_parking?: string;
+    total_floor_for_parking?: string;
+    remark?: string;
+    brochure_file?: string;
+    existing_brochure_file?: string;
+    contacts?: Array<{
+        id: number;
+        name: string;
+        mobile: string;
+        email?: string;
+        designation?: string;
+    }>;
+    tower_details?: Array<any>;
+    basement_parking?: Array<any>;
+    amenities?: Array<{ id: number }>;
+    documents?: Array<any>;
+}
+
 interface Props {
+    project?: Project;
     builders: Builder[];
     states: State[];
     measurementUnits: MeasurementUnit[];
@@ -90,16 +134,18 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const breadcrumbs: BreadcrumbItem[] = [
+const isEditMode = computed(() => !!props.project);
+
+const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     {
         title: 'Dashboard',
         href: '/dashboard',
     },
     {
-        title: 'Create Project',
-        href: '/projects/create',
+        title: isEditMode.value ? 'Edit Project' : 'Create Project',
+        href: isEditMode.value ? `/projects/${props.project?.id}/edit` : '/projects/create',
     },
-];
+]);
 
 const currentStep = ref(1);
 const loading = ref(false);
@@ -107,6 +153,8 @@ const errors = ref<Record<string, string[]>>({});
 
 const cities = ref<City[]>([]);
 const localities = ref<Locality[]>([]);
+const isInitializingForm = ref(false);
+const isPageLoading = ref(false);
 
 interface Contact {
     id: number;
@@ -223,7 +271,7 @@ const form = reactive({
     }>,
     amenity_ids: [] as string[],
     document_uploads: [] as Array<{
-        id: number;
+        id?: number;
         category: string;
         files: File[];
         uploaded_files?: Array<{
@@ -231,8 +279,12 @@ const form = reactive({
             name: string;
             url?: string;
         }>;
+        existing_file_path?: string;
+        existing_file_name?: string;
     }>,
     brochure_file: null as File | null,
+    existing_brochure_file: null as string | null,
+    brochure_deleted: false,
     remark: '',
 });
 
@@ -383,6 +435,11 @@ const handleIntegerInput = (event: Event, field: string) => {
 
 // Watch state changes to load cities
 watch(() => form.state_id, async (newStateId) => {
+    // Don't clear values during form initialization
+    if (isInitializingForm.value) {
+        return;
+    }
+    
     if (newStateId) {
         try {
             const response = await axios.get(`/states/${newStateId}/cities`);
@@ -408,6 +465,11 @@ watch(() => form.state_id, async (newStateId) => {
 
 // Watch city changes to load localities
 watch(() => form.city_id, async (newCityId) => {
+    // Don't clear values during form initialization
+    if (isInitializingForm.value) {
+        return;
+    }
+    
     if (newCityId) {
         try {
             const response = await axios.get(`/cities/${newCityId}/localities`);
@@ -659,6 +721,9 @@ const handleSubmit = async () => {
         // Step 3: Brochure File
         if (form.brochure_file) {
             formData.append('brochure_file', form.brochure_file);
+        } else if (isEditMode.value && form.brochure_deleted) {
+            // If editing and brochure was marked as deleted, send delete flag
+            formData.append('delete_brochure', '1');
         }
         
         // Step 3: Remark
@@ -666,7 +731,14 @@ const handleSubmit = async () => {
         
         // Send request via axios
         // Note: Laravel handles CSRF token automatically via cookies
-        const response = await axios.post('/projects', formData, {
+        // For PUT requests with file uploads, we need to use POST with _method=PUT
+        const url = isEditMode.value ? `/projects/${props.project?.id}` : '/projects';
+        
+        if (isEditMode.value) {
+            formData.append('_method', 'PUT');
+        }
+        
+        const response = await axios.post(url, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -677,7 +749,7 @@ const handleSubmit = async () => {
             router.visit('/projects', {
                 onSuccess: () => {
                     // Show success message if you have a toast system
-                    console.log('Project created successfully!');
+                    console.log(isEditMode.value ? 'Project updated successfully!' : 'Project created successfully!');
                 },
             });
         }
@@ -695,7 +767,7 @@ const handleSubmit = async () => {
             }
         } else {
             // Show error message
-            alert(error.response?.data?.message || 'Failed to create project. Please try again.');
+            alert(error.response?.data?.message || (isEditMode.value ? 'Failed to update project. Please try again.' : 'Failed to create project. Please try again.'));
         }
     }
 };
@@ -746,9 +818,224 @@ const handlePrevious = () => {
     }
 };
 
+// Initialize form data from project if editing
+const initializeFormFromProject = async () => {
+    if (!props.project) return;
+    
+    isInitializingForm.value = true;
+    
+    const project = props.project;
+    
+    // Basic project fields
+    form.builder_id = String(project.builder_id || '');
+    form.builder_website = project.builder_website || '';
+    form.project_name = project.project_name || '';
+    form.address = project.address || '';
+    form.pincode = project.pincode || '';
+    form.location_link = project.location_link || '';
+    form.land_size = project.land_size || '';
+    form.measurement_unit_id = project.measurement_unit_id ? String(project.measurement_unit_id) : '';
+    form.rera_no = project.rera_no || '';
+    form.project_status = project.project_status || '';
+    form.restricted_user_ids = project.restricted_user_ids || [];
+    form.construction_type_id = project.construction_type_id ? String(project.construction_type_id) : '';
+    form.category_id = project.category_id ? String(project.category_id) : '';
+    form.sub_category_id = project.sub_category_id ? String(project.sub_category_id) : '';
+    form.no_of_towers = project.no_of_towers || '';
+    form.no_of_floors = project.no_of_floors || '';
+    form.total_units = project.total_units || '';
+    form.no_of_unit_each_tower = project.no_of_unit_each_tower || '';
+    form.no_of_lift = project.no_of_lift || '';
+    form.front_road_width = project.front_road_width || '';
+    form.front_road_width_measurement_unit_id = project.front_road_width_measurement_unit_id ? String(project.front_road_width_measurement_unit_id) : '';
+    form.washroom = project.washroom || 'Private';
+    form.towers_different_specification = project.towers_different_specification || false;
+    form.free_allotted_parking_four_wheeler = project.free_allotted_parking_four_wheeler || false;
+    form.free_allotted_parking_two_wheeler = project.free_allotted_parking_two_wheeler || false;
+    form.available_for_purchase = project.available_for_purchase || false;
+    form.no_of_parking = project.no_of_parking || '';
+    form.total_floor_for_parking = project.total_floor_for_parking || '1';
+    form.remark = project.remark || '';
+    form.existing_brochure_file = project.brochure_file || null;
+    
+    // Load cities FIRST if state is selected, then set state_id
+    if (project.state_id) {
+        try {
+            const citiesResponse = await axios.get(`/states/${project.state_id}/cities`);
+            cities.value = citiesResponse.data;
+            
+            // Wait for cities to be loaded
+            await nextTick();
+            
+            // Now set state_id (this will trigger watcher, but we're initializing so it won't clear)
+            // Convert to number to match option value type (:value="state.id" is a number)
+            form.state_id = project.state_id ? String(project.state_id) : '';
+            
+            // Load localities if city is selected
+            if (project.city_id) {
+                try {
+                    const localitiesResponse = await axios.get(`/cities/${project.city_id}/localities`);
+                    localities.value = localitiesResponse.data;
+                    
+                    // Wait for localities to be loaded
+                    await nextTick();
+                    
+                    // Now set city_id and locality_id (as strings, Vue will handle conversion)
+                    form.city_id = project.city_id ? String(project.city_id) : '';
+                    form.locality_id = project.locality_id ? String(project.locality_id) : '';
+                } catch (error) {
+                    console.error('Error loading localities:', error);
+                    form.city_id = project.city_id ? String(project.city_id) : '';
+                    form.locality_id = project.locality_id ? String(project.locality_id) : '';
+                }
+            } else {
+                form.city_id = '';
+                form.locality_id = project.locality_id ? String(project.locality_id) : '';
+            }
+        } catch (error) {
+            console.error('Error loading cities:', error);
+            form.state_id = project.state_id ? String(project.state_id) : '';
+            form.city_id = project.city_id ? String(project.city_id) : '';
+            form.locality_id = project.locality_id ? String(project.locality_id) : '';
+        }
+    } else {
+        form.state_id = '';
+        form.city_id = '';
+        form.locality_id = project.locality_id ? String(project.locality_id) : '';
+    }
+    
+    // Wait a bit to ensure watchers don't interfere and DOM is updated
+    await nextTick();
+    isInitializingForm.value = false;
+    await nextTick(); // One more tick to ensure selects are updated
+    
+    // Initialize contacts
+    if (project.contacts && project.contacts.length > 0) {
+        contacts.value = project.contacts.map((contact: any) => ({
+            id: contact.id || contactIdCounter++,
+            name: contact.name || '',
+            mobile: contact.mobile || '',
+            email: contact.email || '',
+            designation: contact.designation || '',
+        }));
+    }
+    
+    // Initialize tower details
+    if (project.tower_details && project.tower_details.length > 0) {
+        form.tower_details = project.tower_details.map((tower: any) => ({
+            tower_name: tower.tower_name || '',
+            saleable_area_from: tower.saleable_area_from || '',
+            saleable_area_to: tower.saleable_area_to || '',
+            saleable_area_unit_id: tower.saleable_area_unit_id ? String(tower.saleable_area_unit_id) : '',
+            ceiling_height: tower.ceiling_height || '',
+            ceiling_height_unit_id: tower.ceiling_height_unit_id ? String(tower.ceiling_height_unit_id) : '',
+            carpet_area_from: tower.carpet_area_from || '',
+            carpet_area_to: tower.carpet_area_to || '',
+            carpet_area_unit_id: tower.carpet_area_unit_id ? String(tower.carpet_area_unit_id) : '',
+            builtup_area_from: tower.builtup_area_from || '',
+            builtup_area_to: tower.builtup_area_to || '',
+            builtup_area_unit_id: tower.builtup_area_unit_id ? String(tower.builtup_area_unit_id) : '',
+            show_carpet_area: tower.show_carpet_area || false,
+            show_builtup_area: tower.show_builtup_area || false,
+        }));
+    }
+    
+    // Initialize basement parking
+    if (project.basement_parking && project.basement_parking.length > 0) {
+        form.basement_parking = project.basement_parking.map((parking: any) => ({
+            floor_no: parking.floor_no || '',
+            ev_charging_point: parking.ev_charging_point || '',
+            hydraulic_parking: parking.hydraulic_parking || '',
+            height_of_basement: parking.height_of_basement || '',
+            height_of_basement_unit_id: parking.height_of_basement_unit_id ? String(parking.height_of_basement_unit_id) : '',
+        }));
+    }
+    
+    // Initialize amenities
+    if (project.amenities && project.amenities.length > 0) {
+        form.amenity_ids = project.amenities.map((amenity: any) => String(amenity.id));
+    }
+    
+    // Initialize documents (existing documents are shown, new ones can be added)
+    // Group documents strictly by category - all documents with the same category are grouped together
+    if (project.documents && project.documents.length > 0) {
+        // Sort documents by category first, then by created_at to maintain order within each category
+        const sortedDocs = [...project.documents].sort((a: any, b: any) => {
+            const categoryA = (a.category || 'Other').toLowerCase();
+            const categoryB = (b.category || 'Other').toLowerCase();
+            if (categoryA !== categoryB) {
+                return categoryA.localeCompare(categoryB);
+            }
+            const timeA = new Date(a.created_at || 0).getTime();
+            const timeB = new Date(b.created_at || 0).getTime();
+            return timeA - timeB;
+        });
+        
+        // Group documents strictly by category
+        const documentGroupsMap = new Map<string, any>();
+        
+        sortedDocs.forEach((doc: any) => {
+            const category = doc.category || 'Other';
+            
+            // Check if a group for this category already exists
+            if (!documentGroupsMap.has(category)) {
+                // Create new group for this category
+                documentGroupsMap.set(category, {
+                    id: doc.id,
+                    category: category,
+                    files: [],
+                    uploaded_files: [],
+                    // Don't set existing_file_path/existing_file_name when using existing_documents array
+                    // to avoid duplicate display
+                    existing_documents: [{
+                        id: doc.id,
+                        file_path: doc.file_path,
+                        file_name: doc.file_name,
+                    }],
+                });
+            } else {
+                // Add to existing group for this category
+                const group = documentGroupsMap.get(category);
+                group.existing_documents.push({
+                    id: doc.id,
+                    file_path: doc.file_path,
+                    file_name: doc.file_name,
+                });
+            }
+        });
+        
+        // Convert map to array
+        const documentGroups = Array.from(documentGroupsMap.values());
+        
+        form.document_uploads = documentGroups;
+        
+        // Don't add empty row when editing - user can add new rows using the + button
+    } else {
+        // If no documents exist, ensure at least one empty entry
+        form.document_uploads = [{
+            id: 1,
+            category: '',
+            files: [],
+            uploaded_files: [],
+        }];
+    }
+};
+
 // Initialize Select2 only for restricted users multiple select
-onMounted(() => {
-    nextTick(() => {
+onMounted(async () => {
+    // Show loader if editing
+    if (isEditMode.value) {
+        isPageLoading.value = true;
+    }
+    
+    try {
+        // Initialize form data if editing
+        if (isEditMode.value) {
+            await initializeFormFromProject();
+        }
+        
+        await nextTick();
+        
         if (typeof window.$ !== 'undefined' && window.$.fn.select2) {
             // Initialize Select2 for restricted users multiple select
             const selectElement = window.$('#restricted_user_ids');
@@ -774,21 +1061,49 @@ onMounted(() => {
                 });
             }
         }
-    });
+        
+        // Wait a bit more to ensure all DOM updates are complete
+        await nextTick();
+        await new Promise(resolve => setTimeout(resolve, 100));
+    } finally {
+        // Hide loader after everything is loaded
+        isPageLoading.value = false;
+    }
 });
 </script>
 
 <template>
-    <Head title="Create Project" />
+    <Head :title="isEditMode ? 'Edit Project' : 'Create Project'" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="row">
-            <div class="col-12">
-                <div class="card mb-4 mt-4">
-                    <div class="card-header color-dark fw-500">
-                        <h4 class="mb-0">Create Project</h4>
-                    </div>
-                    <div class="card-body">
+        <!-- Loading Overlay -->
+        <div
+            v-if="isPageLoading"
+            class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+            style="
+                background-color: rgba(255, 255, 255, 0.9);
+                z-index: 9999;
+            "
+        >
+            <div class="d-flex flex-column align-items-center justify-content-center">
+                <div class="atbd-spin-dots spin-lg">
+                    <span class="spin-dot badge-dot dot-primary"></span>
+                    <span class="spin-dot badge-dot dot-primary"></span>
+                    <span class="spin-dot badge-dot dot-primary"></span>
+                    <span class="spin-dot badge-dot dot-primary"></span>
+                </div>
+                <p class="text-dark mt-3 mb-0 fw-medium">Loading project data...</p>
+            </div>
+        </div>
+        
+        <div v-show="!isPageLoading">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card mb-4 mt-4">
+                        <div class="card-header color-dark fw-500">
+                            <h4 class="mb-0">{{ isEditMode ? 'Edit Project' : 'Create Project' }}</h4>
+                        </div>
+                        <div class="card-body">
                         <div class="row">
                             <!-- Step Indicator (Left Side) -->
                             <div class="col-md-3 col-lg-2">
@@ -897,6 +1212,7 @@ onMounted(() => {
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </AppLayout>
 </template>
