@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted, nextTick } from 'vue';
+import { ref, watch, onMounted, nextTick, computed } from 'vue';
 
 interface ConstructionType {
     id: number;
@@ -23,7 +23,7 @@ interface Props {
     modelValue: {
         construction_type_id: string;
         category_id: string;
-        sub_category_id: string;
+        sub_category_id: string | string[];
     };
     errors?: Record<string, string[]>;
     showIds?: boolean;
@@ -38,9 +38,28 @@ const emit = defineEmits<{
     'update:modelValue': [value: {
         construction_type_id: string;
         category_id: string;
-        sub_category_id: string;
+        sub_category_id: string | string[];
     }];
 }>();
+
+// Check if Retail category is selected (ID 2) - allows multiple sub-categories
+const isRetailCategory = computed(() => {
+    return props.modelValue.category_id === '2';
+});
+
+// Handle sub-category selection (single or multiple based on category)
+const selectedSubCategories = ref<string[]>([]);
+
+// Initialize selected sub-categories from form value
+watch(() => props.modelValue.sub_category_id, (newValue) => {
+    if (isRetailCategory.value) {
+        // For Retail, sub_category_id should be an array
+        selectedSubCategories.value = Array.isArray(newValue) ? newValue : (newValue ? [newValue] : []);
+    } else {
+        // For other categories, it's a single value
+        selectedSubCategories.value = newValue ? [String(newValue)] : [];
+    }
+}, { immediate: true });
 
 const categories = ref<Category[]>([]);
 const subCategories = ref<SubCategory[]>([]);
@@ -198,10 +217,25 @@ const updateCategory = (value: string) => {
 };
 
 const updateSubCategory = (value: string) => {
-    emit('update:modelValue', {
-        ...props.modelValue,
-        sub_category_id: value,
-    });
+    if (isRetailCategory.value) {
+        // For Retail, toggle the sub-category in the array
+        const index = selectedSubCategories.value.indexOf(value);
+        if (index > -1) {
+            selectedSubCategories.value.splice(index, 1);
+        } else {
+            selectedSubCategories.value.push(value);
+        }
+        emit('update:modelValue', {
+            ...props.modelValue,
+            sub_category_id: [...selectedSubCategories.value],
+        });
+    } else {
+        // For other categories, single selection
+        emit('update:modelValue', {
+            ...props.modelValue,
+            sub_category_id: value,
+        });
+    }
 };
 </script>
 
@@ -291,9 +325,9 @@ const updateSubCategory = (value: string) => {
                     >
                         <input
                             :id="`sub_category_${subCategory.id}`"
-                            :checked="modelValue.sub_category_id === String(subCategory.id)"
+                            :checked="isRetailCategory ? selectedSubCategories.includes(String(subCategory.id)) : modelValue.sub_category_id === String(subCategory.id)"
                             @change="updateSubCategory(String(subCategory.id))"
-                            type="radio"
+                            :type="isRetailCategory ? 'checkbox' : 'radio'"
                             :value="String(subCategory.id)"
                             class="form-check-input"
                             :class="{ 'is-invalid': errors.sub_category_id }"

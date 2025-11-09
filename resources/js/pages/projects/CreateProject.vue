@@ -11,6 +11,7 @@ import ContactDetails from './components/ContactDetails.vue';
 import ChoiseSelection from './components/ChoiseSelection.vue';
 import TowerDetailsSection from './components/TowerDetailsSection.vue';
 import ParkingAndAmenities from './components/ParkingAndAmenities.vue';
+import RetailForm from './components/RetailForm.vue';
 
 declare global {
     interface Window {
@@ -147,7 +148,7 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     },
 ]);
 
-const currentStep = ref(1);
+const currentStep = ref(2);
 const loading = ref(false);
 const errors = ref<Record<string, string[]>>({});
 
@@ -206,7 +207,7 @@ const form = reactive({
     // Construction Type
     construction_type_id: '',
     category_id: '',
-    sub_category_id: '',
+    sub_category_id: '' as string | string[],
     
     // Tower Details
     no_of_towers: '',
@@ -219,9 +220,25 @@ const form = reactive({
     
     // Washroom
     washroom: 'Private',
+    two_road_corner: false,
     
     // Tower Specifications
     towers_different_specification: false,
+    
+    // Retail Unit Details
+    retail_unit_details: [] as Array<{
+        id: number;
+        tower_name: string;
+        sub_category_id: string;
+        size_from: string;
+        size_to: string;
+        size_unit_id: string;
+        front_opening: string;
+        front_opening_unit_id: string;
+        no_of_unit_each_floor: string;
+        ceiling_height: string;
+        ceiling_height_unit_id: string;
+    }>,
     
     // Tower Details Array (multiple towers) - Always start with one entry
     tower_details: [{
@@ -663,7 +680,17 @@ const handleSubmit = async () => {
         // Step 2: Construction Type & Category
         formData.append('construction_type_id', form.construction_type_id);
         formData.append('category_id', form.category_id);
-        if (form.sub_category_id) formData.append('sub_category_id', form.sub_category_id);
+        if (form.sub_category_id) {
+            if (Array.isArray(form.sub_category_id)) {
+                // For Retail category, sub_category_id is an array
+                form.sub_category_id.forEach((id: string) => {
+                    formData.append('sub_category_ids[]', id);
+                });
+            } else {
+                // For other categories, single value
+                formData.append('sub_category_id', form.sub_category_id);
+            }
+        }
         
         // Step 2: Tower Details
         if (form.no_of_towers) formData.append('no_of_towers', form.no_of_towers);
@@ -823,9 +850,20 @@ const handleNext = () => {
                 const selectedCategory = selectedConstructionType.categories?.find(
                     (cat) => cat.id === Number(form.category_id)
                 );
-                if (selectedCategory && selectedCategory.sub_categories && selectedCategory.sub_categories.length > 0 && !form.sub_category_id) {
-                    errors.value.sub_category_id = ['Please select a sub-category'];
-                    return;
+                if (selectedCategory && selectedCategory.sub_categories && selectedCategory.sub_categories.length > 0) {
+                    // For Retail (ID 2), sub_category_id should be an array with at least one selection
+                    if (form.category_id === '2') {
+                        if (!Array.isArray(form.sub_category_id) || form.sub_category_id.length === 0) {
+                            errors.value.sub_category_id = ['Please select at least one sub-category'];
+                            return;
+                        }
+                    } else {
+                        // For other categories, single selection required
+                        if (!form.sub_category_id) {
+                            errors.value.sub_category_id = ['Please select a sub-category'];
+                            return;
+                        }
+                    }
                 }
             }
         }
@@ -842,6 +880,39 @@ const handlePrevious = () => {
         currentStep.value--;
     }
 };
+
+// Get sub-categories for Retail category - only show selected ones
+const retailSubCategories = computed(() => {
+    if (!form.construction_type_id || !form.category_id || form.category_id !== '2') {
+        return [];
+    }
+    
+    const selectedConstructionType = props.constructionTypes.find(
+        (ct) => ct.id === Number(form.construction_type_id)
+    );
+    
+    if (!selectedConstructionType || !selectedConstructionType.categories) {
+        return [];
+    }
+    
+    const selectedCategory = selectedConstructionType.categories.find(
+        (cat) => cat.id === Number(form.category_id)
+    );
+    
+    if (!selectedCategory || !selectedCategory.sub_categories) {
+        return [];
+    }
+    
+    // For Retail, only show sub-categories that were selected via checkboxes
+    if (Array.isArray(form.sub_category_id) && form.sub_category_id.length > 0) {
+        return selectedCategory.sub_categories.filter((subCat: any) =>
+            form.sub_category_id.includes(String(subCat.id))
+        );
+    }
+    
+    // If no sub-categories selected yet, return empty array
+    return [];
+});
 
 // Initialize form data from project if editing
 const initializeFormFromProject = async () => {
@@ -865,7 +936,17 @@ const initializeFormFromProject = async () => {
     form.restricted_user_ids = project.restricted_user_ids || [];
     form.construction_type_id = project.construction_type_id ? String(project.construction_type_id) : '';
     form.category_id = project.category_id ? String(project.category_id) : '';
-    form.sub_category_id = project.sub_category_id ? String(project.sub_category_id) : '';
+    // Handle sub_category_id - could be string or JSON array for Retail
+    if (project.sub_category_id) {
+        try {
+            const parsed = JSON.parse(project.sub_category_id);
+            form.sub_category_id = Array.isArray(parsed) ? parsed.map(String) : String(project.sub_category_id);
+        } catch (e) {
+            form.sub_category_id = String(project.sub_category_id);
+        }
+    } else {
+        form.sub_category_id = '';
+    }
     form.no_of_towers = project.no_of_towers || '';
     form.no_of_floors = project.no_of_floors || '';
     form.total_units = project.total_units || '';
@@ -1186,8 +1267,18 @@ onMounted(async () => {
                                     }"
                                 />
 
+                                <!-- Retail Form (when category_id === '2') -->
+                                <RetailForm
+                                    v-if="form.category_id === '2'"
+                                    :form="form"
+                                    :errors="errors"
+                                    :measurement-units="measurementUnits"
+                                    :sub-categories="retailSubCategories"
+                                />
+
                                 <!-- Tower Details Section (Conditional based on Construction Type, Category, Sub Category) -->
                                 <TowerDetailsSection
+                                    v-else
                                     :form="form"
                                     :errors="errors"
                                     :measurement-units="measurementUnits"

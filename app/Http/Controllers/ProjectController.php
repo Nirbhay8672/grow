@@ -122,7 +122,6 @@ class ProjectController extends Controller
                 'restricted_user_ids',
                 'construction_type_id',
                 'category_id',
-                'sub_category_id',
                 'no_of_towers',
                 'no_of_floors',
                 'total_units',
@@ -134,6 +133,15 @@ class ProjectController extends Controller
                 'total_floor_for_parking',
                 'remark',
             ]);
+
+            // Handle sub_category_id - single value or array for Retail
+            if ($request->has('sub_category_ids') && is_array($request->sub_category_ids)) {
+                // For Retail category (ID 2), store as JSON array
+                $projectData['sub_category_id'] = json_encode($request->sub_category_ids);
+            } elseif ($request->has('sub_category_id')) {
+                // For other categories, single value
+                $projectData['sub_category_id'] = $request->sub_category_id;
+            }
 
             // Handle checkbox fields - explicitly set to false if not present or '0'
             $projectData['towers_different_specification'] = $request->has('towers_different_specification') 
@@ -349,7 +357,6 @@ class ProjectController extends Controller
                 'restricted_user_ids',
                 'construction_type_id',
                 'category_id',
-                'sub_category_id',
                 'no_of_towers',
                 'no_of_floors',
                 'total_units',
@@ -361,6 +368,15 @@ class ProjectController extends Controller
                 'total_floor_for_parking',
                 'remark',
             ]);
+
+            // Handle sub_category_id - single value or array for Retail
+            if ($request->has('sub_category_ids') && is_array($request->sub_category_ids)) {
+                // For Retail category (ID 2), store as JSON array
+                $projectData['sub_category_id'] = json_encode($request->sub_category_ids);
+            } elseif ($request->has('sub_category_id')) {
+                // For other categories, single value
+                $projectData['sub_category_id'] = $request->sub_category_id;
+            }
 
             // Handle checkbox fields - explicitly set to false if not present or '0'
             $projectData['towers_different_specification'] = $request->has('towers_different_specification') 
