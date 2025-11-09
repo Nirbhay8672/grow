@@ -156,6 +156,12 @@ const localities = ref<Locality[]>([]);
 const isInitializingForm = ref(false);
 const isPageLoading = ref(false);
 
+const toast = ref<{ show: boolean; message: string; type: 'success' | 'error' }>({
+    show: false,
+    message: '',
+    type: 'success'
+});
+
 interface Contact {
     id: number;
     name: string;
@@ -287,6 +293,17 @@ const form = reactive({
     brochure_deleted: false,
     remark: '',
 });
+
+const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    toast.value = {
+        show: true,
+        message,
+        type
+    };
+    setTimeout(() => {
+        toast.value.show = false;
+    }, 3000);
+};
 
 const addContact = () => {
     contacts.value.push({
@@ -745,13 +762,16 @@ const handleSubmit = async () => {
         });
         
         if (response.data.success) {
-            // Success - redirect to projects list
-            router.visit('/projects', {
-                onSuccess: () => {
-                    // Show success message if you have a toast system
-                    console.log(isEditMode.value ? 'Project updated successfully!' : 'Project created successfully!');
-                },
-            });
+            // Show success toast
+            showToast(
+                isEditMode.value ? 'Project updated successfully!' : 'Project created successfully!',
+                'success'
+            );
+            
+            // Redirect to projects list after showing the toast
+            setTimeout(() => {
+                router.visit('/projects');
+            }, 2500);
         }
     } catch (error: any) {
         console.error('Error creating project:', error);
@@ -760,14 +780,19 @@ const handleSubmit = async () => {
         // Handle validation errors
         if (error.response?.status === 422 && error.response?.data?.errors) {
             errors.value = error.response.data.errors;
+            // Show validation error toast
+            showToast('Please fix the validation errors.', 'error');
             // Scroll to first error
             const firstErrorField = document.querySelector('.is-invalid');
             if (firstErrorField) {
                 firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         } else {
-            // Show error message
-            alert(error.response?.data?.message || (isEditMode.value ? 'Failed to update project. Please try again.' : 'Failed to create project. Please try again.'));
+            // Show error toast
+            showToast(
+                error.response?.data?.message || (isEditMode.value ? 'Failed to update project. Please try again.' : 'Failed to create project. Please try again.'),
+                'error'
+            );
         }
     }
 };
@@ -815,6 +840,14 @@ const handleNext = () => {
 const handlePrevious = () => {
     if (currentStep.value > 1) {
         currentStep.value--;
+    }
+};
+
+const handleStepClick = (step: number) => {
+    // Only allow navigation to steps that have been visited or are the next step
+    // For now, allow navigation to any step (you can add validation if needed)
+    if (step >= 1 && step <= 3) {
+        currentStep.value = step;
     }
 };
 
@@ -1076,42 +1109,40 @@ onMounted(async () => {
     <Head :title="isEditMode ? 'Edit Project' : 'Create Project'" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <!-- Loading Overlay -->
-        <div
-            v-if="isPageLoading"
-            class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
-            style="
-                background-color: rgba(255, 255, 255, 0.9);
-                z-index: 9999;
-            "
-        >
-            <div class="d-flex flex-column align-items-center justify-content-center">
-                <div class="atbd-spin-dots spin-lg">
-                    <span class="spin-dot badge-dot dot-primary"></span>
-                    <span class="spin-dot badge-dot dot-primary"></span>
-                    <span class="spin-dot badge-dot dot-primary"></span>
-                    <span class="spin-dot badge-dot dot-primary"></span>
-                </div>
-                <p class="text-dark mt-3 mb-0 fw-medium">Loading project data...</p>
-            </div>
-        </div>
-        
-        <div v-show="!isPageLoading">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card mb-4 mt-4">
-                        <div class="card-header color-dark fw-500">
-                            <h4 class="mb-0">{{ isEditMode ? 'Edit Project' : 'Create Project' }}</h4>
-                        </div>
-                        <div class="card-body">
-                        <div class="row">
-                            <!-- Step Indicator (Left Side) -->
-                            <div class="col-md-3 col-lg-2">
-                                <StepIndicator :current-step="currentStep" />
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4 mt-4">
+                    <div class="card-header color-dark fw-500">
+                        <h4 class="mb-0">{{ isEditMode ? 'Edit Project' : 'Create Project' }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Loading Indicator in Page Content -->
+                        <div
+                            v-if="isPageLoading"
+                            class="d-flex flex-column align-items-center justify-content-center"
+                            style="min-height: 400px;"
+                        >
+                            <div class="atbd-spin-dots spin-lg">
+                                <span class="spin-dot badge-dot dot-primary"></span>
+                                <span class="spin-dot badge-dot dot-primary"></span>
+                                <span class="spin-dot badge-dot dot-primary"></span>
+                                <span class="spin-dot badge-dot dot-primary"></span>
                             </div>
-                            
-                            <!-- Form Content (Right Side) -->
-                            <div class="col-md-9 col-lg-10">
+                            <p class="text-dark mt-3 mb-0 fw-medium">Loading project data...</p>
+                        </div>
+                        
+                        <div v-show="!isPageLoading">
+                            <div class="row">
+                                <!-- Step Indicator (Left Side) -->
+                                <div class="col-md-3 col-lg-2">
+                                    <StepIndicator 
+                                        :current-step="currentStep" 
+                                        @step-click="handleStepClick"
+                                    />
+                                </div>
+                                
+                                <!-- Form Content (Right Side) -->
+                                <div class="col-md-9 col-lg-10">
                                 <form @submit.prevent="handleSubmit">
                             <!-- Step 1: Project & Builder Information -->
                             <div v-if="currentStep === 1">
@@ -1209,11 +1240,51 @@ onMounted(async () => {
                                 </form>
                             </div>
                         </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Toast Notification -->
+        <div
+            v-if="toast.show"
+            class="toast-notification"
+            :class="toast.type === 'success' ? 'toast-success' : 'toast-error'"
+            style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px; padding: 12px 16px; border-radius: 8px; color: white; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"
+        >
+            <div class="d-flex align-items-center">
+                <span class="me-2" style="font-size: 18px;">
+                    {{ toast.type === 'success' ? '✅' : '❌' }}
+                </span>
+                <span>{{ toast.message }}</span>
+            </div>
         </div>
     </AppLayout>
 </template>
+
+<style scoped>
+.toast-success {
+    background-color: #28a745;
+}
+
+.toast-error {
+    background-color: #dc3545;
+}
+
+.toast-notification {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+</style>
 
