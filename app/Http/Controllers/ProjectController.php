@@ -16,6 +16,8 @@ use App\Models\ProjectBasementParking;
 use App\Models\ProjectCategory3UnitDetail;
 use App\Models\ProjectCategory4TowerDetail;
 use App\Models\ProjectCategory4UnitDetail;
+use App\Models\ProjectCategory5TowerDetail;
+use App\Models\ProjectCategory5UnitDetail;
 use App\Models\ProjectContact;
 use App\Models\ProjectDocument;
 use App\Models\ProjectTowerDetail;
@@ -221,6 +223,11 @@ class ProjectController extends Controller
             // Category 4 Total Room (Construction Type 2, Category 4)
             if ($request->has('category4_total_room')) {
                 $projectData['category4_total_room'] = $request->input('category4_total_room');
+            }
+
+            // Category 5 Total Room (Construction Type 2, Category 5)
+            if ($request->has('category5_total_room')) {
+                $projectData['category5_total_room'] = $request->input('category5_total_room');
             }
 
             $projectData['user_id'] = auth()->id();
@@ -460,6 +467,8 @@ class ProjectController extends Controller
             'category3UnitDetails',
             'category4TowerDetails',
             'category4UnitDetails',
+            'category5TowerDetails',
+            'category5UnitDetails',
             'basementParking',
             'amenities',
             'documents' => function ($query) {
@@ -601,6 +610,13 @@ class ProjectController extends Controller
                 $projectData['category4_total_room'] = null;
             }
 
+            // Category 5 Total Room (Construction Type 2, Category 5)
+            if ($request->has('category5_total_room')) {
+                $projectData['category5_total_room'] = $request->input('category5_total_room');
+            } else {
+                $projectData['category5_total_room'] = null;
+            }
+
             // Handle brochure file upload
             if ($request->hasFile('brochure_file')) {
                 // Delete old brochure if exists
@@ -724,6 +740,61 @@ class ProjectController extends Controller
                         !empty($unitData['balcony_area']) || 
                         !empty($unitData['ceiling_height'])) {
                         ProjectCategory4UnitDetail::create([
+                            'project_id' => $project->id,
+                            'tower_name' => $unitData['tower_name'] ?? null,
+                            'saleable_from' => $unitData['saleable_from'] ?? null,
+                            'saleable_to' => $unitData['saleable_to'] ?? null,
+                            'saleable_unit_id' => $unitData['saleable_unit_id'] ?? null,
+                            'wash_area' => $unitData['wash_area'] ?? null,
+                            'wash_area_unit_id' => $unitData['wash_area_unit_id'] ?? null,
+                            'balcony_area' => $unitData['balcony_area'] ?? null,
+                            'balcony_area_unit_id' => $unitData['balcony_area_unit_id'] ?? null,
+                            'ceiling_height' => $unitData['ceiling_height'] ?? null,
+                            'ceiling_height_unit_id' => $unitData['ceiling_height_unit_id'] ?? null,
+                            'servant_room' => isset($unitData['servant_room']) && $unitData['servant_room'] === '1',
+                            'show_carpet_area' => isset($unitData['show_carpet_area']) && $unitData['show_carpet_area'] === '1',
+                            'carpet_area_from' => $unitData['carpet_area_from'] ?? null,
+                            'carpet_area_to' => $unitData['carpet_area_to'] ?? null,
+                            'carpet_area_unit_id' => $unitData['carpet_area_unit_id'] ?? null,
+                            'show_builtup_area' => isset($unitData['show_builtup_area']) && $unitData['show_builtup_area'] === '1',
+                            'builtup_area_from' => $unitData['builtup_area_from'] ?? null,
+                            'builtup_area_to' => $unitData['builtup_area_to'] ?? null,
+                            'builtup_area_unit_id' => $unitData['builtup_area_unit_id'] ?? null,
+                        ]);
+                    }
+                }
+            }
+
+            // Update Category 5 tower details - delete old and create new
+            $project->category5TowerDetails()->delete();
+            if ($request->has('category5_tower_details') && is_array($request->category5_tower_details)) {
+                foreach ($request->category5_tower_details as $towerData) {
+                    // Filter out completely empty entries
+                    if (!empty($towerData['tower_name']) || 
+                        !empty($towerData['total_units']) || 
+                        !empty($towerData['total_floor'])) {
+                        ProjectCategory5TowerDetail::create([
+                            'project_id' => $project->id,
+                            'tower_name' => $towerData['tower_name'] ?? null,
+                            'total_units' => $towerData['total_units'] ?? null,
+                            'total_floor' => $towerData['total_floor'] ?? null,
+                            'sub_category_ids' => $towerData['sub_category_ids'] ?? [],
+                        ]);
+                    }
+                }
+            }
+
+            // Update Category 5 unit details - delete old and create new
+            $project->category5UnitDetails()->delete();
+            if ($request->has('category5_unit_details') && is_array($request->category5_unit_details)) {
+                foreach ($request->category5_unit_details as $unitData) {
+                    // Filter out completely empty entries
+                    if (!empty($unitData['tower_name']) || 
+                        !empty($unitData['saleable_from']) || 
+                        !empty($unitData['wash_area']) || 
+                        !empty($unitData['balcony_area']) || 
+                        !empty($unitData['ceiling_height'])) {
+                        ProjectCategory5UnitDetail::create([
                             'project_id' => $project->id,
                             'tower_name' => $unitData['tower_name'] ?? null,
                             'saleable_from' => $unitData['saleable_from'] ?? null,

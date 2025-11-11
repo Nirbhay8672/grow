@@ -14,6 +14,7 @@ import ParkingAndAmenities from './components/ParkingAndAmenities.vue';
 import RetailForm from './components/RetailForm.vue';
 import Category3Form from './components/Category3Form.vue';
 import Category4Form from './components/Category4Form.vue';
+import Category5Form from './components/Category5Form.vue';
 
 declare global {
     interface Window {
@@ -113,6 +114,9 @@ interface Project {
     category4_tower_details?: Array<any>;
     category4_unit_details?: Array<any>;
     category4_total_room?: string;
+    category5_tower_details?: Array<any>;
+    category5_unit_details?: Array<any>;
+    category5_total_room?: string;
     free_allotted_parking_four_wheeler?: boolean;
     free_allotted_parking_two_wheeler?: boolean;
     available_for_purchase?: boolean;
@@ -330,6 +334,41 @@ const form = reactive({
     }>,
     // Category 4 Total Room (common field, shown when 5+ BHK is selected)
     category4_total_room: '',
+    
+    // Category 5 Tower Details (Construction Type 2, Category 5)
+    category5_tower_details: [] as Array<{
+        id: number;
+        tower_name: string;
+        total_units: string;
+        total_floor: string;
+        sub_category_ids: string[];
+    }>,
+    
+    // Category 5 Unit Details (Construction Type 2, Category 5)
+    category5_unit_details: [] as Array<{
+        id: number;
+        tower_name: string;
+        saleable_from: string;
+        saleable_to: string;
+        saleable_unit_id: string;
+        wash_area: string;
+        wash_area_unit_id: string;
+        balcony_area: string;
+        balcony_area_unit_id: string;
+        ceiling_height: string;
+        ceiling_height_unit_id: string;
+        servant_room: boolean;
+        show_carpet_area: boolean;
+        carpet_area_from: string;
+        carpet_area_to: string;
+        carpet_area_unit_id: string;
+        show_builtup_area: boolean;
+        builtup_area_from: string;
+        builtup_area_to: string;
+        builtup_area_unit_id: string;
+    }>,
+    // Category 5 Total Room (common field, shown when 5+ BHK is selected)
+    category5_total_room: '',
     
     // Tower Details Array (multiple towers) - Always start with one entry
     tower_details: [{
@@ -958,6 +997,51 @@ const handleSubmit = async () => {
             }
         }
         
+        // Step 2: Category 5 Tower Details and Unit Details (for Construction Type 2, Category 5)
+        if (form.construction_type_id === '2' && form.category_id === '5') {
+            if (form.category5_tower_details && form.category5_tower_details.length > 0) {
+                form.category5_tower_details.forEach((tower: any, index: number) => {
+                    if (tower.tower_name) formData.append(`category5_tower_details[${index}][tower_name]`, tower.tower_name);
+                    if (tower.total_units) formData.append(`category5_tower_details[${index}][total_units]`, tower.total_units);
+                    if (tower.total_floor) formData.append(`category5_tower_details[${index}][total_floor]`, tower.total_floor);
+                    if (tower.sub_category_ids && tower.sub_category_ids.length > 0) {
+                        tower.sub_category_ids.forEach((subCatId: string) => {
+                            formData.append(`category5_tower_details[${index}][sub_category_ids][]`, subCatId);
+                        });
+                    }
+                });
+            }
+            
+            if (form.category5_unit_details && form.category5_unit_details.length > 0) {
+                form.category5_unit_details.forEach((unit: any, index: number) => {
+                    if (unit.tower_name) formData.append(`category5_unit_details[${index}][tower_name]`, unit.tower_name);
+                    if (unit.saleable_from) formData.append(`category5_unit_details[${index}][saleable_from]`, unit.saleable_from);
+                    if (unit.saleable_to) formData.append(`category5_unit_details[${index}][saleable_to]`, unit.saleable_to);
+                    if (unit.saleable_unit_id) formData.append(`category5_unit_details[${index}][saleable_unit_id]`, unit.saleable_unit_id);
+                    if (unit.wash_area) formData.append(`category5_unit_details[${index}][wash_area]`, unit.wash_area);
+                    if (unit.wash_area_unit_id) formData.append(`category5_unit_details[${index}][wash_area_unit_id]`, unit.wash_area_unit_id);
+                    if (unit.balcony_area) formData.append(`category5_unit_details[${index}][balcony_area]`, unit.balcony_area);
+                    if (unit.balcony_area_unit_id) formData.append(`category5_unit_details[${index}][balcony_area_unit_id]`, unit.balcony_area_unit_id);
+                    if (unit.ceiling_height) formData.append(`category5_unit_details[${index}][ceiling_height]`, unit.ceiling_height);
+                    if (unit.ceiling_height_unit_id) formData.append(`category5_unit_details[${index}][ceiling_height_unit_id]`, unit.ceiling_height_unit_id);
+                    formData.append(`category5_unit_details[${index}][servant_room]`, unit.servant_room ? '1' : '0');
+                    formData.append(`category5_unit_details[${index}][show_carpet_area]`, unit.show_carpet_area ? '1' : '0');
+                    if (unit.carpet_area_from) formData.append(`category5_unit_details[${index}][carpet_area_from]`, unit.carpet_area_from);
+                    if (unit.carpet_area_to) formData.append(`category5_unit_details[${index}][carpet_area_to]`, unit.carpet_area_to);
+                    if (unit.carpet_area_unit_id) formData.append(`category5_unit_details[${index}][carpet_area_unit_id]`, unit.carpet_area_unit_id);
+                    formData.append(`category5_unit_details[${index}][show_builtup_area]`, unit.show_builtup_area ? '1' : '0');
+                    if (unit.builtup_area_from) formData.append(`category5_unit_details[${index}][builtup_area_from]`, unit.builtup_area_from);
+                    if (unit.builtup_area_to) formData.append(`category5_unit_details[${index}][builtup_area_to]`, unit.builtup_area_to);
+                    if (unit.builtup_area_unit_id) formData.append(`category5_unit_details[${index}][builtup_area_unit_id]`, unit.builtup_area_unit_id);
+                });
+            }
+            
+            // Category 5 Total Room (common field)
+            if (form.category5_total_room) {
+                formData.append('category5_total_room', form.category5_total_room);
+            }
+        }
+        
         // Step 2: Tower Details Array
         if (form.tower_details && form.tower_details.length > 0) {
             form.tower_details.forEach((tower: any, index: number) => {
@@ -1224,6 +1308,39 @@ const category4SubCategories = computed(() => {
     return [];
 });
 
+// Get sub-categories for Category 5 - show all selected ones
+const category5SubCategories = computed(() => {
+    if (!form.construction_type_id || !form.category_id || form.category_id !== '5') {
+        return [];
+    }
+    
+    const selectedConstructionType = props.constructionTypes.find(
+        (ct) => ct.id === Number(form.construction_type_id)
+    );
+    
+    if (!selectedConstructionType || !selectedConstructionType.categories) {
+        return [];
+    }
+    
+    const selectedCategory = selectedConstructionType.categories.find(
+        (cat) => cat.id === Number(form.category_id)
+    );
+    
+    if (!selectedCategory || !selectedCategory.sub_categories) {
+        return [];
+    }
+    
+    // For Category 5, show all sub-categories that were selected via checkboxes
+    if (Array.isArray(form.sub_category_id) && form.sub_category_id.length > 0) {
+        return selectedCategory.sub_categories.filter((subCat: any) =>
+            form.sub_category_id.includes(String(subCat.id))
+        );
+    }
+    
+    // If no sub-categories selected yet, return empty array
+    return [];
+});
+
 // Initialize form data from project if editing
 const initializeFormFromProject = async () => {
     if (!props.project) return;
@@ -1409,6 +1526,54 @@ const initializeFormFromProject = async () => {
 
     // Handle Category 4 Total Room
     form.category4_total_room = (project as any).category4_total_room || '';
+
+    // Handle Category 5 tower details (Construction Type 2, Category 5)
+    const category5TowerDetails = (project as any).category5_tower_details || (project as any).category5TowerDetails;
+    if (category5TowerDetails && category5TowerDetails.length > 0) {
+        form.category5_tower_details = category5TowerDetails.map((tower: any, index: number) => ({
+            id: tower.id || index + 1,
+            tower_name: tower.tower_name || '',
+            total_units: tower.total_units || '',
+            total_floor: tower.total_floor || '',
+            sub_category_ids: Array.isArray(tower.sub_category_ids) 
+                ? tower.sub_category_ids.map((id: any) => String(id))
+                : (tower.sub_category_ids ? [String(tower.sub_category_ids)] : []),
+        }));
+    } else {
+        form.category5_tower_details = [];
+    }
+
+    // Handle Category 5 unit details (Construction Type 2, Category 5)
+    const category5UnitDetails = (project as any).category5_unit_details || (project as any).category5UnitDetails;
+    if (category5UnitDetails && category5UnitDetails.length > 0) {
+        form.category5_unit_details = category5UnitDetails.map((unit: any, index: number) => ({
+            id: unit.id || index + 1,
+            tower_name: unit.tower_name || '',
+            saleable_from: unit.saleable_from || '',
+            saleable_to: unit.saleable_to || '',
+            saleable_unit_id: unit.saleable_unit_id ? String(unit.saleable_unit_id) : '',
+            wash_area: unit.wash_area || '',
+            wash_area_unit_id: unit.wash_area_unit_id ? String(unit.wash_area_unit_id) : '',
+            balcony_area: unit.balcony_area || '',
+            balcony_area_unit_id: unit.balcony_area_unit_id ? String(unit.balcony_area_unit_id) : '',
+            ceiling_height: unit.ceiling_height || '',
+            ceiling_height_unit_id: unit.ceiling_height_unit_id ? String(unit.ceiling_height_unit_id) : '',
+            servant_room: unit.servant_room || false,
+            show_carpet_area: (unit.carpet_area_from || unit.carpet_area_to || unit.carpet_area_unit_id) ? true : false,
+            carpet_area_from: unit.carpet_area_from || '',
+            carpet_area_to: unit.carpet_area_to || '',
+            carpet_area_unit_id: unit.carpet_area_unit_id ? String(unit.carpet_area_unit_id) : '',
+            show_builtup_area: (unit.builtup_area_from || unit.builtup_area_to || unit.builtup_area_unit_id) ? true : false,
+            builtup_area_from: unit.builtup_area_from || '',
+            builtup_area_to: unit.builtup_area_to || '',
+            builtup_area_unit_id: unit.builtup_area_unit_id ? String(unit.builtup_area_unit_id) : '',
+        }));
+    } else {
+        form.category5_unit_details = [];
+    }
+
+    // Handle Category 5 Total Room
+    form.category5_total_room = (project as any).category5_total_room || '';
 
     form.free_allotted_parking_four_wheeler = project.free_allotted_parking_four_wheeler || false;
     form.free_allotted_parking_two_wheeler = project.free_allotted_parking_two_wheeler || false;
@@ -1745,6 +1910,15 @@ onMounted(async () => {
                                     :errors="errors"
                                     :measurement-units="measurementUnits"
                                     :sub-categories="category4SubCategories"
+                                />
+
+                                <!-- Category 5 Form (when construction_type_id === '2' && category_id === '5') -->
+                                <Category5Form
+                                    v-else-if="form.construction_type_id === '2' && form.category_id === '5'"
+                                    :form="form"
+                                    :errors="errors"
+                                    :measurement-units="measurementUnits"
+                                    :sub-categories="category5SubCategories"
                                 />
 
                                 <!-- Tower Details Section (Conditional based on Construction Type, Category, Sub Category) -->

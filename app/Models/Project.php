@@ -49,6 +49,7 @@ class Project extends Model
         'category3_utility_board',
         'category3_dynamic_facilities',
         'category4_total_room',
+        'category5_total_room',
         
         // Step 3: Parking Details
         'free_allotted_parking_four_wheeler',
@@ -164,6 +165,18 @@ class Project extends Model
     public function category4UnitDetails(): HasMany
     {
         return $this->hasMany(ProjectCategory4UnitDetail::class);
+    }
+
+    // Step 2: Category 5 Tower Details relationship
+    public function category5TowerDetails(): HasMany
+    {
+        return $this->hasMany(ProjectCategory5TowerDetail::class);
+    }
+
+    // Step 2: Category 5 Unit Details relationship
+    public function category5UnitDetails(): HasMany
+    {
+        return $this->hasMany(ProjectCategory5UnitDetail::class);
     }
 
     // Step 2: Front Road Width Measurement Unit
