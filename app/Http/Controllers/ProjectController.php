@@ -18,6 +18,7 @@ use App\Models\ProjectCategory4TowerDetail;
 use App\Models\ProjectCategory4UnitDetail;
 use App\Models\ProjectCategory5TowerDetail;
 use App\Models\ProjectCategory5UnitDetail;
+use App\Models\ProjectCategory6Data;
 use App\Models\ProjectContact;
 use App\Models\ProjectDocument;
 use App\Models\ProjectTowerDetail;
@@ -359,6 +360,30 @@ class ProjectController extends Controller
                 }
             }
 
+            // Create Category 6 data (Construction Type 2, Category 6)
+            if ($request->has('category6_data')) {
+                $category6Data = $request->input('category6_data');
+                ProjectCategory6Data::create([
+                    'project_id' => $project->id,
+                    'total_open_area' => $category6Data['total_open_area'] ?? null,
+                    'total_open_area_unit_id' => $category6Data['total_open_area_unit_id'] ?? null,
+                    'total_no_of_plots' => $category6Data['total_no_of_plots'] ?? null,
+                    'project_with_multiple_theme_phase' => isset($category6Data['project_with_multiple_theme_phase']) && ($category6Data['project_with_multiple_theme_phase'] === '1' || $category6Data['project_with_multiple_theme_phase'] === true || $category6Data['project_with_multiple_theme_phase'] === 'true'),
+                    'phase_name' => $category6Data['phase_name'] ?? null,
+                    'plots_with_construction' => isset($category6Data['plots_with_construction']) && ($category6Data['plots_with_construction'] === '1' || $category6Data['plots_with_construction'] === true || $category6Data['plots_with_construction'] === 'true'),
+                    'saleable_plot_from' => $category6Data['saleable_plot_from'] ?? null,
+                    'saleable_plot_to' => $category6Data['saleable_plot_to'] ?? null,
+                    'saleable_plot_unit_id' => $category6Data['saleable_plot_unit_id'] ?? null,
+                    'show_carpet_plot_size' => isset($category6Data['show_carpet_plot_size']) && ($category6Data['show_carpet_plot_size'] === '1' || $category6Data['show_carpet_plot_size'] === true || $category6Data['show_carpet_plot_size'] === 'true'),
+                    'carpet_plot_from' => $category6Data['carpet_plot_from'] ?? null,
+                    'carpet_plot_to' => $category6Data['carpet_plot_to'] ?? null,
+                    'carpet_plot_unit_id' => $category6Data['carpet_plot_unit_id'] ?? null,
+                    'constructed_saleable_area_from' => $category6Data['constructed_saleable_area_from'] ?? null,
+                    'constructed_saleable_area_to' => $category6Data['constructed_saleable_area_to'] ?? null,
+                    'constructed_saleable_area_unit_id' => $category6Data['constructed_saleable_area_unit_id'] ?? null,
+                ]);
+            }
+
             // Create basement parking
             if ($request->has('basement_parking') && is_array($request->basement_parking)) {
                 foreach ($request->basement_parking as $parkingData) {
@@ -469,6 +494,7 @@ class ProjectController extends Controller
             'category4UnitDetails',
             'category5TowerDetails',
             'category5UnitDetails',
+            'category6Data',
             'basementParking',
             'amenities',
             'documents' => function ($query) {
@@ -818,6 +844,31 @@ class ProjectController extends Controller
                         ]);
                     }
                 }
+            }
+
+            // Update Category 6 data (Construction Type 2, Category 6)
+            $project->category6Data()->delete();
+            if ($request->has('category6_data')) {
+                $category6Data = $request->input('category6_data');
+                ProjectCategory6Data::create([
+                    'project_id' => $project->id,
+                    'total_open_area' => $category6Data['total_open_area'] ?? null,
+                    'total_open_area_unit_id' => $category6Data['total_open_area_unit_id'] ?? null,
+                    'total_no_of_plots' => $category6Data['total_no_of_plots'] ?? null,
+                    'project_with_multiple_theme_phase' => isset($category6Data['project_with_multiple_theme_phase']) && ($category6Data['project_with_multiple_theme_phase'] === '1' || $category6Data['project_with_multiple_theme_phase'] === true || $category6Data['project_with_multiple_theme_phase'] === 'true'),
+                    'phase_name' => $category6Data['phase_name'] ?? null,
+                    'plots_with_construction' => isset($category6Data['plots_with_construction']) && ($category6Data['plots_with_construction'] === '1' || $category6Data['plots_with_construction'] === true || $category6Data['plots_with_construction'] === 'true'),
+                    'saleable_plot_from' => $category6Data['saleable_plot_from'] ?? null,
+                    'saleable_plot_to' => $category6Data['saleable_plot_to'] ?? null,
+                    'saleable_plot_unit_id' => $category6Data['saleable_plot_unit_id'] ?? null,
+                    'show_carpet_plot_size' => isset($category6Data['show_carpet_plot_size']) && ($category6Data['show_carpet_plot_size'] === '1' || $category6Data['show_carpet_plot_size'] === true || $category6Data['show_carpet_plot_size'] === 'true'),
+                    'carpet_plot_from' => $category6Data['carpet_plot_from'] ?? null,
+                    'carpet_plot_to' => $category6Data['carpet_plot_to'] ?? null,
+                    'carpet_plot_unit_id' => $category6Data['carpet_plot_unit_id'] ?? null,
+                    'constructed_saleable_area_from' => $category6Data['constructed_saleable_area_from'] ?? null,
+                    'constructed_saleable_area_to' => $category6Data['constructed_saleable_area_to'] ?? null,
+                    'constructed_saleable_area_unit_id' => $category6Data['constructed_saleable_area_unit_id'] ?? null,
+                ]);
             }
 
             // Update basement parking - delete old and create new

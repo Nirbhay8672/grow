@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Project extends Model
 {
@@ -177,6 +178,12 @@ class Project extends Model
     public function category5UnitDetails(): HasMany
     {
         return $this->hasMany(ProjectCategory5UnitDetail::class);
+    }
+
+    // Step 2: Category 6 Data relationship
+    public function category6Data(): HasOne
+    {
+        return $this->hasOne(ProjectCategory6Data::class);
     }
 
     // Step 2: Front Road Width Measurement Unit

@@ -15,6 +15,7 @@ import RetailForm from './components/RetailForm.vue';
 import Category3Form from './components/Category3Form.vue';
 import Category4Form from './components/Category4Form.vue';
 import Category5Form from './components/Category5Form.vue';
+import Category6Form from './components/Category6Form.vue';
 
 declare global {
     interface Window {
@@ -117,6 +118,7 @@ interface Project {
     category5_tower_details?: Array<any>;
     category5_unit_details?: Array<any>;
     category5_total_room?: string;
+    category6_data?: any;
     free_allotted_parking_four_wheeler?: boolean;
     free_allotted_parking_two_wheeler?: boolean;
     available_for_purchase?: boolean;
@@ -369,6 +371,26 @@ const form = reactive({
     }>,
     // Category 5 Total Room (common field, shown when 5+ BHK is selected)
     category5_total_room: '',
+    
+    // Category 6 Data (Construction Type 2, Category 6)
+    category6_data: {
+        total_open_area: '',
+        total_open_area_unit_id: '',
+        total_no_of_plots: '',
+        project_with_multiple_theme_phase: false,
+        phase_name: '',
+        plots_with_construction: false,
+        saleable_plot_from: '',
+        saleable_plot_to: '',
+        saleable_plot_unit_id: '',
+        show_carpet_plot_size: false,
+        carpet_plot_from: '',
+        carpet_plot_to: '',
+        carpet_plot_unit_id: '',
+        constructed_saleable_area_from: '',
+        constructed_saleable_area_to: '',
+        constructed_saleable_area_unit_id: '',
+    },
     
     // Tower Details Array (multiple towers) - Always start with one entry
     tower_details: [{
@@ -1042,6 +1064,29 @@ const handleSubmit = async () => {
             }
         }
         
+        // Step 2: Category 6 Data (for Construction Type 2, Category 6)
+        if (form.construction_type_id === '2' && form.category_id === '6') {
+            if ((form as any).category6_data) {
+                const data = (form as any).category6_data;
+                if (data.total_open_area) formData.append('category6_data[total_open_area]', data.total_open_area);
+                if (data.total_open_area_unit_id) formData.append('category6_data[total_open_area_unit_id]', data.total_open_area_unit_id);
+                if (data.total_no_of_plots) formData.append('category6_data[total_no_of_plots]', data.total_no_of_plots);
+                formData.append('category6_data[project_with_multiple_theme_phase]', data.project_with_multiple_theme_phase ? '1' : '0');
+                if (data.phase_name) formData.append('category6_data[phase_name]', data.phase_name);
+                formData.append('category6_data[plots_with_construction]', data.plots_with_construction ? '1' : '0');
+                if (data.saleable_plot_from) formData.append('category6_data[saleable_plot_from]', data.saleable_plot_from);
+                if (data.saleable_plot_to) formData.append('category6_data[saleable_plot_to]', data.saleable_plot_to);
+                if (data.saleable_plot_unit_id) formData.append('category6_data[saleable_plot_unit_id]', data.saleable_plot_unit_id);
+                formData.append('category6_data[show_carpet_plot_size]', data.show_carpet_plot_size ? '1' : '0');
+                if (data.carpet_plot_from) formData.append('category6_data[carpet_plot_from]', data.carpet_plot_from);
+                if (data.carpet_plot_to) formData.append('category6_data[carpet_plot_to]', data.carpet_plot_to);
+                if (data.carpet_plot_unit_id) formData.append('category6_data[carpet_plot_unit_id]', data.carpet_plot_unit_id);
+                if (data.constructed_saleable_area_from) formData.append('category6_data[constructed_saleable_area_from]', data.constructed_saleable_area_from);
+                if (data.constructed_saleable_area_to) formData.append('category6_data[constructed_saleable_area_to]', data.constructed_saleable_area_to);
+                if (data.constructed_saleable_area_unit_id) formData.append('category6_data[constructed_saleable_area_unit_id]', data.constructed_saleable_area_unit_id);
+            }
+        }
+        
         // Step 2: Tower Details Array
         if (form.tower_details && form.tower_details.length > 0) {
             form.tower_details.forEach((tower: any, index: number) => {
@@ -1575,6 +1620,48 @@ const initializeFormFromProject = async () => {
     // Handle Category 5 Total Room
     form.category5_total_room = (project as any).category5_total_room || '';
 
+    // Handle Category 6 data (Construction Type 2, Category 6)
+    const category6Data = (project as any).category6_data || (project as any).category6Data;
+    if (category6Data) {
+        (form as any).category6_data = {
+            total_open_area: category6Data.total_open_area || '',
+            total_open_area_unit_id: category6Data.total_open_area_unit_id ? String(category6Data.total_open_area_unit_id) : '',
+            total_no_of_plots: category6Data.total_no_of_plots || '',
+            project_with_multiple_theme_phase: category6Data.project_with_multiple_theme_phase || false,
+            phase_name: category6Data.phase_name || '',
+            plots_with_construction: category6Data.plots_with_construction || false,
+            saleable_plot_from: category6Data.saleable_plot_from || '',
+            saleable_plot_to: category6Data.saleable_plot_to || '',
+            saleable_plot_unit_id: category6Data.saleable_plot_unit_id ? String(category6Data.saleable_plot_unit_id) : '',
+            show_carpet_plot_size: (category6Data.carpet_plot_from || category6Data.carpet_plot_to || category6Data.carpet_plot_unit_id) ? true : false,
+            carpet_plot_from: category6Data.carpet_plot_from || '',
+            carpet_plot_to: category6Data.carpet_plot_to || '',
+            carpet_plot_unit_id: category6Data.carpet_plot_unit_id ? String(category6Data.carpet_plot_unit_id) : '',
+            constructed_saleable_area_from: category6Data.constructed_saleable_area_from || '',
+            constructed_saleable_area_to: category6Data.constructed_saleable_area_to || '',
+            constructed_saleable_area_unit_id: category6Data.constructed_saleable_area_unit_id ? String(category6Data.constructed_saleable_area_unit_id) : '',
+        };
+    } else {
+        (form as any).category6_data = {
+            total_open_area: '',
+            total_open_area_unit_id: '',
+            total_no_of_plots: '',
+            project_with_multiple_theme_phase: false,
+            phase_name: '',
+            plots_with_construction: false,
+            saleable_plot_from: '',
+            saleable_plot_to: '',
+            saleable_plot_unit_id: '',
+            show_carpet_plot_size: false,
+            carpet_plot_from: '',
+            carpet_plot_to: '',
+            carpet_plot_unit_id: '',
+            constructed_saleable_area_from: '',
+            constructed_saleable_area_to: '',
+            constructed_saleable_area_unit_id: '',
+        };
+    }
+
     form.free_allotted_parking_four_wheeler = project.free_allotted_parking_four_wheeler || false;
     form.free_allotted_parking_two_wheeler = project.free_allotted_parking_two_wheeler || false;
     form.available_for_purchase = project.available_for_purchase || false;
@@ -1919,6 +2006,14 @@ onMounted(async () => {
                                     :errors="errors"
                                     :measurement-units="measurementUnits"
                                     :sub-categories="category5SubCategories"
+                                />
+
+                                <!-- Category 6 Form (when construction_type_id === '2' && category_id === '6') -->
+                                <Category6Form
+                                    v-else-if="form.construction_type_id === '2' && form.category_id === '6'"
+                                    :form="form"
+                                    :errors="errors"
+                                    :measurement-units="measurementUnits"
                                 />
 
                                 <!-- Tower Details Section (Conditional based on Construction Type, Category, Sub Category) -->
