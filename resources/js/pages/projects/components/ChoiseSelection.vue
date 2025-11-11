@@ -42,9 +42,9 @@ const emit = defineEmits<{
     }];
 }>();
 
-// Check if Retail category is selected (ID 2) - allows multiple sub-categories
+// Check if Retail category is selected (ID 2) or Category 4 (ID 4) - allows multiple sub-categories
 const isRetailCategory = computed(() => {
-    return props.modelValue.category_id === '2';
+    return props.modelValue.category_id === '2' || props.modelValue.category_id === '4';
 });
 
 // Handle sub-category selection (single or multiple based on category)
@@ -53,7 +53,7 @@ const selectedSubCategories = ref<string[]>([]);
 // Initialize selected sub-categories from form value
 watch(() => props.modelValue.sub_category_id, (newValue) => {
     if (isRetailCategory.value) {
-        // For Retail, sub_category_id should be an array
+        // For Retail and Category 4, sub_category_id should be an array
         selectedSubCategories.value = Array.isArray(newValue) ? newValue : (newValue ? [newValue] : []);
     } else {
         // For other categories, it's a single value

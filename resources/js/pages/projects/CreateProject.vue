@@ -13,6 +13,7 @@ import TowerDetailsSection from './components/TowerDetailsSection.vue';
 import ParkingAndAmenities from './components/ParkingAndAmenities.vue';
 import RetailForm from './components/RetailForm.vue';
 import Category3Form from './components/Category3Form.vue';
+import Category4Form from './components/Category4Form.vue';
 
 declare global {
     interface Window {
@@ -109,6 +110,9 @@ interface Project {
     category3_unit_details?: Array<any>;
     category3_utility_board?: string | object;
     category3_dynamic_facilities?: string | Array<any>;
+    category4_tower_details?: Array<any>;
+    category4_unit_details?: Array<any>;
+    category4_total_room?: string;
     free_allotted_parking_four_wheeler?: boolean;
     free_allotted_parking_two_wheeler?: boolean;
     available_for_purchase?: boolean;
@@ -155,7 +159,7 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     },
 ]);
 
-const currentStep = ref(1);
+const currentStep = ref(2 );
 const loading = ref(false);
 const errors = ref<Record<string, string[]>>({});
 
@@ -291,6 +295,41 @@ const form = reactive({
             value: '',
         },
     },
+    
+    // Category 4 Tower Details (Construction Type 2, Category 4)
+    category4_tower_details: [] as Array<{
+        id: number;
+        tower_name: string;
+        total_units: string;
+        total_floor: string;
+        sub_category_ids: string[];
+    }>,
+    
+    // Category 4 Unit Details (Construction Type 2, Category 4)
+    category4_unit_details: [] as Array<{
+        id: number;
+        tower_name: string;
+        saleable_from: string;
+        saleable_to: string;
+        saleable_unit_id: string;
+        wash_area: string;
+        wash_area_unit_id: string;
+        balcony_area: string;
+        balcony_area_unit_id: string;
+        ceiling_height: string;
+        ceiling_height_unit_id: string;
+        servant_room: boolean;
+        show_carpet_area: boolean;
+        carpet_area_from: string;
+        carpet_area_to: string;
+        carpet_area_unit_id: string;
+        show_builtup_area: boolean;
+        builtup_area_from: string;
+        builtup_area_to: string;
+        builtup_area_unit_id: string;
+    }>,
+    // Category 4 Total Room (common field, shown when 5+ BHK is selected)
+    category4_total_room: '',
     
     // Tower Details Array (multiple towers) - Always start with one entry
     tower_details: [{
@@ -794,7 +833,7 @@ const handleSubmit = async () => {
         formData.append('category_id', form.category_id);
         if (form.sub_category_id) {
             if (Array.isArray(form.sub_category_id)) {
-                // For Retail category, sub_category_id is an array
+                // For Retail (ID 2) and Category 4 (ID 4), sub_category_id is an array
                 form.sub_category_id.forEach((id: string) => {
                     formData.append('sub_category_ids[]', id);
                 });
@@ -871,6 +910,51 @@ const handleSubmit = async () => {
                 if (form.utility_board.power.value) formData.append('utility_board[power][value]', form.utility_board.power.value);
                 formData.append('utility_board[water][checked]', form.utility_board.water.checked ? '1' : '0');
                 if (form.utility_board.water.value) formData.append('utility_board[water][value]', form.utility_board.water.value);
+            }
+        }
+        
+        // Step 2: Category 4 Tower Details and Unit Details (for Construction Type 2, Category 4)
+        if (form.construction_type_id === '2' && form.category_id === '4') {
+            if (form.category4_tower_details && form.category4_tower_details.length > 0) {
+                form.category4_tower_details.forEach((tower: any, index: number) => {
+                    if (tower.tower_name) formData.append(`category4_tower_details[${index}][tower_name]`, tower.tower_name);
+                    if (tower.total_units) formData.append(`category4_tower_details[${index}][total_units]`, tower.total_units);
+                    if (tower.total_floor) formData.append(`category4_tower_details[${index}][total_floor]`, tower.total_floor);
+                    if (tower.sub_category_ids && tower.sub_category_ids.length > 0) {
+                        tower.sub_category_ids.forEach((subCatId: string) => {
+                            formData.append(`category4_tower_details[${index}][sub_category_ids][]`, subCatId);
+                        });
+                    }
+                });
+            }
+            
+            if (form.category4_unit_details && form.category4_unit_details.length > 0) {
+                form.category4_unit_details.forEach((unit: any, index: number) => {
+                    if (unit.tower_name) formData.append(`category4_unit_details[${index}][tower_name]`, unit.tower_name);
+                    if (unit.saleable_from) formData.append(`category4_unit_details[${index}][saleable_from]`, unit.saleable_from);
+                    if (unit.saleable_to) formData.append(`category4_unit_details[${index}][saleable_to]`, unit.saleable_to);
+                    if (unit.saleable_unit_id) formData.append(`category4_unit_details[${index}][saleable_unit_id]`, unit.saleable_unit_id);
+                    if (unit.wash_area) formData.append(`category4_unit_details[${index}][wash_area]`, unit.wash_area);
+                    if (unit.wash_area_unit_id) formData.append(`category4_unit_details[${index}][wash_area_unit_id]`, unit.wash_area_unit_id);
+                    if (unit.balcony_area) formData.append(`category4_unit_details[${index}][balcony_area]`, unit.balcony_area);
+                    if (unit.balcony_area_unit_id) formData.append(`category4_unit_details[${index}][balcony_area_unit_id]`, unit.balcony_area_unit_id);
+                    if (unit.ceiling_height) formData.append(`category4_unit_details[${index}][ceiling_height]`, unit.ceiling_height);
+                    if (unit.ceiling_height_unit_id) formData.append(`category4_unit_details[${index}][ceiling_height_unit_id]`, unit.ceiling_height_unit_id);
+                    formData.append(`category4_unit_details[${index}][servant_room]`, unit.servant_room ? '1' : '0');
+                    formData.append(`category4_unit_details[${index}][show_carpet_area]`, unit.show_carpet_area ? '1' : '0');
+                    if (unit.carpet_area_from) formData.append(`category4_unit_details[${index}][carpet_area_from]`, unit.carpet_area_from);
+                    if (unit.carpet_area_to) formData.append(`category4_unit_details[${index}][carpet_area_to]`, unit.carpet_area_to);
+                    if (unit.carpet_area_unit_id) formData.append(`category4_unit_details[${index}][carpet_area_unit_id]`, unit.carpet_area_unit_id);
+                    formData.append(`category4_unit_details[${index}][show_builtup_area]`, unit.show_builtup_area ? '1' : '0');
+                    if (unit.builtup_area_from) formData.append(`category4_unit_details[${index}][builtup_area_from]`, unit.builtup_area_from);
+                    if (unit.builtup_area_to) formData.append(`category4_unit_details[${index}][builtup_area_to]`, unit.builtup_area_to);
+                    if (unit.builtup_area_unit_id) formData.append(`category4_unit_details[${index}][builtup_area_unit_id]`, unit.builtup_area_unit_id);
+                });
+            }
+            
+            // Category 4 Total Room (common field)
+            if (form.category4_total_room) {
+                formData.append('category4_total_room', form.category4_total_room);
             }
         }
         
@@ -1031,8 +1115,8 @@ const handleNext = () => {
                     (cat) => cat.id === Number(form.category_id)
                 );
                 if (selectedCategory && selectedCategory.sub_categories && selectedCategory.sub_categories.length > 0) {
-                    // For Retail (ID 2), sub_category_id should be an array with at least one selection
-                    if (form.category_id === '2') {
+                    // For Retail (ID 2) and Category 4 (ID 4), sub_category_id should be an array with at least one selection
+                    if (form.category_id === '2' || form.category_id === '4') {
                         if (!Array.isArray(form.sub_category_id) || form.sub_category_id.length === 0) {
                             errors.value.sub_category_id = ['Please select at least one sub-category'];
                             hasError = true;
@@ -1097,6 +1181,39 @@ const retailSubCategories = computed(() => {
     }
     
     // For Retail, only show sub-categories that were selected via checkboxes
+    if (Array.isArray(form.sub_category_id) && form.sub_category_id.length > 0) {
+        return selectedCategory.sub_categories.filter((subCat: any) =>
+            form.sub_category_id.includes(String(subCat.id))
+        );
+    }
+    
+    // If no sub-categories selected yet, return empty array
+    return [];
+});
+
+// Get sub-categories for Category 4 - show all selected ones
+const category4SubCategories = computed(() => {
+    if (!form.construction_type_id || !form.category_id || form.category_id !== '4') {
+        return [];
+    }
+    
+    const selectedConstructionType = props.constructionTypes.find(
+        (ct) => ct.id === Number(form.construction_type_id)
+    );
+    
+    if (!selectedConstructionType || !selectedConstructionType.categories) {
+        return [];
+    }
+    
+    const selectedCategory = selectedConstructionType.categories.find(
+        (cat) => cat.id === Number(form.category_id)
+    );
+    
+    if (!selectedCategory || !selectedCategory.sub_categories) {
+        return [];
+    }
+    
+    // For Category 4, show all sub-categories that were selected via checkboxes
     if (Array.isArray(form.sub_category_id) && form.sub_category_id.length > 0) {
         return selectedCategory.sub_categories.filter((subCat: any) =>
             form.sub_category_id.includes(String(subCat.id))
@@ -1244,6 +1361,54 @@ const initializeFormFromProject = async () => {
     } else {
         form.dynamic_facilities = [];
     }
+
+    // Handle Category 4 tower details (Construction Type 2, Category 4)
+    const category4TowerDetails = (project as any).category4_tower_details || (project as any).category4TowerDetails;
+    if (category4TowerDetails && category4TowerDetails.length > 0) {
+        form.category4_tower_details = category4TowerDetails.map((tower: any, index: number) => ({
+            id: tower.id || index + 1,
+            tower_name: tower.tower_name || '',
+            total_units: tower.total_units || '',
+            total_floor: tower.total_floor || '',
+            sub_category_ids: Array.isArray(tower.sub_category_ids) 
+                ? tower.sub_category_ids.map((id: any) => String(id))
+                : (tower.sub_category_ids ? [String(tower.sub_category_ids)] : []),
+        }));
+    } else {
+        form.category4_tower_details = [];
+    }
+
+    // Handle Category 4 unit details (Construction Type 2, Category 4)
+    const category4UnitDetails = (project as any).category4_unit_details || (project as any).category4UnitDetails;
+    if (category4UnitDetails && category4UnitDetails.length > 0) {
+        form.category4_unit_details = category4UnitDetails.map((unit: any, index: number) => ({
+            id: unit.id || index + 1,
+            tower_name: unit.tower_name || '',
+            saleable_from: unit.saleable_from || '',
+            saleable_to: unit.saleable_to || '',
+            saleable_unit_id: unit.saleable_unit_id ? String(unit.saleable_unit_id) : '',
+            wash_area: unit.wash_area || '',
+            wash_area_unit_id: unit.wash_area_unit_id ? String(unit.wash_area_unit_id) : '',
+            balcony_area: unit.balcony_area || '',
+            balcony_area_unit_id: unit.balcony_area_unit_id ? String(unit.balcony_area_unit_id) : '',
+            ceiling_height: unit.ceiling_height || '',
+            ceiling_height_unit_id: unit.ceiling_height_unit_id ? String(unit.ceiling_height_unit_id) : '',
+            servant_room: unit.servant_room || false,
+            show_carpet_area: (unit.carpet_area_from || unit.carpet_area_to || unit.carpet_area_unit_id) ? true : false,
+            carpet_area_from: unit.carpet_area_from || '',
+            carpet_area_to: unit.carpet_area_to || '',
+            carpet_area_unit_id: unit.carpet_area_unit_id ? String(unit.carpet_area_unit_id) : '',
+            show_builtup_area: (unit.builtup_area_from || unit.builtup_area_to || unit.builtup_area_unit_id) ? true : false,
+            builtup_area_from: unit.builtup_area_from || '',
+            builtup_area_to: unit.builtup_area_to || '',
+            builtup_area_unit_id: unit.builtup_area_unit_id ? String(unit.builtup_area_unit_id) : '',
+        }));
+    } else {
+        form.category4_unit_details = [];
+    }
+
+    // Handle Category 4 Total Room
+    form.category4_total_room = (project as any).category4_total_room || '';
 
     form.free_allotted_parking_four_wheeler = project.free_allotted_parking_four_wheeler || false;
     form.free_allotted_parking_two_wheeler = project.free_allotted_parking_two_wheeler || false;
@@ -1571,6 +1736,15 @@ onMounted(async () => {
                                     :form="form"
                                     :errors="errors"
                                     :measurement-units="measurementUnits"
+                                />
+
+                                <!-- Category 4 Form (when construction_type_id === '2' && category_id === '4') -->
+                                <Category4Form
+                                    v-else-if="form.construction_type_id === '2' && form.category_id === '4'"
+                                    :form="form"
+                                    :errors="errors"
+                                    :measurement-units="measurementUnits"
+                                    :sub-categories="category4SubCategories"
                                 />
 
                                 <!-- Tower Details Section (Conditional based on Construction Type, Category, Sub Category) -->
