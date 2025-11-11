@@ -140,9 +140,9 @@ class ProjectController extends Controller
                 'remark',
             ]);
 
-            // Handle sub_category_id - single value or array for Retail
+            // Handle sub_category_id - single value or array for Retail, Category 4, and Category 7
             if ($request->has('sub_category_ids') && is_array($request->sub_category_ids) && count($request->sub_category_ids) > 0) {
-                // For Retail category (ID 2), store multiple in sub_category_ids JSON column
+                // For Retail category (ID 2), Category 4 (ID 4), and Category 7 (ID 7), store multiple in sub_category_ids JSON column
                 $projectData['sub_category_ids'] = json_encode($request->sub_category_ids);
                 $projectData['sub_category_id'] = null; // Set single to null when using multiple
             } elseif ($request->has('sub_category_id') && !empty($request->sub_category_id)) {
@@ -548,9 +548,9 @@ class ProjectController extends Controller
                 'remark',
             ]);
 
-            // Handle sub_category_id - single value or array for Retail
+            // Handle sub_category_id - single value or array for Retail, Category 4, and Category 7
             if ($request->has('sub_category_ids') && is_array($request->sub_category_ids) && count($request->sub_category_ids) > 0) {
-                // For Retail category (ID 2), store multiple in sub_category_ids JSON column
+                // For Retail category (ID 2), Category 4 (ID 4), and Category 7 (ID 7), store multiple in sub_category_ids JSON column
                 $projectData['sub_category_ids'] = json_encode($request->sub_category_ids);
                 $projectData['sub_category_id'] = null; // Set single to null when using multiple
             } elseif ($request->has('sub_category_id') && !empty($request->sub_category_id)) {

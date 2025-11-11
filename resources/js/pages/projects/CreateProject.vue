@@ -894,7 +894,7 @@ const handleSubmit = async () => {
         formData.append('category_id', form.category_id);
         if (form.sub_category_id) {
             if (Array.isArray(form.sub_category_id)) {
-                // For Retail (ID 2) and Category 4 (ID 4), sub_category_id is an array
+                // For Retail (ID 2), Category 4 (ID 4), and Category 7 (ID 7), sub_category_id is an array
                 form.sub_category_id.forEach((id: string) => {
                     formData.append('sub_category_ids[]', id);
                 });
@@ -975,7 +975,7 @@ const handleSubmit = async () => {
         }
         
         // Step 2: Category 4 Tower Details and Unit Details (for Construction Type 2, Category 4)
-        if (form.construction_type_id === '2' && form.category_id === '4') {
+        if (form.construction_type_id === '2' && (form.category_id === '4' || form.category_id === '7')) {
             if (form.category4_tower_details && form.category4_tower_details.length > 0) {
                 form.category4_tower_details.forEach((tower: any, index: number) => {
                     if (tower.tower_name) formData.append(`category4_tower_details[${index}][tower_name]`, tower.tower_name);
@@ -1244,8 +1244,8 @@ const handleNext = () => {
                     (cat) => cat.id === Number(form.category_id)
                 );
                 if (selectedCategory && selectedCategory.sub_categories && selectedCategory.sub_categories.length > 0) {
-                    // For Retail (ID 2) and Category 4 (ID 4), sub_category_id should be an array with at least one selection
-                    if (form.category_id === '2' || form.category_id === '4') {
+                    // For Retail (ID 2), Category 4 (ID 4), and Category 7 (ID 7), sub_category_id should be an array with at least one selection
+                    if (form.category_id === '2' || form.category_id === '4' || form.category_id === '7') {
                         if (!Array.isArray(form.sub_category_id) || form.sub_category_id.length === 0) {
                             errors.value.sub_category_id = ['Please select at least one sub-category'];
                             hasError = true;
@@ -1322,7 +1322,7 @@ const retailSubCategories = computed(() => {
 
 // Get sub-categories for Category 4 - show all selected ones
 const category4SubCategories = computed(() => {
-    if (!form.construction_type_id || !form.category_id || form.category_id !== '4') {
+    if (!form.construction_type_id || !form.category_id || (form.category_id !== '4' && form.category_id !== '7')) {
         return [];
     }
     
@@ -1410,7 +1410,7 @@ const initializeFormFromProject = async () => {
     form.category_id = project.category_id ? String(project.category_id) : '';
     // Handle sub_category_id - check both single and multiple columns
     if (project.sub_category_ids) {
-        // Retail category with multiple sub-categories
+        // Retail, Category 4, and Category 7 with multiple sub-categories
         try {
             const parsed = typeof project.sub_category_ids === 'string' 
                 ? JSON.parse(project.sub_category_ids) 
@@ -1990,9 +1990,9 @@ onMounted(async () => {
                                     :measurement-units="measurementUnits"
                                 />
 
-                                <!-- Category 4 Form (when construction_type_id === '2' && category_id === '4') -->
+                                <!-- Category 4 Form (when construction_type_id === '2' && category_id === '4' or '7') -->
                                 <Category4Form
-                                    v-else-if="form.construction_type_id === '2' && form.category_id === '4'"
+                                    v-else-if="form.construction_type_id === '2' && (form.category_id === '4' || form.category_id === '7')"
                                     :form="form"
                                     :errors="errors"
                                     :measurement-units="measurementUnits"
