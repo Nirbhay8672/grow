@@ -12,6 +12,7 @@ import ChoiseSelection from './components/ChoiseSelection.vue';
 import TowerDetailsSection from './components/TowerDetailsSection.vue';
 import ParkingAndAmenities from './components/ParkingAndAmenities.vue';
 import RetailForm from './components/RetailForm.vue';
+import Category3Form from './components/Category3Form.vue';
 
 declare global {
     interface Window {
@@ -105,6 +106,9 @@ interface Project {
     two_road_corner?: boolean;
     towers_different_specification?: boolean;
     retail_unit_details?: string | Array<any>;
+    category3_unit_details?: Array<any>;
+    category3_utility_board?: string | object;
+    category3_dynamic_facilities?: string | Array<any>;
     free_allotted_parking_four_wheeler?: boolean;
     free_allotted_parking_two_wheeler?: boolean;
     available_for_purchase?: boolean;
@@ -242,6 +246,51 @@ const form = reactive({
         ceiling_height: string;
         ceiling_height_unit_id: string;
     }>,
+    
+    // Category 3 Unit Details (Construction Type 1, Category 3)
+    category3_unit_details: [] as Array<{
+        id: number;
+        plot_area_from: string;
+        plot_area_to: string;
+        plot_area_unit_id: string;
+        constructed_area_from: string;
+        constructed_area_to: string;
+        constructed_area_unit_id: string;
+        road_width_from: string;
+        road_width_to: string;
+        road_width_unit_id: string;
+        ceiling_height: string;
+        ceiling_height_unit_id: string;
+        total_no_of_units: string;
+    }>,
+    dynamic_facilities: [] as Array<{
+        id: number;
+        label: string;
+        checked: boolean;
+        value: string;
+    }>,
+    utility_board: {
+        pollution_control_board: {
+            checked: false,
+            value: '',
+        },
+        ec: {
+            checked: false,
+            value: '',
+        },
+        gas: {
+            checked: false,
+            value: '',
+        },
+        power: {
+            checked: false,
+            value: '',
+        },
+        water: {
+            checked: false,
+            value: '',
+        },
+    },
     
     // Tower Details Array (multiple towers) - Always start with one entry
     tower_details: [{
@@ -783,6 +832,48 @@ const handleSubmit = async () => {
             });
         }
         
+        // Step 2: Category 3 Unit Details (for Construction Type 1, Category 3)
+        if (form.construction_type_id === '1' && form.category_id === '3') {
+            if (form.category3_unit_details && form.category3_unit_details.length > 0) {
+                form.category3_unit_details.forEach((unit: any, index: number) => {
+                    if (unit.plot_area_from) formData.append(`category3_unit_details[${index}][plot_area_from]`, unit.plot_area_from);
+                    if (unit.plot_area_to) formData.append(`category3_unit_details[${index}][plot_area_to]`, unit.plot_area_to);
+                    if (unit.plot_area_unit_id) formData.append(`category3_unit_details[${index}][plot_area_unit_id]`, unit.plot_area_unit_id);
+                    if (unit.constructed_area_from) formData.append(`category3_unit_details[${index}][constructed_area_from]`, unit.constructed_area_from);
+                    if (unit.constructed_area_to) formData.append(`category3_unit_details[${index}][constructed_area_to]`, unit.constructed_area_to);
+                    if (unit.constructed_area_unit_id) formData.append(`category3_unit_details[${index}][constructed_area_unit_id]`, unit.constructed_area_unit_id);
+                    if (unit.road_width_from) formData.append(`category3_unit_details[${index}][road_width_from]`, unit.road_width_from);
+                    if (unit.road_width_to) formData.append(`category3_unit_details[${index}][road_width_to]`, unit.road_width_to);
+                    if (unit.road_width_unit_id) formData.append(`category3_unit_details[${index}][road_width_unit_id]`, unit.road_width_unit_id);
+                    if (unit.ceiling_height) formData.append(`category3_unit_details[${index}][ceiling_height]`, unit.ceiling_height);
+                    if (unit.ceiling_height_unit_id) formData.append(`category3_unit_details[${index}][ceiling_height_unit_id]`, unit.ceiling_height_unit_id);
+                    if (unit.total_no_of_units) formData.append(`category3_unit_details[${index}][total_no_of_units]`, unit.total_no_of_units);
+                });
+            }
+            
+            // Dynamic facilities
+            if (form.dynamic_facilities && form.dynamic_facilities.length > 0) {
+                form.dynamic_facilities.forEach((facility: any, index: number) => {
+                    formData.append(`dynamic_facilities[${index}][label]`, facility.label);
+                    formData.append(`dynamic_facilities[${index}][checked]`, facility.checked ? '1' : '0');
+                    if (facility.value) formData.append(`dynamic_facilities[${index}][value]`, facility.value);
+                });
+            }
+            
+            if (form.utility_board) {
+                formData.append('utility_board[pollution_control_board][checked]', form.utility_board.pollution_control_board.checked ? '1' : '0');
+                if (form.utility_board.pollution_control_board.value) formData.append('utility_board[pollution_control_board][value]', form.utility_board.pollution_control_board.value);
+                formData.append('utility_board[ec][checked]', form.utility_board.ec.checked ? '1' : '0');
+                if (form.utility_board.ec.value) formData.append('utility_board[ec][value]', form.utility_board.ec.value);
+                formData.append('utility_board[gas][checked]', form.utility_board.gas.checked ? '1' : '0');
+                if (form.utility_board.gas.value) formData.append('utility_board[gas][value]', form.utility_board.gas.value);
+                formData.append('utility_board[power][checked]', form.utility_board.power.checked ? '1' : '0');
+                if (form.utility_board.power.value) formData.append('utility_board[power][value]', form.utility_board.power.value);
+                formData.append('utility_board[water][checked]', form.utility_board.water.checked ? '1' : '0');
+                if (form.utility_board.water.value) formData.append('utility_board[water][value]', form.utility_board.water.value);
+            }
+        }
+        
         // Step 2: Tower Details Array
         if (form.tower_details && form.tower_details.length > 0) {
             form.tower_details.forEach((tower: any, index: number) => {
@@ -1079,6 +1170,81 @@ const initializeFormFromProject = async () => {
     } else {
         form.retail_unit_details = [];
     }
+
+    // Handle Category 3 unit details (Construction Type 1, Category 3)
+    // Check both snake_case and camelCase property names
+    const category3UnitDetails = (project as any).category3_unit_details || (project as any).category3UnitDetails;
+    if (category3UnitDetails && category3UnitDetails.length > 0) {
+        form.category3_unit_details = category3UnitDetails.map((unit: any, index: number) => ({
+            id: unit.id || index + 1,
+            total_no_of_units: unit.total_no_of_units || '',
+            ceiling_height: unit.ceiling_height || '',
+            ceiling_height_unit_id: unit.ceiling_height_unit_id ? String(unit.ceiling_height_unit_id) : '',
+            plot_area_from: unit.plot_area_from || '',
+            plot_area_to: unit.plot_area_to || '',
+            plot_area_unit_id: unit.plot_area_unit_id ? String(unit.plot_area_unit_id) : '',
+            road_width_from: unit.road_width_from || '',
+            road_width_to: unit.road_width_to || '',
+            road_width_unit_id: unit.road_width_unit_id ? String(unit.road_width_unit_id) : '',
+            constructed_area_from: unit.constructed_area_from || '',
+            constructed_area_to: unit.constructed_area_to || '',
+            constructed_area_unit_id: unit.constructed_area_unit_id ? String(unit.constructed_area_unit_id) : '',
+        }));
+    } else {
+        form.category3_unit_details = [];
+    }
+
+    // Handle Category 3 utility board - parse JSON if exists
+    if (project.category3_utility_board) {
+        try {
+            const parsed = typeof project.category3_utility_board === 'string' 
+                ? JSON.parse(project.category3_utility_board) 
+                : project.category3_utility_board;
+            form.utility_board = parsed || {
+                pollution_control_board: { checked: false, value: '' },
+                ec: { checked: false, value: '' },
+                gas: { checked: false, value: '' },
+                power: { checked: false, value: '' },
+                water: { checked: false, value: '' },
+            };
+        } catch (e) {
+            form.utility_board = {
+                pollution_control_board: { checked: false, value: '' },
+                ec: { checked: false, value: '' },
+                gas: { checked: false, value: '' },
+                power: { checked: false, value: '' },
+                water: { checked: false, value: '' },
+            };
+        }
+    } else {
+        form.utility_board = {
+            pollution_control_board: { checked: false, value: '' },
+            ec: { checked: false, value: '' },
+            gas: { checked: false, value: '' },
+            power: { checked: false, value: '' },
+            water: { checked: false, value: '' },
+        };
+    }
+
+    // Handle Category 3 dynamic facilities - parse JSON if exists
+    if (project.category3_dynamic_facilities) {
+        try {
+            const parsed = typeof project.category3_dynamic_facilities === 'string' 
+                ? JSON.parse(project.category3_dynamic_facilities) 
+                : project.category3_dynamic_facilities;
+            form.dynamic_facilities = Array.isArray(parsed) ? parsed.map((facility: any, index: number) => ({
+                id: facility.id || index + 1,
+                label: facility.label || '',
+                checked: facility.checked || false,
+                value: facility.value || '',
+            })) : [];
+        } catch (e) {
+            form.dynamic_facilities = [];
+        }
+    } else {
+        form.dynamic_facilities = [];
+    }
+
     form.free_allotted_parking_four_wheeler = project.free_allotted_parking_four_wheeler || false;
     form.free_allotted_parking_two_wheeler = project.free_allotted_parking_two_wheeler || false;
     form.available_for_purchase = project.available_for_purchase || false;
@@ -1397,6 +1563,14 @@ onMounted(async () => {
                                     :errors="errors"
                                     :measurement-units="measurementUnits"
                                     :sub-categories="retailSubCategories"
+                                />
+
+                                <!-- Category 3 Form (when construction_type_id === '1' && category_id === '3') -->
+                                <Category3Form
+                                    v-else-if="form.construction_type_id === '1' && form.category_id === '3'"
+                                    :form="form"
+                                    :errors="errors"
+                                    :measurement-units="measurementUnits"
                                 />
 
                                 <!-- Tower Details Section (Conditional based on Construction Type, Category, Sub Category) -->

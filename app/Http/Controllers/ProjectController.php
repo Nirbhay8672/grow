@@ -13,6 +13,7 @@ use App\Models\Locality;
 use App\Models\MeasurementUnit;
 use App\Models\Project;
 use App\Models\ProjectBasementParking;
+use App\Models\ProjectCategory3UnitDetail;
 use App\Models\ProjectContact;
 use App\Models\ProjectDocument;
 use App\Models\ProjectTowerDetail;
@@ -171,6 +172,33 @@ class ProjectController extends Controller
             } else {
                 $projectData['retail_unit_details'] = null;
             }
+
+            // Handle Category 3: Utility Board and Dynamic Facilities (Construction Type 1, Category 3)
+            if ($request->has('utility_board')) {
+                $utilityBoard = $request->input('utility_board');
+                if (is_array($utilityBoard) && !empty($utilityBoard)) {
+                    $projectData['category3_utility_board'] = json_encode($utilityBoard);
+                } else {
+                    $projectData['category3_utility_board'] = null;
+                }
+            } else {
+                $projectData['category3_utility_board'] = null;
+            }
+
+            if ($request->has('dynamic_facilities')) {
+                $dynamicFacilities = $request->input('dynamic_facilities');
+                if (is_array($dynamicFacilities) && count($dynamicFacilities) > 0) {
+                    // Filter out empty entries
+                    $filteredFacilities = array_filter($dynamicFacilities, function($facility) {
+                        return !empty($facility['label']) || !empty($facility['value']);
+                    });
+                    $projectData['category3_dynamic_facilities'] = !empty($filteredFacilities) ? json_encode(array_values($filteredFacilities)) : null;
+                } else {
+                    $projectData['category3_dynamic_facilities'] = null;
+                }
+            } else {
+                $projectData['category3_dynamic_facilities'] = null;
+            }
             
             $projectData['free_allotted_parking_four_wheeler'] = $request->has('free_allotted_parking_four_wheeler') 
                 && ($request->free_allotted_parking_four_wheeler === '1' || $request->free_allotted_parking_four_wheeler === true || $request->free_allotted_parking_four_wheeler === 1);
@@ -233,6 +261,34 @@ class ProjectController extends Controller
                         'builtup_area_to' => $towerData['builtup_area_to'] ?? null,
                         'builtup_area_unit_id' => $towerData['builtup_area_unit_id'] ?? null,
                     ]);
+                }
+            }
+
+            // Create Category 3 unit details (Construction Type 1, Category 3)
+            if ($request->has('category3_unit_details') && is_array($request->category3_unit_details)) {
+                foreach ($request->category3_unit_details as $unitData) {
+                    // Filter out completely empty entries
+                    if (!empty($unitData['total_no_of_units']) || 
+                        !empty($unitData['ceiling_height']) || 
+                        !empty($unitData['plot_area_from']) || 
+                        !empty($unitData['road_width_from']) || 
+                        !empty($unitData['constructed_area_from'])) {
+                        ProjectCategory3UnitDetail::create([
+                            'project_id' => $project->id,
+                            'total_no_of_units' => $unitData['total_no_of_units'] ?? null,
+                            'ceiling_height' => $unitData['ceiling_height'] ?? null,
+                            'ceiling_height_unit_id' => $unitData['ceiling_height_unit_id'] ?? null,
+                            'plot_area_from' => $unitData['plot_area_from'] ?? null,
+                            'plot_area_to' => $unitData['plot_area_to'] ?? null,
+                            'plot_area_unit_id' => $unitData['plot_area_unit_id'] ?? null,
+                            'road_width_from' => $unitData['road_width_from'] ?? null,
+                            'road_width_to' => $unitData['road_width_to'] ?? null,
+                            'road_width_unit_id' => $unitData['road_width_unit_id'] ?? null,
+                            'constructed_area_from' => $unitData['constructed_area_from'] ?? null,
+                            'constructed_area_to' => $unitData['constructed_area_to'] ?? null,
+                            'constructed_area_unit_id' => $unitData['constructed_area_unit_id'] ?? null,
+                        ]);
+                    }
                 }
             }
 
@@ -341,6 +397,7 @@ class ProjectController extends Controller
             'category',
             'subCategory',
             'towerDetails',
+            'category3UnitDetails',
             'basementParking',
             'amenities',
             'documents' => function ($query) {
@@ -431,6 +488,33 @@ class ProjectController extends Controller
             } else {
                 $projectData['retail_unit_details'] = null;
             }
+
+            // Handle Category 3: Utility Board and Dynamic Facilities (Construction Type 1, Category 3)
+            if ($request->has('utility_board')) {
+                $utilityBoard = $request->input('utility_board');
+                if (is_array($utilityBoard) && !empty($utilityBoard)) {
+                    $projectData['category3_utility_board'] = json_encode($utilityBoard);
+                } else {
+                    $projectData['category3_utility_board'] = null;
+                }
+            } else {
+                $projectData['category3_utility_board'] = null;
+            }
+
+            if ($request->has('dynamic_facilities')) {
+                $dynamicFacilities = $request->input('dynamic_facilities');
+                if (is_array($dynamicFacilities) && count($dynamicFacilities) > 0) {
+                    // Filter out empty entries
+                    $filteredFacilities = array_filter($dynamicFacilities, function($facility) {
+                        return !empty($facility['label']) || !empty($facility['value']);
+                    });
+                    $projectData['category3_dynamic_facilities'] = !empty($filteredFacilities) ? json_encode(array_values($filteredFacilities)) : null;
+                } else {
+                    $projectData['category3_dynamic_facilities'] = null;
+                }
+            } else {
+                $projectData['category3_dynamic_facilities'] = null;
+            }
             
             $projectData['free_allotted_parking_four_wheeler'] = $request->has('free_allotted_parking_four_wheeler') 
                 && ($request->free_allotted_parking_four_wheeler === '1' || $request->free_allotted_parking_four_wheeler === true || $request->free_allotted_parking_four_wheeler === 1);
@@ -509,6 +593,35 @@ class ProjectController extends Controller
                         'builtup_area_to' => $towerData['builtup_area_to'] ?? null,
                         'builtup_area_unit_id' => $towerData['builtup_area_unit_id'] ?? null,
                     ]);
+                }
+            }
+
+            // Update Category 3 unit details - delete old and create new
+            $project->category3UnitDetails()->delete();
+            if ($request->has('category3_unit_details') && is_array($request->category3_unit_details)) {
+                foreach ($request->category3_unit_details as $unitData) {
+                    // Filter out completely empty entries
+                    if (!empty($unitData['total_no_of_units']) || 
+                        !empty($unitData['ceiling_height']) || 
+                        !empty($unitData['plot_area_from']) || 
+                        !empty($unitData['road_width_from']) || 
+                        !empty($unitData['constructed_area_from'])) {
+                        ProjectCategory3UnitDetail::create([
+                            'project_id' => $project->id,
+                            'total_no_of_units' => $unitData['total_no_of_units'] ?? null,
+                            'ceiling_height' => $unitData['ceiling_height'] ?? null,
+                            'ceiling_height_unit_id' => $unitData['ceiling_height_unit_id'] ?? null,
+                            'plot_area_from' => $unitData['plot_area_from'] ?? null,
+                            'plot_area_to' => $unitData['plot_area_to'] ?? null,
+                            'plot_area_unit_id' => $unitData['plot_area_unit_id'] ?? null,
+                            'road_width_from' => $unitData['road_width_from'] ?? null,
+                            'road_width_to' => $unitData['road_width_to'] ?? null,
+                            'road_width_unit_id' => $unitData['road_width_unit_id'] ?? null,
+                            'constructed_area_from' => $unitData['constructed_area_from'] ?? null,
+                            'constructed_area_to' => $unitData['constructed_area_to'] ?? null,
+                            'constructed_area_unit_id' => $unitData['constructed_area_unit_id'] ?? null,
+                        ]);
+                    }
                 }
             }
 

@@ -46,6 +46,8 @@ class Project extends Model
         'two_road_corner',
         'towers_different_specification',
         'retail_unit_details',
+        'category3_utility_board',
+        'category3_dynamic_facilities',
         
         // Step 3: Parking Details
         'free_allotted_parking_four_wheeler',
@@ -72,6 +74,8 @@ class Project extends Model
             'towers_different_specification' => 'boolean',
             'two_road_corner' => 'boolean',
             'retail_unit_details' => 'array',
+            'category3_utility_board' => 'array',
+            'category3_dynamic_facilities' => 'array',
             'free_allotted_parking_four_wheeler' => 'boolean',
             'free_allotted_parking_two_wheeler' => 'boolean',
             'available_for_purchase' => 'boolean',
@@ -141,6 +145,12 @@ class Project extends Model
     public function towerDetails(): HasMany
     {
         return $this->hasMany(ProjectTowerDetail::class);
+    }
+
+    // Step 2: Category 3 Unit Details relationship
+    public function category3UnitDetails(): HasMany
+    {
+        return $this->hasMany(ProjectCategory3UnitDetail::class);
     }
 
     // Step 2: Front Road Width Measurement Unit
