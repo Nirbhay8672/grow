@@ -72,8 +72,11 @@ const isInitializing = ref(true);
 // Initialize categories and subcategories from existing form values on mount
 const initializeFromForm = () => {
     if (props.modelValue.construction_type_id) {
+        // For Construction Type 4, use categories from Construction Type 2 (Residential)
+        const constructionTypeIdToLoad = props.modelValue.construction_type_id === '4' ? '2' : props.modelValue.construction_type_id;
+        
         const selectedConstructionType = props.constructionTypes.find(
-            (ct) => ct.id === Number(props.modelValue.construction_type_id)
+            (ct) => ct.id === Number(constructionTypeIdToLoad)
         );
         if (selectedConstructionType && selectedConstructionType.categories) {
             categories.value = selectedConstructionType.categories;
@@ -99,8 +102,11 @@ const initializeFromForm = () => {
 watch(() => props.modelValue.construction_type_id, (newConstructionTypeId) => {
     // Only run if we have a construction type and categories list is empty or needs refresh
     if (newConstructionTypeId && (categories.value.length === 0 || !categories.value.some(cat => cat.id === Number(props.modelValue.category_id)))) {
+        // For Construction Type 4, use categories from Construction Type 2 (Residential)
+        const constructionTypeIdToLoad = newConstructionTypeId === '4' ? '2' : newConstructionTypeId;
+        
         const selectedConstructionType = props.constructionTypes.find(
-            (ct) => ct.id === Number(newConstructionTypeId)
+            (ct) => ct.id === Number(constructionTypeIdToLoad)
         );
         if (selectedConstructionType && selectedConstructionType.categories) {
             categories.value = selectedConstructionType.categories;
@@ -142,8 +148,11 @@ watch(() => props.modelValue.construction_type_id, (newConstructionTypeId, oldCo
     }
     
     if (newConstructionTypeId) {
+        // For Construction Type 4, use categories from Construction Type 2 (Residential)
+        const constructionTypeIdToLoad = newConstructionTypeId === '4' ? '2' : newConstructionTypeId;
+        
         const selectedConstructionType = props.constructionTypes.find(
-            (ct) => ct.id === Number(newConstructionTypeId)
+            (ct) => ct.id === Number(constructionTypeIdToLoad)
         );
         if (selectedConstructionType && selectedConstructionType.categories) {
             categories.value = selectedConstructionType.categories;
@@ -272,34 +281,36 @@ const updateSubCategory = (value: string) => {
         <div class="mb-4">
             <h5 class="mb-3 section-title">Property Type</h5>
             <div class="form-group">
-                <div class="d-flex flex-wrap gap-3">
-                    <div 
-                        v-for="constructionType in constructionTypes" 
+                <div v-if="constructionTypes && constructionTypes.length > 0" class="d-flex flex-wrap gap-2">
+                    <button
+                        v-for="constructionType in constructionTypes"
                         :key="constructionType.id"
-                        class="form-check form-check-inline construction-type-radio"
+                        type="button"
+                        class="btn btn-sm"
+                        :class="modelValue.construction_type_id === String(constructionType.id) ? 'btn-primary' : 'btn-outline-primary'"
+                        @click="updateConstructionType(String(constructionType.id))"
+                        style="border-color: #1c467b; border-radius: 20px; height: 30px;"
                     >
-                        <input
-                            :id="`construction_type_${constructionType.id}`"
-                            :checked="modelValue.construction_type_id === String(constructionType.id)"
-                            @change="updateConstructionType(String(constructionType.id))"
-                            type="radio"
-                            :value="String(constructionType.id)"
-                            class="form-check-input"
-                            :class="{ 'is-invalid': errors.construction_type_id }"
-                        />
-                        <label 
-                            :for="`construction_type_${constructionType.id}`"
-                            class="form-check-label construction-type-label"
-                        >
-                            {{ constructionType.name }}
-                        </label>
-                    </div>
+                        {{ constructionType.name }}
+                    </button>
+                </div>
+                <div v-else class="text-muted mb-3">
+                    Loading property types...
                 </div>
                 <div v-if="errors.construction_type_id" class="invalid-feedback d-block">
                     {{ errors.construction_type_id[0] }}
                 </div>
             </div>
         </div>
+
+        <!-- RESIDENTIAL Section Header (for construction type 4) -->
+        <h5 
+            v-if="modelValue.construction_type_id === '4'" 
+            class="mb-3 section-title" 
+            style="background-color: orange; color: #1c467b; padding: 8px 12px; border-radius: 4px; width: 100%; font-weight: bold;"
+        >
+            RESIDENTIAL
+        </h5>
 
         <!-- Category Selection (shown after construction type is selected, but not for construction type 3) -->
         <div v-if="modelValue.construction_type_id && modelValue.construction_type_id !== '3' && categories.length > 0" class="mb-4">
@@ -308,28 +319,18 @@ const updateSubCategory = (value: string) => {
                 Loading categories...
             </div>
             <div v-else-if="categories.length > 0" class="form-group">
-                <div class="d-flex flex-wrap gap-3">
-                    <div 
-                        v-for="category in categories" 
+                <div class="d-flex flex-wrap gap-2">
+                    <button
+                        v-for="category in categories"
                         :key="category.id"
-                        class="form-check form-check-inline construction-type-radio"
+                        type="button"
+                        class="btn btn-sm"
+                        :class="modelValue.category_id === String(category.id) ? 'btn-primary' : 'btn-outline-primary'"
+                        @click="updateCategory(String(category.id))"
+                        style="border-color: #1c467b; border-radius: 20px; height: 30px;"
                     >
-                        <input
-                            :id="`category_${category.id}`"
-                            :checked="modelValue.category_id === String(category.id)"
-                            @change="updateCategory(String(category.id))"
-                            type="radio"
-                            :value="String(category.id)"
-                            class="form-check-input"
-                            :class="{ 'is-invalid': errors.category_id }"
-                        />
-                        <label 
-                            :for="`category_${category.id}`"
-                            class="form-check-label construction-type-label"
-                        >
-                            {{ category.name }}
-                        </label>
-                    </div>
+                        {{ category.name }}
+                    </button>
                 </div>
                 <div v-if="errors.category_id" class="invalid-feedback d-block">
                     {{ errors.category_id[0] }}
@@ -344,28 +345,18 @@ const updateSubCategory = (value: string) => {
         <div v-if="modelValue.category_id && modelValue.construction_type_id !== '3' && subCategories.length > 0" class="mb-4">
             <h5 class="mb-3 section-title">Sub Category</h5>
             <div class="form-group">
-                <div class="d-flex flex-wrap gap-3">
-                    <div 
-                        v-for="subCategory in subCategories" 
+                <div class="d-flex flex-wrap gap-2">
+                    <button
+                        v-for="subCategory in subCategories"
                         :key="subCategory.id"
-                        class="form-check form-check-inline construction-type-radio"
+                        type="button"
+                        class="btn btn-sm"
+                        :class="(isRetailCategory ? selectedSubCategories.includes(String(subCategory.id)) : modelValue.sub_category_id === String(subCategory.id)) ? 'btn-primary' : 'btn-outline-primary'"
+                        @click="updateSubCategory(String(subCategory.id))"
+                        style="border-color: #1c467b; border-radius: 20px; height: 30px;"
                     >
-                        <input
-                            :id="`sub_category_${subCategory.id}`"
-                            :checked="isRetailCategory ? selectedSubCategories.includes(String(subCategory.id)) : modelValue.sub_category_id === String(subCategory.id)"
-                            @change="updateSubCategory(String(subCategory.id))"
-                            :type="isRetailCategory ? 'checkbox' : 'radio'"
-                            :value="String(subCategory.id)"
-                            class="form-check-input"
-                            :class="{ 'is-invalid': errors.sub_category_id }"
-                        />
-                        <label 
-                            :for="`sub_category_${subCategory.id}`"
-                            class="form-check-label construction-type-label"
-                        >
-                            {{ subCategory.name }}
-                        </label>
-                    </div>
+                        {{ subCategory.name.toUpperCase() }}
+                    </button>
                 </div>
                 <div v-if="errors.sub_category_id" class="invalid-feedback d-block">
                     {{ errors.sub_category_id[0] }}

@@ -17,6 +17,8 @@ import Category4Form from './components/Category4Form.vue';
 import Category5Form from './components/Category5Form.vue';
 import Category6Form from './components/Category6Form.vue';
 import OfficeRetailForm from './components/OfficeRetailForm.vue';
+import RetailSection from './components/RetailSection.vue';
+import ResidentialCommercialForm from './components/ResidentialCommercialForm.vue';
 
 declare global {
     interface Window {
@@ -166,7 +168,7 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     },
 ]);
 
-const currentStep = ref(1);
+const currentStep = ref(2);
 const loading = ref(false);
 const errors = ref<Record<string, string[]>>({});
 
@@ -1048,8 +1050,8 @@ const handleSubmit = async () => {
             }
         }
         
-        // Step 2: Category 4 Tower Details and Unit Details (for Construction Type 2, Category 4)
-        if (form.construction_type_id === '2' && (form.category_id === '4' || form.category_id === '7')) {
+        // Step 2: Category 4 Tower Details and Unit Details (for Construction Type 2 and 4, Category 4)
+        if ((form.construction_type_id === '2' || form.construction_type_id === '4') && (form.category_id === '4' || form.category_id === '7')) {
             if (form.category4_tower_details && form.category4_tower_details.length > 0) {
                 form.category4_tower_details.forEach((tower: any, index: number) => {
                     if (tower.tower_name) formData.append(`category4_tower_details[${index}][tower_name]`, tower.tower_name);
@@ -1093,8 +1095,8 @@ const handleSubmit = async () => {
             }
         }
         
-        // Step 2: Category 5 Tower Details and Unit Details (for Construction Type 2, Category 5)
-        if (form.construction_type_id === '2' && form.category_id === '5') {
+        // Step 2: Category 5 Tower Details and Unit Details (for Construction Type 2 and 4, Category 5)
+        if ((form.construction_type_id === '2' || form.construction_type_id === '4') && form.category_id === '5') {
             if (form.category5_tower_details && form.category5_tower_details.length > 0) {
                 form.category5_tower_details.forEach((tower: any, index: number) => {
                     if (tower.tower_name) formData.append(`category5_tower_details[${index}][tower_name]`, tower.tower_name);
@@ -1138,8 +1140,8 @@ const handleSubmit = async () => {
             }
         }
         
-        // Step 2: Category 6 Data (for Construction Type 2, Category 6)
-        if (form.construction_type_id === '2' && form.category_id === '6') {
+        // Step 2: Category 6 Data (for Construction Type 2 and 4, Category 6)
+        if ((form.construction_type_id === '2' || form.construction_type_id === '4') && form.category_id === '6') {
             if ((form as any).category6_data) {
                 const data = (form as any).category6_data;
                 if (data.total_open_area) formData.append('category6_data[total_open_area]', data.total_open_area);
@@ -1188,8 +1190,8 @@ const handleSubmit = async () => {
             if (data.builtup_area_unit_id) formData.append('office_retail_data[builtup_area_unit_id]', data.builtup_area_unit_id);
         }
         
-        // Step 2: Office & Retail Retail Unit Details (for Construction Type 3)
-        if (form.construction_type_id === '3' && (form as any).office_retail_retail_unit_details && (form as any).office_retail_retail_unit_details.length > 0) {
+        // Step 2: Office & Retail Retail Unit Details (for Construction Type 3 and 4)
+        if ((form.construction_type_id === '3' || form.construction_type_id === '4') && (form as any).office_retail_retail_unit_details && (form as any).office_retail_retail_unit_details.length > 0) {
             (form as any).office_retail_retail_unit_details.forEach((unit: any, index: number) => {
                 if (unit.tower_name) formData.append(`office_retail_retail_unit_details[${index}][tower_name]`, unit.tower_name);
                 if (unit.sub_category_id) formData.append(`office_retail_retail_unit_details[${index}][sub_category_id]`, unit.sub_category_id);
@@ -1444,14 +1446,50 @@ const retailSubCategories = computed(() => {
     return [];
 });
 
-// Get sub-categories for Category 4 - show all selected ones
-const category4SubCategories = computed(() => {
+// Get ALL sub-categories for Category 4 (for Select2 dropdown options) - for construction type 2 and 4
+const category4AllSubCategories = computed(() => {
     if (!form.construction_type_id || !form.category_id || (form.category_id !== '4' && form.category_id !== '7')) {
+        return [];
+    }
+    // For construction type 4, use construction type 2's categories
+    const constructionTypeIdToLoad = form.construction_type_id === '4' ? '2' : form.construction_type_id;
+    if (constructionTypeIdToLoad !== '2' && constructionTypeIdToLoad !== '4') {
         return [];
     }
     
     const selectedConstructionType = props.constructionTypes.find(
-        (ct) => ct.id === Number(form.construction_type_id)
+        (ct) => ct.id === Number(constructionTypeIdToLoad)
+    );
+    
+    if (!selectedConstructionType || !selectedConstructionType.categories) {
+        return [];
+    }
+    
+    const selectedCategory = selectedConstructionType.categories.find(
+        (cat) => cat.id === Number(form.category_id)
+    );
+    
+    if (!selectedCategory || !selectedCategory.sub_categories) {
+        return [];
+    }
+    
+    // Return ALL sub-categories for this category (for Select2 dropdown options)
+    return selectedCategory.sub_categories;
+});
+
+// Get sub-categories for Category 4 - show all selected ones (for construction type 2 and 4)
+const category4SubCategories = computed(() => {
+    if (!form.construction_type_id || !form.category_id || (form.category_id !== '4' && form.category_id !== '7')) {
+        return [];
+    }
+    // For construction type 4, use construction type 2's categories
+    const constructionTypeIdToLoad = form.construction_type_id === '4' ? '2' : form.construction_type_id;
+    if (constructionTypeIdToLoad !== '2' && constructionTypeIdToLoad !== '4') {
+        return [];
+    }
+    
+    const selectedConstructionType = props.constructionTypes.find(
+        (ct) => ct.id === Number(constructionTypeIdToLoad)
     );
     
     if (!selectedConstructionType || !selectedConstructionType.categories) {
@@ -1511,9 +1549,9 @@ const officeSubCategories = computed(() => {
     return [];
 });
 
-// Get sub-categories for Retail (Category 2) - for Office & Retail combination (construction type 3)
+// Get sub-categories for Retail (Category 2) - for Office & Retail combination (construction type 3) and Residential & Commercial (construction type 4)
 const officeRetailRetailSubCategories = computed(() => {
-    if (!form.construction_type_id || form.construction_type_id !== '3') {
+    if (!form.construction_type_id || (form.construction_type_id !== '3' && form.construction_type_id !== '4')) {
         return [];
     }
     
@@ -1545,14 +1583,50 @@ const officeRetailRetailSubCategories = computed(() => {
     return [];
 });
 
-// Get sub-categories for Category 5 - show all selected ones
-const category5SubCategories = computed(() => {
+// Get ALL sub-categories for Category 5 (for Select2 dropdown options) - for construction type 2 and 4
+const category5AllSubCategories = computed(() => {
     if (!form.construction_type_id || !form.category_id || form.category_id !== '5') {
+        return [];
+    }
+    // For construction type 4, use construction type 2's categories
+    const constructionTypeIdToLoad = form.construction_type_id === '4' ? '2' : form.construction_type_id;
+    if (constructionTypeIdToLoad !== '2' && constructionTypeIdToLoad !== '4') {
         return [];
     }
     
     const selectedConstructionType = props.constructionTypes.find(
-        (ct) => ct.id === Number(form.construction_type_id)
+        (ct) => ct.id === Number(constructionTypeIdToLoad)
+    );
+    
+    if (!selectedConstructionType || !selectedConstructionType.categories) {
+        return [];
+    }
+    
+    const selectedCategory = selectedConstructionType.categories.find(
+        (cat) => cat.id === Number(form.category_id)
+    );
+    
+    if (!selectedCategory || !selectedCategory.sub_categories) {
+        return [];
+    }
+    
+    // Return ALL sub-categories for this category (for Select2 dropdown options)
+    return selectedCategory.sub_categories;
+});
+
+// Get sub-categories for Category 5 - show all selected ones (for construction type 2 and 4)
+const category5SubCategories = computed(() => {
+    if (!form.construction_type_id || !form.category_id || form.category_id !== '5') {
+        return [];
+    }
+    // For construction type 4, use construction type 2's categories
+    const constructionTypeIdToLoad = form.construction_type_id === '4' ? '2' : form.construction_type_id;
+    if (constructionTypeIdToLoad !== '2' && constructionTypeIdToLoad !== '4') {
+        return [];
+    }
+    
+    const selectedConstructionType = props.constructionTypes.find(
+        (ct) => ct.id === Number(constructionTypeIdToLoad)
     );
     
     if (!selectedConstructionType || !selectedConstructionType.categories) {
@@ -2285,6 +2359,7 @@ onMounted(async () => {
                                     :errors="errors"
                                     :measurement-units="measurementUnits"
                                     :sub-categories="category4SubCategories"
+                                    :all-sub-categories="category4AllSubCategories"
                                 />
 
                                 <!-- Category 5 Form (when construction_type_id === '2' && category_id === '5') -->
@@ -2294,6 +2369,7 @@ onMounted(async () => {
                                     :errors="errors"
                                     :measurement-units="measurementUnits"
                                     :sub-categories="category5SubCategories"
+                                    :all-sub-categories="category5AllSubCategories"
                                 />
 
                                 <!-- Category 6 Form (when construction_type_id === '2' && category_id === '6') -->
@@ -2302,6 +2378,19 @@ onMounted(async () => {
                                     :form="form"
                                     :errors="errors"
                                     :measurement-units="measurementUnits"
+                                />
+
+                                <!-- Residential & Commercial Form (when construction_type_id === '4') -->
+                                <ResidentialCommercialForm
+                                    v-else-if="form.construction_type_id === '4'"
+                                    :form="form"
+                                    :errors="errors"
+                                    :measurement-units="measurementUnits"
+                                    :category4-sub-categories="category4SubCategories"
+                                    :category4-all-sub-categories="category4AllSubCategories"
+                                    :category5-sub-categories="category5SubCategories"
+                                    :category5-all-sub-categories="category5AllSubCategories"
+                                    :retail-sub-categories="officeRetailRetailSubCategories"
                                 />
 
                                 <!-- Office & Retail Form (when construction_type_id === '3') -->

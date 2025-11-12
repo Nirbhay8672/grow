@@ -13,6 +13,7 @@ interface Props {
     errors: any;
     measurementUnits: any[];
     subCategories: any[];
+    allSubCategories?: any[];
 }
 
 const props = defineProps<Props>();
@@ -80,12 +81,17 @@ initializeCategory4TowerDetails();
 let category4TowerIdCounter = Math.max(...(props.form.category4_tower_details || []).map((t: any) => t.id || 0), 0) + 1;
 
 const addTower = async () => {
+    // Initialize new tower with sub-categories from form if available
+    const initialSubCategoryIds = Array.isArray(props.form.sub_category_id) && props.form.sub_category_id.length > 0
+        ? [...props.form.sub_category_id.map((id: string) => String(id))]
+        : [];
+    
     props.form.category4_tower_details.push({
         id: category4TowerIdCounter++,
         tower_name: '',
         total_units: '',
         total_floor: '',
-        sub_category_ids: [],
+        sub_category_ids: initialSubCategoryIds,
     });
     // Initialize Select2 for the new tower
     await nextTick();
@@ -252,9 +258,18 @@ const initializeSelect2 = async () => {
                     width: '100%',
                 });
                 
-                // Set initial values if tower has sub_category_ids
+                // Set initial values: first check if tower has sub_category_ids, otherwise use form.sub_category_id
+                let initialValues: string[] = [];
                 if (tower.sub_category_ids && tower.sub_category_ids.length > 0) {
-                    selectElement.val(tower.sub_category_ids.map((id: string) => String(id))).trigger('change');
+                    initialValues = tower.sub_category_ids.map((id: string) => String(id));
+                } else if (Array.isArray(props.form.sub_category_id) && props.form.sub_category_id.length > 0) {
+                    // Use sub-categories selected in ChoiseSelection
+                    initialValues = props.form.sub_category_id.map((id: string) => String(id));
+                    tower.sub_category_ids = [...initialValues];
+                }
+                
+                if (initialValues.length > 0) {
+                    selectElement.val(initialValues).trigger('change');
                 }
                 
                 // Sync Select2 with Vue model
@@ -277,6 +292,39 @@ watch(() => props.form.category4_tower_details.length, () => {
 // Watch for sub-categories changes to update Select2
 watch(() => props.subCategories, () => {
     initializeSelect2();
+}, { deep: true });
+
+// Watch for form.sub_category_id changes to sync with Select2 dropdowns
+watch(() => props.form.sub_category_id, (newValue) => {
+    if (Array.isArray(newValue) && newValue.length > 0) {
+        // Update all tower details to have the selected sub-categories
+        nextTick(() => {
+            if (typeof window.$ !== 'undefined' && window.$.fn.select2) {
+                props.form.category4_tower_details.forEach((tower: any, index: number) => {
+                    const selectId = `category4_tower_sub_category_${index}`;
+                    const selectElement = window.$(`#${selectId}`);
+                    
+                    if (selectElement.length) {
+                        // Get current selected values
+                        const currentValues = tower.sub_category_ids || [];
+                        // If Select2 is initialized, update it
+                        if (selectElement.data('select2')) {
+                            // Merge with form sub_category_id, but only if tower doesn't have any selected
+                            if (currentValues.length === 0) {
+                                tower.sub_category_ids = [...newValue.map((id: string) => String(id))];
+                                selectElement.val(tower.sub_category_ids).trigger('change');
+                            }
+                        } else {
+                            // If Select2 is not initialized yet, set the values for when it initializes
+                            if (currentValues.length === 0) {
+                                tower.sub_category_ids = [...newValue.map((id: string) => String(id))];
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    }
 }, { deep: true });
 
 onMounted(() => {
