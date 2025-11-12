@@ -327,7 +327,7 @@ const updateSubCategory = (value: string) => {
                             :for="`category_${category.id}`"
                             class="form-check-label construction-type-label"
                         >
-                            {{ category.name }} {{ category.id }}
+                            {{ category.name }}
                         </label>
                     </div>
                 </div>
@@ -363,7 +363,7 @@ const updateSubCategory = (value: string) => {
                             :for="`sub_category_${subCategory.id}`"
                             class="form-check-label construction-type-label"
                         >
-                            {{ subCategory.name }} {{ subCategory.id }}
+                            {{ subCategory.name }}
                         </label>
                     </div>
                 </div>
