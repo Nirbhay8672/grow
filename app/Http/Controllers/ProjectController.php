@@ -19,6 +19,8 @@ use App\Models\ProjectCategory4UnitDetail;
 use App\Models\ProjectCategory5TowerDetail;
 use App\Models\ProjectCategory5UnitDetail;
 use App\Models\ProjectCategory6Data;
+use App\Models\ProjectOfficeRetailData;
+use App\Models\ProjectOfficeRetailRetailUnitDetail;
 use App\Models\ProjectContact;
 use App\Models\ProjectDocument;
 use App\Models\ProjectTowerDetail;
@@ -384,6 +386,63 @@ class ProjectController extends Controller
                 ]);
             }
 
+            // Create Office & Retail data
+            if ($request->has('office_retail_data')) {
+                $officeRetailData = $request->input('office_retail_data');
+                ProjectOfficeRetailData::create([
+                    'project_id' => $project->id,
+                    'office_sub_category_id' => $officeRetailData['office_sub_category_id'] ?? null,
+                    'no_of_towers' => $officeRetailData['no_of_towers'] ?? null,
+                    'no_of_floors' => $officeRetailData['no_of_floors'] ?? null,
+                    'no_of_unit_each_tower' => $officeRetailData['no_of_unit_each_tower'] ?? null,
+                    'no_of_lift' => $officeRetailData['no_of_lift'] ?? null,
+                    'front_road_width' => $officeRetailData['front_road_width'] ?? null,
+                    'front_road_width_unit_id' => $officeRetailData['front_road_width_unit_id'] ?? null,
+                    'washroom' => $officeRetailData['washroom'] ?? null,
+                    'two_road_corner' => isset($officeRetailData['two_road_corner']) && ($officeRetailData['two_road_corner'] === '1' || $officeRetailData['two_road_corner'] === true || $officeRetailData['two_road_corner'] === 'true'),
+                    'tower_name' => $officeRetailData['tower_name'] ?? null,
+                    'total_units' => $officeRetailData['total_units'] ?? null,
+                    'saleable_from' => $officeRetailData['saleable_from'] ?? null,
+                    'saleable_to' => $officeRetailData['saleable_to'] ?? null,
+                    'saleable_unit_id' => $officeRetailData['saleable_unit_id'] ?? null,
+                    'show_carpet_area' => isset($officeRetailData['show_carpet_area']) && ($officeRetailData['show_carpet_area'] === '1' || $officeRetailData['show_carpet_area'] === true || $officeRetailData['show_carpet_area'] === 'true'),
+                    'carpet_area_from' => $officeRetailData['carpet_area_from'] ?? null,
+                    'carpet_area_to' => $officeRetailData['carpet_area_to'] ?? null,
+                    'carpet_area_unit_id' => $officeRetailData['carpet_area_unit_id'] ?? null,
+                    'show_builtup_area' => isset($officeRetailData['show_builtup_area']) && ($officeRetailData['show_builtup_area'] === '1' || $officeRetailData['show_builtup_area'] === true || $officeRetailData['show_builtup_area'] === 'true'),
+                    'builtup_area_from' => $officeRetailData['builtup_area_from'] ?? null,
+                    'builtup_area_to' => $officeRetailData['builtup_area_to'] ?? null,
+                    'builtup_area_unit_id' => $officeRetailData['builtup_area_unit_id'] ?? null,
+                ]);
+            }
+
+            // Create Office & Retail Retail Unit Details
+            if ($request->has('office_retail_retail_unit_details') && is_array($request->office_retail_retail_unit_details)) {
+                foreach ($request->office_retail_retail_unit_details as $unitData) {
+                    // Filter out completely empty entries
+                    if (!empty($unitData['tower_name']) || 
+                        !empty($unitData['sub_category_id']) || 
+                        !empty($unitData['size_from']) || 
+                        !empty($unitData['front_opening']) || 
+                        !empty($unitData['no_of_unit_each_floor']) || 
+                        !empty($unitData['ceiling_height'])) {
+                        ProjectOfficeRetailRetailUnitDetail::create([
+                            'project_id' => $project->id,
+                            'tower_name' => $unitData['tower_name'] ?? null,
+                            'sub_category_id' => $unitData['sub_category_id'] ?? null,
+                            'size_from' => $unitData['size_from'] ?? null,
+                            'size_to' => $unitData['size_to'] ?? null,
+                            'size_unit_id' => $unitData['size_unit_id'] ?? null,
+                            'front_opening' => $unitData['front_opening'] ?? null,
+                            'front_opening_unit_id' => $unitData['front_opening_unit_id'] ?? null,
+                            'no_of_unit_each_floor' => $unitData['no_of_unit_each_floor'] ?? null,
+                            'ceiling_height' => $unitData['ceiling_height'] ?? null,
+                            'ceiling_height_unit_id' => $unitData['ceiling_height_unit_id'] ?? null,
+                        ]);
+                    }
+                }
+            }
+
             // Create basement parking
             if ($request->has('basement_parking') && is_array($request->basement_parking)) {
                 foreach ($request->basement_parking as $parkingData) {
@@ -495,6 +554,8 @@ class ProjectController extends Controller
             'category5TowerDetails',
             'category5UnitDetails',
             'category6Data',
+            'officeRetailData',
+            'officeRetailRetailUnitDetails',
             'basementParking',
             'amenities',
             'documents' => function ($query) {
@@ -869,6 +930,65 @@ class ProjectController extends Controller
                     'constructed_saleable_area_to' => $category6Data['constructed_saleable_area_to'] ?? null,
                     'constructed_saleable_area_unit_id' => $category6Data['constructed_saleable_area_unit_id'] ?? null,
                 ]);
+            }
+
+            // Update Office & Retail data
+            $project->officeRetailData()->delete();
+            if ($request->has('office_retail_data')) {
+                $officeRetailData = $request->input('office_retail_data');
+                ProjectOfficeRetailData::create([
+                    'project_id' => $project->id,
+                    'office_sub_category_id' => $officeRetailData['office_sub_category_id'] ?? null,
+                    'no_of_towers' => $officeRetailData['no_of_towers'] ?? null,
+                    'no_of_floors' => $officeRetailData['no_of_floors'] ?? null,
+                    'no_of_unit_each_tower' => $officeRetailData['no_of_unit_each_tower'] ?? null,
+                    'no_of_lift' => $officeRetailData['no_of_lift'] ?? null,
+                    'front_road_width' => $officeRetailData['front_road_width'] ?? null,
+                    'front_road_width_unit_id' => $officeRetailData['front_road_width_unit_id'] ?? null,
+                    'washroom' => $officeRetailData['washroom'] ?? null,
+                    'two_road_corner' => isset($officeRetailData['two_road_corner']) && ($officeRetailData['two_road_corner'] === '1' || $officeRetailData['two_road_corner'] === true || $officeRetailData['two_road_corner'] === 'true'),
+                    'tower_name' => $officeRetailData['tower_name'] ?? null,
+                    'total_units' => $officeRetailData['total_units'] ?? null,
+                    'saleable_from' => $officeRetailData['saleable_from'] ?? null,
+                    'saleable_to' => $officeRetailData['saleable_to'] ?? null,
+                    'saleable_unit_id' => $officeRetailData['saleable_unit_id'] ?? null,
+                    'show_carpet_area' => isset($officeRetailData['show_carpet_area']) && ($officeRetailData['show_carpet_area'] === '1' || $officeRetailData['show_carpet_area'] === true || $officeRetailData['show_carpet_area'] === 'true'),
+                    'carpet_area_from' => $officeRetailData['carpet_area_from'] ?? null,
+                    'carpet_area_to' => $officeRetailData['carpet_area_to'] ?? null,
+                    'carpet_area_unit_id' => $officeRetailData['carpet_area_unit_id'] ?? null,
+                    'show_builtup_area' => isset($officeRetailData['show_builtup_area']) && ($officeRetailData['show_builtup_area'] === '1' || $officeRetailData['show_builtup_area'] === true || $officeRetailData['show_builtup_area'] === 'true'),
+                    'builtup_area_from' => $officeRetailData['builtup_area_from'] ?? null,
+                    'builtup_area_to' => $officeRetailData['builtup_area_to'] ?? null,
+                    'builtup_area_unit_id' => $officeRetailData['builtup_area_unit_id'] ?? null,
+                ]);
+            }
+
+            // Update Office & Retail Retail Unit Details - delete old and create new
+            $project->officeRetailRetailUnitDetails()->delete();
+            if ($request->has('office_retail_retail_unit_details') && is_array($request->office_retail_retail_unit_details)) {
+                foreach ($request->office_retail_retail_unit_details as $unitData) {
+                    // Filter out completely empty entries
+                    if (!empty($unitData['tower_name']) || 
+                        !empty($unitData['sub_category_id']) || 
+                        !empty($unitData['size_from']) || 
+                        !empty($unitData['front_opening']) || 
+                        !empty($unitData['no_of_unit_each_floor']) || 
+                        !empty($unitData['ceiling_height'])) {
+                        ProjectOfficeRetailRetailUnitDetail::create([
+                            'project_id' => $project->id,
+                            'tower_name' => $unitData['tower_name'] ?? null,
+                            'sub_category_id' => $unitData['sub_category_id'] ?? null,
+                            'size_from' => $unitData['size_from'] ?? null,
+                            'size_to' => $unitData['size_to'] ?? null,
+                            'size_unit_id' => $unitData['size_unit_id'] ?? null,
+                            'front_opening' => $unitData['front_opening'] ?? null,
+                            'front_opening_unit_id' => $unitData['front_opening_unit_id'] ?? null,
+                            'no_of_unit_each_floor' => $unitData['no_of_unit_each_floor'] ?? null,
+                            'ceiling_height' => $unitData['ceiling_height'] ?? null,
+                            'ceiling_height_unit_id' => $unitData['ceiling_height_unit_id'] ?? null,
+                        ]);
+                    }
+                }
             }
 
             // Update basement parking - delete old and create new

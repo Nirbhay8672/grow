@@ -301,8 +301,8 @@ const updateSubCategory = (value: string) => {
             </div>
         </div>
 
-        <!-- Category Selection (shown after construction type is selected) -->
-        <div v-if="modelValue.construction_type_id" class="mb-4">
+        <!-- Category Selection (shown after construction type is selected, but not for construction type 3) -->
+        <div v-if="modelValue.construction_type_id && modelValue.construction_type_id !== '3' && categories.length > 0" class="mb-4">
             <h5 class="mb-3 section-title">Category</h5>
             <div v-if="categories.length === 0" class="text-muted mb-3">
                 Loading categories...
@@ -340,8 +340,8 @@ const updateSubCategory = (value: string) => {
             </div>
         </div>
 
-        <!-- Sub-Category Selection (shown after category is selected, only if sub-categories exist) -->
-        <div v-if="modelValue.category_id && subCategories.length > 0" class="mb-4">
+        <!-- Sub-Category Selection (shown after category is selected, only if sub-categories exist, but not for construction type 3) -->
+        <div v-if="modelValue.category_id && modelValue.construction_type_id !== '3' && subCategories.length > 0" class="mb-4">
             <h5 class="mb-3 section-title">Sub Category</h5>
             <div class="form-group">
                 <div class="d-flex flex-wrap gap-3">

@@ -16,6 +16,7 @@ import Category3Form from './components/Category3Form.vue';
 import Category4Form from './components/Category4Form.vue';
 import Category5Form from './components/Category5Form.vue';
 import Category6Form from './components/Category6Form.vue';
+import OfficeRetailForm from './components/OfficeRetailForm.vue';
 
 declare global {
     interface Window {
@@ -391,6 +392,45 @@ const form = reactive({
         constructed_saleable_area_to: '',
         constructed_saleable_area_unit_id: '',
     },
+    
+    // Office & Retail Data (Combination of Office and Retail)
+    office_retail_data: {
+        office_sub_category_id: '',
+        no_of_towers: '',
+        no_of_floors: '',
+        no_of_unit_each_tower: '',
+        no_of_lift: '',
+        front_road_width: '',
+        front_road_width_unit_id: '',
+        washroom: 'Private',
+        two_road_corner: false,
+        tower_name: '',
+        total_units: '',
+        saleable_from: '',
+        saleable_to: '',
+        saleable_unit_id: '',
+        show_carpet_area: false,
+        carpet_area_from: '',
+        carpet_area_to: '',
+        carpet_area_unit_id: '',
+        show_builtup_area: false,
+        builtup_area_from: '',
+        builtup_area_to: '',
+        builtup_area_unit_id: '',
+    },
+    office_retail_retail_unit_details: [] as Array<{
+        id: number;
+        tower_name: string;
+        sub_category_id: string;
+        size_from: string;
+        size_to: string;
+        size_unit_id: string;
+        front_opening: string;
+        front_opening_unit_id: string;
+        no_of_unit_each_floor: string;
+        ceiling_height: string;
+        ceiling_height_unit_id: string;
+    }>,
     
     // Tower Details Array (multiple towers) - Always start with one entry
     tower_details: [{
@@ -891,16 +931,50 @@ const handleSubmit = async () => {
         
         // Step 2: Construction Type & Category
         formData.append('construction_type_id', form.construction_type_id);
-        formData.append('category_id', form.category_id);
-        if (form.sub_category_id) {
-            if (Array.isArray(form.sub_category_id)) {
-                // For Retail (ID 2), Category 4 (ID 4), and Category 7 (ID 7), sub_category_id is an array
-                form.sub_category_id.forEach((id: string) => {
+        
+        // For Construction Type 3 (Office & Retail), ensure category_id is set
+        // Since category selection is hidden for construction type 3, we need to set it explicitly
+        if (form.construction_type_id === '3') {
+            // For Office & Retail, we can set category_id to '1' (Office) as the primary category
+            // or leave it empty if backend doesn't require it
+            // But let's send it if it exists, otherwise set a default
+            const categoryId = form.category_id || '1'; // Default to Office category ID
+            formData.append('category_id', categoryId);
+        } else {
+            formData.append('category_id', form.category_id);
+        }
+        
+        // For Construction Type 3 (Office & Retail), send both single and array
+        if (form.construction_type_id === '3') {
+            const officeRetailData = (form as any).office_retail_data;
+            // Send Office sub-category as single value
+            if (officeRetailData && officeRetailData.office_sub_category_id) {
+                formData.append('sub_category_id', officeRetailData.office_sub_category_id);
+            }
+            // Send Retail sub-categories as array
+            if (Array.isArray(form.sub_category_id) && form.sub_category_id.length > 0) {
+                // Get retail sub-category IDs from the computed property
+                const retailSubCatIds = officeRetailRetailSubCategories.value.map((subCat: any) => String(subCat.id));
+                // Filter form.sub_category_id to only include Retail sub-categories
+                const selectedRetailSubCatIds = form.sub_category_id.filter((id: string) => 
+                    retailSubCatIds.includes(String(id))
+                );
+                selectedRetailSubCatIds.forEach((id: string) => {
                     formData.append('sub_category_ids[]', id);
                 });
-            } else {
-                // For other categories, single value
-                formData.append('sub_category_id', form.sub_category_id);
+            }
+        } else {
+            // For other construction types
+            if (form.sub_category_id) {
+                if (Array.isArray(form.sub_category_id)) {
+                    // For Retail (ID 2), Category 4 (ID 4), and Category 7 (ID 7), sub_category_id is an array
+                    form.sub_category_id.forEach((id: string) => {
+                        formData.append('sub_category_ids[]', id);
+                    });
+                } else {
+                    // For other categories, single value
+                    formData.append('sub_category_id', form.sub_category_id);
+                }
             }
         }
         
@@ -1087,6 +1161,49 @@ const handleSubmit = async () => {
             }
         }
         
+        // Step 2: Office & Retail Data (for Construction Type 3)
+        if (form.construction_type_id === '3' && (form as any).office_retail_data) {
+            const data = (form as any).office_retail_data;
+            if (data.office_sub_category_id) formData.append('office_retail_data[office_sub_category_id]', data.office_sub_category_id);
+            if (data.no_of_towers) formData.append('office_retail_data[no_of_towers]', data.no_of_towers);
+            if (data.no_of_floors) formData.append('office_retail_data[no_of_floors]', data.no_of_floors);
+            if (data.no_of_unit_each_tower) formData.append('office_retail_data[no_of_unit_each_tower]', data.no_of_unit_each_tower);
+            if (data.no_of_lift) formData.append('office_retail_data[no_of_lift]', data.no_of_lift);
+            if (data.front_road_width) formData.append('office_retail_data[front_road_width]', data.front_road_width);
+            if (data.front_road_width_unit_id) formData.append('office_retail_data[front_road_width_unit_id]', data.front_road_width_unit_id);
+            if (data.washroom) formData.append('office_retail_data[washroom]', data.washroom);
+            formData.append('office_retail_data[two_road_corner]', data.two_road_corner ? '1' : '0');
+            if (data.tower_name) formData.append('office_retail_data[tower_name]', data.tower_name);
+            if (data.total_units) formData.append('office_retail_data[total_units]', data.total_units);
+            if (data.saleable_from) formData.append('office_retail_data[saleable_from]', data.saleable_from);
+            if (data.saleable_to) formData.append('office_retail_data[saleable_to]', data.saleable_to);
+            if (data.saleable_unit_id) formData.append('office_retail_data[saleable_unit_id]', data.saleable_unit_id);
+            formData.append('office_retail_data[show_carpet_area]', data.show_carpet_area ? '1' : '0');
+            if (data.carpet_area_from) formData.append('office_retail_data[carpet_area_from]', data.carpet_area_from);
+            if (data.carpet_area_to) formData.append('office_retail_data[carpet_area_to]', data.carpet_area_to);
+            if (data.carpet_area_unit_id) formData.append('office_retail_data[carpet_area_unit_id]', data.carpet_area_unit_id);
+            formData.append('office_retail_data[show_builtup_area]', data.show_builtup_area ? '1' : '0');
+            if (data.builtup_area_from) formData.append('office_retail_data[builtup_area_from]', data.builtup_area_from);
+            if (data.builtup_area_to) formData.append('office_retail_data[builtup_area_to]', data.builtup_area_to);
+            if (data.builtup_area_unit_id) formData.append('office_retail_data[builtup_area_unit_id]', data.builtup_area_unit_id);
+        }
+        
+        // Step 2: Office & Retail Retail Unit Details (for Construction Type 3)
+        if (form.construction_type_id === '3' && (form as any).office_retail_retail_unit_details && (form as any).office_retail_retail_unit_details.length > 0) {
+            (form as any).office_retail_retail_unit_details.forEach((unit: any, index: number) => {
+                if (unit.tower_name) formData.append(`office_retail_retail_unit_details[${index}][tower_name]`, unit.tower_name);
+                if (unit.sub_category_id) formData.append(`office_retail_retail_unit_details[${index}][sub_category_id]`, unit.sub_category_id);
+                if (unit.size_from) formData.append(`office_retail_retail_unit_details[${index}][size_from]`, unit.size_from);
+                if (unit.size_to) formData.append(`office_retail_retail_unit_details[${index}][size_to]`, unit.size_to);
+                if (unit.size_unit_id) formData.append(`office_retail_retail_unit_details[${index}][size_unit_id]`, unit.size_unit_id);
+                if (unit.front_opening) formData.append(`office_retail_retail_unit_details[${index}][front_opening]`, unit.front_opening);
+                if (unit.front_opening_unit_id) formData.append(`office_retail_retail_unit_details[${index}][front_opening_unit_id]`, unit.front_opening_unit_id);
+                if (unit.no_of_unit_each_floor) formData.append(`office_retail_retail_unit_details[${index}][no_of_unit_each_floor]`, unit.no_of_unit_each_floor);
+                if (unit.ceiling_height) formData.append(`office_retail_retail_unit_details[${index}][ceiling_height]`, unit.ceiling_height);
+                if (unit.ceiling_height_unit_id) formData.append(`office_retail_retail_unit_details[${index}][ceiling_height_unit_id]`, unit.ceiling_height_unit_id);
+            });
+        }
+        
         // Step 2: Tower Details Array
         if (form.tower_details && form.tower_details.length > 0) {
             form.tower_details.forEach((tower: any, index: number) => {
@@ -1222,7 +1339,14 @@ const handleNext = () => {
         }
         currentStep.value = 2;
     } else if (currentStep.value === 2) {
-        // Validate step 2 before proceeding
+        // Skip all frontend validation for Construction Type 3 (Office & Retail)
+        // Backend validation will handle it
+        if (form.construction_type_id === '3') {
+            currentStep.value = 3;
+            return;
+        }
+        
+        // Validate step 2 before proceeding (for other construction types)
         errors.value = {};
         let hasError = false;
         
@@ -1350,6 +1474,74 @@ const category4SubCategories = computed(() => {
     }
     
     // If no sub-categories selected yet, return empty array
+    return [];
+});
+
+// Get sub-categories for Office (Category 1) - for construction type 3
+const officeSubCategories = computed(() => {
+    if (!form.construction_type_id || form.construction_type_id !== '3') {
+        return [];
+    }
+    
+    // First try to find from construction type 3
+    const selectedConstructionType = props.constructionTypes.find(
+        (ct) => ct.id === Number(form.construction_type_id)
+    );
+    
+    if (selectedConstructionType && selectedConstructionType.categories) {
+        const officeCategory = selectedConstructionType.categories.find(
+            (cat) => cat.id === 1
+        );
+        
+        if (officeCategory && officeCategory.sub_categories) {
+            return officeCategory.sub_categories;
+        }
+    }
+    
+    // If not found in construction type 3, try to find from any construction type that has category 1
+    for (const ct of props.constructionTypes) {
+        if (ct.categories) {
+            const officeCategory = ct.categories.find((cat) => cat.id === 1);
+            if (officeCategory && officeCategory.sub_categories) {
+                return officeCategory.sub_categories;
+            }
+        }
+    }
+    
+    return [];
+});
+
+// Get sub-categories for Retail (Category 2) - for Office & Retail combination (construction type 3)
+const officeRetailRetailSubCategories = computed(() => {
+    if (!form.construction_type_id || form.construction_type_id !== '3') {
+        return [];
+    }
+    
+    // First try to find from construction type 3
+    const selectedConstructionType = props.constructionTypes.find(
+        (ct) => ct.id === Number(form.construction_type_id)
+    );
+    
+    if (selectedConstructionType && selectedConstructionType.categories) {
+        const retailCategory = selectedConstructionType.categories.find(
+            (cat) => cat.id === 2
+        );
+        
+        if (retailCategory && retailCategory.sub_categories) {
+            return retailCategory.sub_categories;
+        }
+    }
+    
+    // If not found in construction type 3, try to find from any construction type that has category 2
+    for (const ct of props.constructionTypes) {
+        if (ct.categories) {
+            const retailCategory = ct.categories.find((cat) => cat.id === 2);
+            if (retailCategory && retailCategory.sub_categories) {
+                return retailCategory.sub_categories;
+            }
+        }
+    }
+    
     return [];
 });
 
@@ -1662,6 +1854,97 @@ const initializeFormFromProject = async () => {
         };
     }
 
+    // Handle Office & Retail data
+    const officeRetailData = (project as any).office_retail_data || (project as any).officeRetailData;
+    if (officeRetailData) {
+        (form as any).office_retail_data = {
+            office_sub_category_id: officeRetailData.office_sub_category_id ? String(officeRetailData.office_sub_category_id) : '',
+            no_of_towers: officeRetailData.no_of_towers || '',
+            no_of_floors: officeRetailData.no_of_floors || '',
+            no_of_unit_each_tower: officeRetailData.no_of_unit_each_tower || '',
+            no_of_lift: officeRetailData.no_of_lift || '',
+            front_road_width: officeRetailData.front_road_width || '',
+            front_road_width_unit_id: officeRetailData.front_road_width_unit_id ? String(officeRetailData.front_road_width_unit_id) : '',
+            washroom: officeRetailData.washroom || 'Private',
+            two_road_corner: officeRetailData.two_road_corner || false,
+            tower_name: officeRetailData.tower_name || '',
+            total_units: officeRetailData.total_units || '',
+            saleable_from: officeRetailData.saleable_from || '',
+            saleable_to: officeRetailData.saleable_to || '',
+            saleable_unit_id: officeRetailData.saleable_unit_id ? String(officeRetailData.saleable_unit_id) : '',
+            show_carpet_area: (officeRetailData.carpet_area_from || officeRetailData.carpet_area_to || officeRetailData.carpet_area_unit_id) ? true : false,
+            carpet_area_from: officeRetailData.carpet_area_from || '',
+            carpet_area_to: officeRetailData.carpet_area_to || '',
+            carpet_area_unit_id: officeRetailData.carpet_area_unit_id ? String(officeRetailData.carpet_area_unit_id) : '',
+            show_builtup_area: (officeRetailData.builtup_area_from || officeRetailData.builtup_area_to || officeRetailData.builtup_area_unit_id) ? true : false,
+            builtup_area_from: officeRetailData.builtup_area_from || '',
+            builtup_area_to: officeRetailData.builtup_area_to || '',
+            builtup_area_unit_id: officeRetailData.builtup_area_unit_id ? String(officeRetailData.builtup_area_unit_id) : '',
+        };
+    } else {
+        (form as any).office_retail_data = {
+            office_sub_category_id: '',
+            no_of_towers: '',
+            no_of_floors: '',
+            no_of_unit_each_tower: '',
+            no_of_lift: '',
+            front_road_width: '',
+            front_road_width_unit_id: '',
+            washroom: 'Private',
+            two_road_corner: false,
+            tower_name: '',
+            total_units: '',
+            saleable_from: '',
+            saleable_to: '',
+            saleable_unit_id: '',
+            show_carpet_area: false,
+            carpet_area_from: '',
+            carpet_area_to: '',
+            carpet_area_unit_id: '',
+            show_builtup_area: false,
+            builtup_area_from: '',
+            builtup_area_to: '',
+            builtup_area_unit_id: '',
+        };
+    }
+
+    // Handle Office & Retail Retail Unit Details
+    const officeRetailRetailUnitDetails = (project as any).office_retail_retail_unit_details || (project as any).officeRetailRetailUnitDetails;
+    if (officeRetailRetailUnitDetails && officeRetailRetailUnitDetails.length > 0) {
+        (form as any).office_retail_retail_unit_details = officeRetailRetailUnitDetails.map((unit: any, index: number) => ({
+            id: unit.id || Date.now() + index,
+            tower_name: unit.tower_name || '',
+            sub_category_id: unit.sub_category_id ? String(unit.sub_category_id) : '',
+            size_from: unit.size_from || '',
+            size_to: unit.size_to || '',
+            size_unit_id: unit.size_unit_id ? String(unit.size_unit_id) : '',
+            front_opening: unit.front_opening || '',
+            front_opening_unit_id: unit.front_opening_unit_id ? String(unit.front_opening_unit_id) : '',
+            no_of_unit_each_floor: unit.no_of_unit_each_floor || '',
+            ceiling_height: unit.ceiling_height || '',
+            ceiling_height_unit_id: unit.ceiling_height_unit_id ? String(unit.ceiling_height_unit_id) : '',
+        }));
+        
+        // Update selected retail sub-categories based on loaded data
+        const loadedSubCategoryIds = officeRetailRetailUnitDetails
+            .map((unit: any) => unit.sub_category_id ? String(unit.sub_category_id) : null)
+            .filter((id: string | null) => id !== null);
+        
+        // Merge with existing sub_category_id array
+        const currentSubCategories = Array.isArray(form.sub_category_id) 
+            ? [...form.sub_category_id] 
+            : (form.sub_category_id ? [form.sub_category_id] : []);
+        
+        // Remove retail sub-categories and add loaded ones
+        const filtered = currentSubCategories.filter(id => 
+            !officeRetailRetailSubCategories.value.some(subCat => String(subCat.id) === String(id))
+        );
+        
+        form.sub_category_id = [...filtered, ...loadedSubCategoryIds];
+    } else {
+        (form as any).office_retail_retail_unit_details = [];
+    }
+
     form.free_allotted_parking_four_wheeler = project.free_allotted_parking_four_wheeler || false;
     form.free_allotted_parking_two_wheeler = project.free_allotted_parking_two_wheeler || false;
     form.available_for_purchase = project.available_for_purchase || false;
@@ -1970,6 +2253,11 @@ onMounted(async () => {
                                         form.construction_type_id = value.construction_type_id;
                                         form.category_id = value.category_id;
                                         form.sub_category_id = value.sub_category_id;
+                                        
+                                        // For Construction Type 3 (Office & Retail), ensure category_id is set
+                                        if (value.construction_type_id === '3' && !value.category_id) {
+                                            form.category_id = '1'; // Default to Office category
+                                        }
                                     }"
                                 />
 
@@ -2014,6 +2302,16 @@ onMounted(async () => {
                                     :form="form"
                                     :errors="errors"
                                     :measurement-units="measurementUnits"
+                                />
+
+                                <!-- Office & Retail Form (when construction_type_id === '3') -->
+                                <OfficeRetailForm
+                                    v-else-if="form.construction_type_id === '3'"
+                                    :form="form"
+                                    :errors="errors"
+                                    :measurement-units="measurementUnits"
+                                    :office-sub-categories="officeSubCategories"
+                                    :retail-sub-categories="officeRetailRetailSubCategories"
                                 />
 
                                 <!-- Tower Details Section (Conditional based on Construction Type, Category, Sub Category) -->

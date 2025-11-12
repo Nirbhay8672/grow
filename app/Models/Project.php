@@ -186,6 +186,17 @@ class Project extends Model
         return $this->hasOne(ProjectCategory6Data::class);
     }
 
+    // Step 2: Office & Retail Data relationship
+    public function officeRetailData(): HasOne
+    {
+        return $this->hasOne(ProjectOfficeRetailData::class);
+    }
+
+    public function officeRetailRetailUnitDetails(): HasMany
+    {
+        return $this->hasMany(ProjectOfficeRetailRetailUnitDetail::class);
+    }
+
     // Step 2: Front Road Width Measurement Unit
     public function frontRoadWidthMeasurementUnit(): BelongsTo
     {
